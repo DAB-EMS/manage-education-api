@@ -13,6 +13,8 @@ import java.util.UUID;
 @Getter
 @Setter
 public class ProgramSyllabusId implements Serializable {
+
+    @Id
     @Column(name = "training_program_id")
     private UUID trainingProgramId;
 

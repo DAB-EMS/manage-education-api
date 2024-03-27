@@ -2,9 +2,7 @@ package com.example.manageeducation.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.Hibernate;
 
 import java.io.Serializable;
@@ -15,19 +13,15 @@ import java.util.Objects;
 @Getter
 @Setter
 public class ProgramSyllabus implements Serializable {
-    @EmbeddedId
+    @Id
     private ProgramSyllabusId id;
 
     @ManyToOne
-    @MapsId("training_program_id")
     @JoinColumn(name = "training_program_id")
-    @JsonBackReference
     private TrainingProgram trainingProgram;
 
     @ManyToOne
-    @MapsId("syllabus_id")
     @JoinColumn(name = "syllabus_id")
-    @JsonBackReference
     private Syllabus syllabus;
     private int position;
 
