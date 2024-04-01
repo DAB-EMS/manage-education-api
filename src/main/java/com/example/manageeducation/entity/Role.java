@@ -15,9 +15,9 @@ import java.util.UUID;
 @Setter
 public class Role {
     @Id
-    private UUID id;
+    private String id;
 
-    @Column(length = 60)
+    @Column(length = 30)
     @Enumerated(EnumType.STRING)
     private RoleType name;
 

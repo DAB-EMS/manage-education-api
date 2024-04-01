@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.info.License;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.servers.Server;
 import org.springframework.context.annotation.Configuration;
@@ -13,27 +14,32 @@ import org.springframework.context.annotation.Configuration;
 @OpenAPIDefinition(
         info = @Info(
                 contact = @Contact(
-                        name = "Dam Anh Bang",
+                        name = "Admin",
                         email = "damanhbangthpt@gmail.com",
-                        url = "http://localhost:8080/swagger-ui/index.html#/"
+                        url = "https://manageducation.monoinfinity.net"
                 ),
-                description = "OpenApi documentation for spring Security",
-                title = "OpenApi specification - AnhBang",
+                description = "Website help customer can manage student and teacher.",
+                title = "Manage Education",
                 version = "1.0",
                 license = @License(
-                        name = "License name",
-                        url = "http://localhost:8080/swagger-ui/index.html#/"
+                        name = "Licence name",
+                        url = "https://manageducation.monoinfinity.net"
                 ),
-                termsOfService = "Term of service"
+                termsOfService = "Terms of service"
         ),
         servers = {
                 @Server(
-                        description = "Local ENV",
-                        url = "http://localhost:8080"
+                        description = "Prod ENV",
+                        url = "https://manageducation.monoinfinity.net"
                 ),
                 @Server(
-                        description = "Pro ENV",
+                        description = "Local ENV",
                         url = "http://localhost:8080"
+                )
+        },
+        security = {
+                @SecurityRequirement(
+                        name = "bearerAuth"
                 )
         }
 )

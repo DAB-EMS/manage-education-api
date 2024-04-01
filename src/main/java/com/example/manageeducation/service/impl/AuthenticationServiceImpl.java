@@ -5,6 +5,7 @@ import com.example.manageeducation.dto.request.RegisterRequest;
 import com.example.manageeducation.dto.response.AuthenticationResponse;
 import com.example.manageeducation.entity.Customer;
 import com.example.manageeducation.entity.RefreshToken;
+import com.example.manageeducation.enums.Gender;
 import com.example.manageeducation.enums.TokenType;
 import com.example.manageeducation.repository.CustomerRepository;
 import com.example.manageeducation.repository.RefreshTokenRepository;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.Date;
 import java.util.List;
 
 @Service
@@ -46,10 +48,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public AuthenticationResponse register(RegisterRequest request) {
         var user = Customer.builder()
-                .fullname(request.getName())
+                .id(request.getId())
+                .fullName(request.getName())
                 .avatar(request.getAvatar())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
+                .gender(Gender.MALE)
+                .level("")
                 .role(request.getRole())//Role.USER
                 .build();
         var savedUser = customerRepository.save(user);
@@ -104,6 +109,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             token.setRevoked(true);
         });
         refreshTokenRepository.saveAll(validUserTokens);
+
     }
 
     @Override
