@@ -11,7 +11,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class RegisterRequest {
-    private UUID id;
+    private String id;
     private String name;
     private String avatar;
     private String email;

@@ -12,15 +12,18 @@ import java.util.Objects;
 @Getter
 @Setter
 public class ProgramSyllabus implements Serializable {
-    @Id
+
+    @EmbeddedId
     private ProgramSyllabusId id;
 
     @ManyToOne
-    @JoinColumn(name = "training_program_id")
+    @MapsId("trainingProgramId")
+    @JoinColumn(name = "training_program_id", insertable = false, updatable = false)
     private TrainingProgram trainingProgram;
 
     @ManyToOne
-    @JoinColumn(name = "syllabus_id")
+    @MapsId("syllabusId")
+    @JoinColumn(name = "syllabus_id", insertable = false, updatable = false)
     private Syllabus syllabus;
     private int position;
 

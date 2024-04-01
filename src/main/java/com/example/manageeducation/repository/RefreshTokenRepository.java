@@ -17,7 +17,7 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, UUID
       on t.customer.id = u.id\s
       where u.id = :id and (t.expiryDate = false or t.revoked = false)\s
       """)
-    List<RefreshToken> findAllValidTokenByUser(UUID id);
+    List<RefreshToken> findAllValidTokenByUser(String id);
 
     Optional<RefreshToken> findByToken(String token);
 }

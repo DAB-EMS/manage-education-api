@@ -24,7 +24,7 @@ public class CustomerServiceImpl implements CustomerService {
                 throw new BadRequestException("Email not exist in system.");
             }
         }catch (Exception e){
-            throw new BadRequestException("Error when get customer by email.");
+            return null;
         }
     }
 }

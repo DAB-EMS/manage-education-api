@@ -26,7 +26,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-@RequiredArgsConstructor
 public class AuthController {
 
     @Autowired
@@ -44,11 +43,9 @@ public class AuthController {
     @PostMapping("/firebase")
     public ResponseEntity<AuthenticationResponse> authorizeToken(@RequestBody String token) {
         try {
-            // Xác thực token
             FirebaseToken decodedToken = firebaseService.verifyToken(token);
 
             String uid = decodedToken.getUid();
-            UUID id = UUID.fromString(uid);
             String email = decodedToken.getEmail();
             String name = decodedToken.getName();
             String picture = decodedToken.getPicture();
@@ -58,16 +55,14 @@ public class AuthController {
                 request.setEmail(email);
                 request.setPassword("");
                 return ResponseEntity.ok(authenticationService.authenticate(request));
-                //authenticationService.authenticate();
             }else{
                 RegisterRequest request = new RegisterRequest();
-                request.setId(id);
+                request.setId(uid);
                 request.setName(name);
                 request.setAvatar(picture);
                 request.setEmail(email);
                 request.setPassword("");
-                UUID roleId = UUID.fromString("your_uuid_here");
-                request.setRole(roleService.GetRoleById(roleId));
+                request.setRole(roleService.GetRoleByName());
 
                 return ResponseEntity.ok(authenticationService.register(request));
             }
