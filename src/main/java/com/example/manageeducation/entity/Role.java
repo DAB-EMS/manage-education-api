@@ -16,7 +16,6 @@ import java.util.UUID;
 @Setter
 public class Role {
     @Id
-    @GeneratedValue
     private UUID id;
 
     @Column(length = 60)
