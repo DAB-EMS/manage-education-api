@@ -6,7 +6,6 @@ import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.validation.constraints.NotNull;
-import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,8 +20,8 @@ public class RefreshToken {
             name = "UUID",
             strategy = "org.hibernate.id.UUIDGenerator"
     )
-    @Column(name = "id", updatable = false, nullable = false)
-    private UUID id;
+    @Column(name = "id", nullable = false)
+    private String id;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")

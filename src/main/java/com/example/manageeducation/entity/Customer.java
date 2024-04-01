@@ -18,8 +18,8 @@ import java.util.*;
 @Setter
 public class Customer implements UserDetails {
     @Id
-    @Column(name = "id", updatable = false, nullable = false)
     private String id;
+
     @NonNull
     private String email;
     private String avatar;
@@ -28,7 +28,7 @@ public class Customer implements UserDetails {
     private Instant expiredDate;
     private Instant createdDate;
     private Instant updatedDate;
-    private String fullname;
+    private String fullName;
 
     private Date birthday;
     private Gender gender;

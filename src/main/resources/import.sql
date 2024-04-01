@@ -1,0 +1,2 @@
+-- INSERT INTO role(id,name)
+-- VALUES ('a358a9e2-48a7-48ea-8f1b-93591130da1p','USER');
