@@ -4,25 +4,54 @@ import com.example.manageeducation.dto.request.AuthenticationRequest;
 import com.example.manageeducation.dto.request.RegisterRequest;
 import com.example.manageeducation.dto.response.AuthenticationResponse;
 import com.example.manageeducation.entity.Customer;
+import com.example.manageeducation.entity.RefreshToken;
+import com.example.manageeducation.enums.TokenType;
+import com.example.manageeducation.repository.CustomerRepository;
+import com.example.manageeducation.repository.RefreshTokenRepository;
+import com.example.manageeducation.security.JwtService;
+import com.example.manageeducation.service.AuthenticationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
-public class AuthenticationServiceImpl implements AuthenticationService{
+@RequiredArgsConstructor
+public class AuthenticationServiceImpl implements AuthenticationService {
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
+    @Autowired
+    AuthenticationManager authenticationManager;
+
+    @Autowired
+    CustomerRepository customerRepository;
+
+    @Autowired
+    RefreshTokenRepository refreshTokenRepository;
+
+    @Autowired
+    JwtService jwtService;
+
     @Override
     public AuthenticationResponse register(RegisterRequest request) {
-        var user = User.builder()
-                .firstname(request.getFirstname())
-                .lastname(request.getLastname())
+        var user = Customer.builder()
+                .fullname(request.getName())
+                .avatar(request.getAvatar())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())//Role.USER
                 .build();
-        var savedUser = repository.save(user);
+        var savedUser = customerRepository.save(user);
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         saveUserToken(savedUser, jwtToken);
@@ -40,7 +69,7 @@ public class AuthenticationServiceImpl implements AuthenticationService{
                         request.getPassword()
                 )
         );
-        var user = repository.findByEmail(request.getEmail())
+        var user = customerRepository.findByEmail(request.getEmail())
                 .orElseThrow();
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
@@ -54,28 +83,29 @@ public class AuthenticationServiceImpl implements AuthenticationService{
 
     @Override
     public void saveUserToken(Customer customer, String jwtToken) {
-        var token = Token.builder()
-                .user(user)
+        var token = RefreshToken.builder()
+                .customer(customer)
                 .token(jwtToken)
                 .tokenType(TokenType.BEARER)
-                .expired(false)
+                .expiryDate(false)
                 .revoked(false)
                 .build();
-        tokenRepository.save(token);
+        refreshTokenRepository.save(token);
     }
 
     @Override
     public void revokeAllUserTokens(Customer customer) {
-        var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
+        List<RefreshToken> validUserTokens = refreshTokenRepository.findAllValidTokenByUser(customer.getId());
         if (validUserTokens.isEmpty())
             return;
         validUserTokens.forEach(token -> {
-            token.setExpired(true);
+            token.setExpiryDate(true);
             token.setRevoked(true);
         });
-        tokenRepository.saveAll(validUserTokens);
+        refreshTokenRepository.saveAll(validUserTokens);
     }
 
+    @Override
     public void refreshToken(
             HttpServletRequest request,
             HttpServletResponse response
@@ -89,7 +119,7 @@ public class AuthenticationServiceImpl implements AuthenticationService{
         refreshToken = authHeader.substring(7);
         userEmail = jwtService.extractUsername(refreshToken);
         if (userEmail != null) {
-            var user = this.repository.findByEmail(userEmail)
+            var user = this.customerRepository.findByEmail(userEmail)
                     .orElseThrow();
             if (jwtService.isTokenValid(refreshToken, user)) {
                 var accessToken = jwtService.generateToken(user);
