@@ -2,10 +2,7 @@ package com.example.manageeducation.entity;
 
 import com.example.manageeducation.enums.Gender;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,13 +12,13 @@ import java.time.Instant;
 import java.util.*;
 
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Getter
 @Setter
 public class Customer implements UserDetails {
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
     @NonNull
@@ -37,6 +34,9 @@ public class Customer implements UserDetails {
     private Date birthday;
     private Gender gender;
     private String level;
+
+    @ManyToOne
+    @JoinColumn(name = "role_id")
     private Role role;
 
     @Override

@@ -1,9 +1,8 @@
 package com.example.manageeducation.entity;
 
+import com.example.manageeducation.enums.TokenType;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
@@ -12,6 +11,8 @@ import java.time.Instant;
 import java.util.UUID;
 
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Getter
 @Setter
@@ -33,7 +34,10 @@ public class RefreshToken {
     @Column(nullable = false, unique = true)
     private String token;
 
-    @Column(nullable = false)
-    @NotNull
-    private Instant expiryDate;
+    @Enumerated(EnumType.STRING)
+    public TokenType tokenType = TokenType.BEARER;
+
+    public boolean revoked;
+
+    private boolean expiryDate;
 }

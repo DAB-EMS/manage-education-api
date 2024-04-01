@@ -1,5 +1,6 @@
 package com.example.manageeducation.entity;
 
+import com.example.manageeducation.enums.RoleType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -19,13 +21,9 @@ public class Role {
     private UUID id;
 
     @Column(length = 60)
-    private String name;
+    @Enumerated(EnumType.STRING)
+    private RoleType name;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JsonIgnore
-    @JoinTable(name = "role_authority",
-            joinColumns = @JoinColumn(name = "role_id"),
-            inverseJoinColumns = @JoinColumn(name = "authority_id")
-    )
-    Set<Authority> authorities;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "role")
+    private List<Customer> customers;
 }
