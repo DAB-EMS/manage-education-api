@@ -1,6 +1,7 @@
 package com.example.manageeducation.service.impl;
 
 import com.example.manageeducation.entity.Role;
+import com.example.manageeducation.enums.RoleType;
 import com.example.manageeducation.exception.BadRequestException;
 import com.example.manageeducation.repository.RoleRepository;
 import com.example.manageeducation.service.RoleService;
@@ -17,9 +18,9 @@ public class RoleServiceImpl implements RoleService {
     RoleRepository roleRepository;
 
     @Override
-    public Role GetRoleById(UUID Id) {
+    public Role GetRoleByName() {
         try{
-            Optional<Role> roleOptional = roleRepository.findById(Id);
+            Optional<Role> roleOptional = roleRepository.findByName(RoleType.USER);
             if(roleOptional.isPresent()){
                 return roleOptional.get();
             }else{

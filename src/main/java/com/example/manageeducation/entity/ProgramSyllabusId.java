@@ -1,6 +1,8 @@
 package com.example.manageeducation.entity;
 
 import javax.persistence.*;
+
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,12 +10,12 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.UUID;
 
-@NoArgsConstructor
+@Embeddable
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProgramSyllabusId implements Serializable {
-
-    @Id
     @Column(name = "training_program_id")
     private UUID trainingProgramId;
 

@@ -19,7 +19,7 @@ import java.util.*;
 public class Customer implements UserDetails {
     @Id
     @Column(name = "id", updatable = false, nullable = false)
-    private UUID id;
+    private String id;
     @NonNull
     private String email;
     private String avatar;
