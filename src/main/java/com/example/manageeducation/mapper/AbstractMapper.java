@@ -1,5 +1,7 @@
 package com.example.manageeducation.mapper;
 
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -10,18 +12,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class AbstractMapper<E, D> {
 
     @Autowired
     ModelMapper modelMapper;
     Class<E> entityType;
     Class<D> dtoType;
-
-    @Autowired
-    public AbstractMapper(Class<E> entityType, Class<D> dtoType) {
-        this.entityType = entityType;
-        this.dtoType = dtoType;
-    }
 
     public E mapDtoToEntity(D dto) {
         return modelMapper.map(dto, entityType);

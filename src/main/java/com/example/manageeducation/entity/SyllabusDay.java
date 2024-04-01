@@ -1,7 +1,7 @@
 package com.example.manageeducation.entity;
 
 import com.example.manageeducation.enums.SyllabusDayStatus;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

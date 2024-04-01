@@ -5,10 +5,12 @@ import com.example.manageeducation.exception.BadRequestException;
 import com.example.manageeducation.repository.RoleRepository;
 import com.example.manageeducation.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.UUID;
 
+@Service
 public class RoleServiceImpl implements RoleService {
 
     @Autowired
