@@ -1,10 +1,9 @@
 package com.example.manageeducation.entity;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Type;
 
 import java.io.Serializable;
 import java.util.UUID;

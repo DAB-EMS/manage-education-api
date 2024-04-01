@@ -1,13 +1,11 @@
 package com.example.manageeducation.entity;
 
 import com.example.manageeducation.enums.TokenType;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
 
 import javax.validation.constraints.NotNull;
-import java.time.Instant;
 import java.util.UUID;
 
 @NoArgsConstructor

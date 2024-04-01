@@ -4,10 +4,10 @@ import com.example.manageeducation.dto.request.AuthenticationRequest;
 import com.example.manageeducation.dto.request.RegisterRequest;
 import com.example.manageeducation.dto.response.AuthenticationResponse;
 import com.example.manageeducation.entity.Customer;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Service

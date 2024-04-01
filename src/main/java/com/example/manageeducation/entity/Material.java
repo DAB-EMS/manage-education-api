@@ -1,12 +1,11 @@
 package com.example.manageeducation.entity;
 
 import com.example.manageeducation.enums.MaterialStatus;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
 
 import java.util.Date;
 import java.util.UUID;
