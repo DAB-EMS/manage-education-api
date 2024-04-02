@@ -1,5 +1,6 @@
 package com.example.manageeducation.service.impl;
 
+import com.example.manageeducation.dto.request.SyllabusRequest;
 import com.example.manageeducation.entity.Syllabus;
 import com.example.manageeducation.repository.SyllabusRepository;
 import com.example.manageeducation.service.SyllabusService;
@@ -13,8 +14,8 @@ public class SyllabusServiceImpl implements SyllabusService {
     SyllabusRepository syllabusRepository;
 
     @Override
-    public String createSyllabus(Syllabus dto) {
-        syllabusRepository.save(dto);
+    public String createSyllabus(SyllabusRequest dto) {
+//        syllabusRepository.save(dto);
         return "create successful";
     }
 }

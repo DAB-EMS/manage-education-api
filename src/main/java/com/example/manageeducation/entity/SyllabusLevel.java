@@ -6,8 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 import java.util.List;
+import java.util.UUID;
 
 @NoArgsConstructor
 @Entity
@@ -21,7 +23,8 @@ public class SyllabusLevel {
             strategy = "org.hibernate.id.UUIDGenerator"
     )
     @Column(name = "id", updatable = false, nullable = false)
-    private String id;
+    @Type(type = "org.hibernate.type.UUIDCharType")
+    private UUID id;
     private String name;
     @JsonIgnore
     @OneToMany(mappedBy = "syllabusLevel", orphanRemoval = true)

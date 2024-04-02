@@ -17,14 +17,13 @@ public class ProgramSyllabus implements Serializable {
     private ProgramSyllabusId id;
 
     @ManyToOne
-    @MapsId("trainingProgramId")
     @JoinColumn(name = "training_program_id", insertable = false, updatable = false)
     private TrainingProgram trainingProgram;
 
     @ManyToOne
-    @MapsId("syllabusId")
     @JoinColumn(name = "syllabus_id", insertable = false, updatable = false)
     private Syllabus syllabus;
+
     private int position;
 
     @Override

@@ -11,6 +11,7 @@ import lombok.ToString;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 import java.util.Date;
 import java.util.List;
@@ -29,7 +30,8 @@ public class Syllabus {
             strategy = "org.hibernate.id.UUIDGenerator"
     )
     @Column(name = "id", updatable = false, nullable = false)
-    private String id;
+    @Type(type = "org.hibernate.type.UUIDCharType")
+    private UUID id;
     private String name;
     private String code;
     private String version;
@@ -42,7 +44,7 @@ public class Syllabus {
     //	private int deliveryPrincipleId;// fk
     private int days;
     private int hours;
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private SyllabusStatus status;
     private boolean isTemplate;
     private UUID createdBy;
@@ -79,7 +81,6 @@ public class Syllabus {
 
     //Training Syllabus
     @OneToMany(mappedBy = "syllabus")
-    @ToString.Exclude
     @JsonManagedReference
     @JsonIgnore
     private List<ProgramSyllabus> programSyllabusAssociation; // relationship association
