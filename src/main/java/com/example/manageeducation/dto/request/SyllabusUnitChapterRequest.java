@@ -11,6 +11,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,6 +21,7 @@ public class SyllabusUnitChapterRequest {
     private String name;
     private double duration;
     private boolean isOnline;
+    private UUID outputStandardId;
 
     private List<MaterialRequest> materials;
 
