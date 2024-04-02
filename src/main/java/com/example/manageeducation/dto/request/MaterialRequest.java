@@ -17,11 +17,4 @@ import java.util.UUID;
 public class MaterialRequest {
     private String name;
     private String url;
-    private UUID createdBy;
-    private Date createdDate;
-    private UUID updatedBy;
-    private Date updatedDate;
-
-    @Lob
-    private byte[] data;
 }

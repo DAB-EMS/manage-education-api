@@ -8,7 +8,6 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,22 +27,10 @@ public class SyllabusRequest {
     @Enumerated(EnumType.STRING)
     private SyllabusStatus status;
     private boolean isTemplate;
-    private UUID createdBy;
-    @CreationTimestamp
-    private Date createdDate;
-    private UUID updatedBy;
-    @CreationTimestamp
-    private Date updatedDate;
 
     private AssessmentSchemeRequest assessmentScheme;
 
     private UUID syllabusLevel;
 
     private List<SyllabusDayRequest> syllabusDays;
-
-//    private DeliveryPrinciple deliveryPrinciple;
-//
-//    private List<SyllabusUnit> syllabusUnits;
-//
-//    private List<ProgramSyllabus> programSyllabusAssociation;
 }

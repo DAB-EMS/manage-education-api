@@ -1,10 +1,8 @@
 package com.example.manageeducation.service.impl;
 
-import com.example.manageeducation.dto.request.SyllabusDayRequest;
-import com.example.manageeducation.dto.request.SyllabusRequest;
-import com.example.manageeducation.dto.request.SyllabusUnitChapterRequest;
-import com.example.manageeducation.dto.request.SyllabusUnitRequest;
+import com.example.manageeducation.dto.request.*;
 import com.example.manageeducation.entity.*;
+import com.example.manageeducation.enums.MaterialStatus;
 import com.example.manageeducation.enums.SyllabusDayStatus;
 import com.example.manageeducation.exception.BadRequestException;
 import com.example.manageeducation.repository.*;
@@ -13,6 +11,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -47,10 +47,15 @@ public class SyllabusServiceImpl implements SyllabusService {
     CustomerRepository customerRepository;
 
     @Autowired
+    DeliveryTypeRepository deliveryTypeRepository;
+
+    @Autowired
     ModelMapper modelMapper;
 
     @Override
-    public String createSyllabus(SyllabusRequest dto) {
+    public String createSyllabus(String id, SyllabusRequest dto) {
+        LocalDate currentDate = LocalDate.now();
+        Date date = java.sql.Date.valueOf(currentDate);
         AssessmentScheme assessmentScheme = getAssessmentScheme(dto);
         AssessmentScheme saveAssessmentScheme = assessmentSchemeRepository.save(assessmentScheme);
 
@@ -61,12 +66,13 @@ public class SyllabusServiceImpl implements SyllabusService {
         }
 
         //check validation customer
-        Optional<Customer> customerOptional = customerRepository.findById(dto.getCreatedBy().toString());
+        Optional<Customer> customerOptional = customerRepository.findById(id);
         if(customerOptional.isEmpty()){
             throw new BadRequestException("Create by id not found.");
         }
 
-        Syllabus syllabus = getSyllabus(dto, saveAssessmentScheme, syllabusLevelOptional);
+        //save syllabus
+        Syllabus syllabus = getSyllabus(dto, saveAssessmentScheme, syllabusLevelOptional, id, date);
         Syllabus savedSyllabus = syllabusRepository.save(syllabus);
 
         //save syllabus days
@@ -101,15 +107,36 @@ public class SyllabusServiceImpl implements SyllabusService {
                         throw new BadRequestException("Output standard id is not found.");
                     }
 
-                    syllabusUnitChapter.setOutputStandard(outputStandardOptional.get());
+                    //check delivery type
+                    Optional<DeliveryType> deliveryTypeOptional = deliveryTypeRepository.findById(syllabusUnitChapterRequest.getDeliveryTypeId());
+                    if(deliveryTypeOptional.isEmpty()){
+                        throw new BadRequestException("Delivery type id is not found.");
+                    }
 
+                    syllabusUnitChapter.setOutputStandard(outputStandardOptional.get());
+                    syllabusUnitChapter.setDeliveryType(deliveryTypeOptional.get());
+                    SyllabusUnitChapter savedSyllabusUnitChapter = syllabusUnitChapterRepository.save(syllabusUnitChapter);
+
+                    //save material
+                    for(MaterialRequest materialRequest: syllabusUnitChapterRequest.getMaterials()){
+                        Material material = new Material();
+                        material.setName(materialRequest.getName());
+                        material.setUrl(materialRequest.getUrl());
+                        material.setCreatedBy(customerOptional.get().getId());
+                        material.setCreatedDate(date);
+                        material.setUpdatedBy(customerOptional.get().getId());
+                        material.setUpdatedDate(date);
+                        material.setMaterialStatus(MaterialStatus.ACTIVE);
+                        material.setUnitChapter(savedSyllabusUnitChapter);
+                        materialRepository.save(material);
+                    }
                 }
             }
         }
         return "create successful";
     }
 
-    private static Syllabus getSyllabus(SyllabusRequest dto, AssessmentScheme saveAssessmentScheme, Optional<SyllabusLevel> syllabusLevelOptional) {
+    private static Syllabus getSyllabus(SyllabusRequest dto, AssessmentScheme saveAssessmentScheme, Optional<SyllabusLevel> syllabusLevelOptional, String id, Date date) {
         Syllabus syllabus = new Syllabus();
         syllabus.setName(dto.getName());
         syllabus.setCode(dto.getCode());
@@ -121,10 +148,10 @@ public class SyllabusServiceImpl implements SyllabusService {
         syllabus.setHours(dto.getHours());
         syllabus.setStatus(dto.getStatus());
         syllabus.setTemplate(dto.isTemplate());
-        syllabus.setCreatedBy(dto.getCreatedBy());
-        syllabus.setCreatedDate(dto.getCreatedDate());
-        syllabus.setUpdatedBy(dto.getUpdatedBy());
-        syllabus.setUpdatedDate(dto.getUpdatedDate());
+        syllabus.setCreatedBy(id);
+        syllabus.setCreatedDate(date);
+        syllabus.setUpdatedBy(id);
+        syllabus.setUpdatedDate(date);
         syllabus.setAssessmentScheme(saveAssessmentScheme);
         syllabus.setSyllabusLevel(syllabusLevelOptional.get());
         return syllabus;
