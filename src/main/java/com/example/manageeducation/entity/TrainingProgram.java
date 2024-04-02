@@ -42,9 +42,9 @@ public class TrainingProgram {
 
     private Date updatedDate;
     private String version;
-    // private int duration; // day
 
-    @Enumerated(EnumType.ORDINAL)
+
+    @Enumerated(EnumType.STRING)
     private TrainingProgramStatus status;
 
     @OneToOne // đánh dấu có mối quan hệ 1-1 với Tranning class ở dưới
