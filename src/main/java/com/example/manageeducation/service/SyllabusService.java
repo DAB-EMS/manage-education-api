@@ -6,5 +6,5 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface SyllabusService {
-    String createSyllabus(SyllabusRequest dto);
+    String createSyllabus(String id, SyllabusRequest dto);
 }

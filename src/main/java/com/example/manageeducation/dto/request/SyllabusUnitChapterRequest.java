@@ -22,8 +22,7 @@ public class SyllabusUnitChapterRequest {
     private double duration;
     private boolean isOnline;
     private UUID outputStandardId;
+    private UUID deliveryTypeId;
 
     private List<MaterialRequest> materials;
-
-    private DeliveryType deliveryType;
 }

@@ -47,10 +47,10 @@ public class Syllabus {
     @Enumerated(EnumType.STRING)
     private SyllabusStatus status;
     private boolean isTemplate;
-    private UUID createdBy;
+    private String createdBy;
     @CreationTimestamp
     private Date createdDate;
-    private UUID updatedBy;
+    private String updatedBy;
     @CreationTimestamp
     private Date updatedDate;
 

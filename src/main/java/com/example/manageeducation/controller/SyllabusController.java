@@ -8,16 +8,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
-@RequestMapping("/api/v1/auth/syllabus")
+@RequestMapping("/api/v1/auth")
 public class SyllabusController {
 
     @Autowired
     SyllabusService syllabusService;
 
-    @PostMapping()
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> createSyllabus(@RequestBody SyllabusRequest dto) {
-        return ResponseEntity.ok(syllabusService.createSyllabus(dto));
+    @PostMapping("/customer/{customer-id}/syllabus")
+    public ResponseEntity<?> createSyllabus(@PathVariable("customer-id") String id, @RequestBody SyllabusRequest dto) {
+        return ResponseEntity.ok(syllabusService.createSyllabus(id,dto));
     }
 }
