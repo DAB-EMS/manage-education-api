@@ -21,6 +21,7 @@ public class AssessmentScheme {
             strategy = "org.hibernate.id.UUIDGenerator"
     )
     @Column(name = "id", updatable = false, nullable = false)
+    @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID id;
     private Double assignment;
     private Double quiz;

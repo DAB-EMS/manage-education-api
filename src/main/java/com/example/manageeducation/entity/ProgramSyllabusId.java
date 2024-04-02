@@ -16,9 +16,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProgramSyllabusId implements Serializable {
-    @Column(name = "training_program_id")
+    @Column(name = "training_program_id", columnDefinition = "BINARY(16)")
     private UUID trainingProgramId;
 
-    @Column(name = "syllabus_id")
+    @Column(name = "syllabus_id", columnDefinition = "BINARY(16)")
     private UUID syllabusId;
 }
