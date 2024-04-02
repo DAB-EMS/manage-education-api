@@ -29,7 +29,7 @@ public class Syllabus {
             strategy = "org.hibernate.id.UUIDGenerator"
     )
     @Column(name = "id", updatable = false, nullable = false)
-    private UUID id;
+    private String id;
     private String name;
     private String code;
     private String version;
