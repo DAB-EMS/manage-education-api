@@ -33,7 +33,11 @@ public class OutputStandardServiceImpl implements OutputStandardService {
     public OutputStandard updateOutputStandard(UUID id, OutputStandardRequest dto) {
         Optional<OutputStandard> outputStandardOptional = outputStandardRepository.findById(id);
         if(outputStandardOptional.isPresent()){
-            return outputStandardRepository.save(modelMapper.map(dto,OutputStandard.class));
+            OutputStandard outputStandard = outputStandardOptional.get();
+            outputStandard.setCode(dto.getCode());
+            outputStandard.setName(dto.getName());
+            outputStandard.setDescription(dto.getDescription());
+            return outputStandardRepository.save(outputStandard);
         }else{
             throw new BadRequestException("Output standard id not found.");
         }

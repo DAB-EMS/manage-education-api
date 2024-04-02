@@ -41,6 +41,9 @@ public class SyllabusServiceImpl implements SyllabusService {
     AssessmentSchemeRepository assessmentSchemeRepository;
 
     @Autowired
+    OutputStandardRepository outputStandardRepository;
+
+    @Autowired
     CustomerRepository customerRepository;
 
     @Autowired
@@ -91,6 +94,14 @@ public class SyllabusServiceImpl implements SyllabusService {
                     syllabusUnitChapter.setOnline(syllabusUnitChapterRequest.isOnline());
                     syllabusUnitChapter.setName(syllabusUnitChapterRequest.getName());
                     syllabusUnitChapter.setSyllabusUnit(savedSyllabusUnit);
+
+                    //check output standard
+                    Optional<OutputStandard> outputStandardOptional = outputStandardRepository.findById(syllabusUnitChapterRequest.getOutputStandardId());
+                    if(outputStandardOptional.isEmpty()){
+                        throw new BadRequestException("Output standard id is not found.");
+                    }
+
+                    syllabusUnitChapter.setOutputStandard(outputStandardOptional.get());
 
                 }
             }

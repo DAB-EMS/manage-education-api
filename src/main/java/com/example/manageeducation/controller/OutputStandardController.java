@@ -1,9 +1,7 @@
 package com.example.manageeducation.controller;
 
 import com.example.manageeducation.dto.request.OutputStandardRequest;
-import com.example.manageeducation.dto.request.SyllabusLevelRequest;
 import com.example.manageeducation.service.OutputStandardService;
-import com.example.manageeducation.service.SyllabusLevelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
