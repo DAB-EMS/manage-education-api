@@ -1,6 +1,7 @@
 package com.example.manageeducation.controller;
 
 import com.example.manageeducation.dto.request.SyllabusRequest;
+import com.example.manageeducation.dto.request.SyllabusUpdateRequest;
 import com.example.manageeducation.entity.Syllabus;
 import com.example.manageeducation.service.SyllabusService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,5 +39,15 @@ public class SyllabusController {
             @RequestParam(required = false) String search,
             @RequestParam(required = false) Date date) {
         return ResponseEntity.ok(syllabusService.syllabuses(search, date));
+    }
+
+    @DeleteMapping("/customer/syllabus/{syllabus-id}")
+    public ResponseEntity<?> deleteSyllabus(@PathVariable("syllabus-id") UUID id) {
+        return ResponseEntity.ok(syllabusService.deleteSyllabus(id));
+    }
+
+    @PutMapping("/customer/syllabus/{syllabus-id}")
+    public ResponseEntity<?> putSyllabus(@PathVariable("syllabus-id") UUID id, @RequestBody SyllabusUpdateRequest dto) {
+        return ResponseEntity.ok(syllabusService.updateSyllabus(id,dto));
     }
 }
