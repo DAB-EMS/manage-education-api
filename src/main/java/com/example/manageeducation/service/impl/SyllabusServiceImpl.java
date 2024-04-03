@@ -7,6 +7,7 @@ import com.example.manageeducation.dto.response.ViewSyllabusResponse;
 import com.example.manageeducation.entity.*;
 import com.example.manageeducation.enums.MaterialStatus;
 import com.example.manageeducation.enums.SyllabusDayStatus;
+import com.example.manageeducation.enums.SyllabusStatus;
 import com.example.manageeducation.exception.BadRequestException;
 import com.example.manageeducation.repository.*;
 import com.example.manageeducation.service.SyllabusService;
@@ -143,7 +144,7 @@ public class SyllabusServiceImpl implements SyllabusService {
 
     @Override
     public SyllabusResponse syllabus(UUID id) {
-        Optional<Syllabus> syllabusOptional = syllabusRepository.findById(id);
+        Optional<Syllabus> syllabusOptional = syllabusRepository.findByIdAndStatus(id,SyllabusStatus.ACTIVE);
         if(syllabusOptional.isPresent()){
             return modelMapper.map(syllabusOptional.get(),SyllabusResponse.class);
         }else {
@@ -155,9 +156,9 @@ public class SyllabusServiceImpl implements SyllabusService {
     public List<ViewSyllabusResponse> syllabuses(String search, Date date) {
         List<Syllabus> syllabusList;
         if (search == null && date == null) {
-            syllabusList = syllabusRepository.findAll();
+            syllabusList = syllabusRepository.findAllByStatus(SyllabusStatus.ACTIVE);
         } else {
-            syllabusList = syllabusRepository.findAllByNameAndCodeAndCreatedByAndCreatedDate(search, search, search, date);
+            syllabusList = syllabusRepository.findAllByNameAndCodeAndCreatedByAndCreatedDateAndStatus(search, search, search, date,SyllabusStatus.ACTIVE);
         }
 
         return syllabusList.stream()
@@ -255,6 +256,49 @@ public class SyllabusServiceImpl implements SyllabusService {
                 }
             }
             return "create fail.";
+        }else{
+            throw new BadRequestException("Syllabus id is not found.");
+        }
+    }
+
+    @Override
+    public String deleteSyllabus(UUID id) {
+        Optional<Syllabus> syllabusOptional = syllabusRepository.findById(id);
+        if(syllabusOptional.isPresent()){
+            Syllabus syllabus = syllabusOptional.get();
+            syllabus.setStatus(SyllabusStatus.DELETED);
+            syllabusRepository.save(syllabus);
+            return "Delete successful.";
+        }else{
+            throw new BadRequestException("Syllabus id is not found.");
+        }
+    }
+
+    @Override
+    public Syllabus updateSyllabus(UUID id, SyllabusUpdateRequest dto) {
+        Optional<Syllabus> syllabusOptional = syllabusRepository.findById(id);
+        if(syllabusOptional.isPresent()){
+            Syllabus syllabus = syllabusOptional.get();
+            modelMapper.map(dto, syllabus);
+            syllabusRepository.save(syllabus);
+            Optional<AssessmentScheme> assessmentSchemeOptional = assessmentSchemeRepository.findById(syllabus.getAssessmentScheme().getId());
+            if(assessmentSchemeOptional.isPresent()){
+                AssessmentScheme assessmentScheme = assessmentSchemeOptional.get();
+                modelMapper.map(dto, assessmentScheme);
+                assessmentSchemeRepository.save(assessmentScheme);
+
+                Optional<SyllabusLevel> syllabusLevelOptional = syllabusLevelRepository.findById(syllabus.getSyllabusLevel().getId());
+                if(syllabusLevelOptional.isPresent()){
+                    SyllabusLevel syllabusLevel = syllabusLevelOptional.get();
+                    modelMapper.map(dto, syllabusLevel);
+                    syllabusLevelRepository.save(syllabusLevel);
+                    return syllabus;
+                }else {
+                    throw new BadRequestException("Assessment Scheme id is not found.");
+                }
+            }else {
+                throw new BadRequestException("Assessment Scheme id is not found.");
+            }
         }else{
             throw new BadRequestException("Syllabus id is not found.");
         }
