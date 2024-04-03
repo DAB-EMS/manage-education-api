@@ -1,10 +1,14 @@
 package com.example.manageeducation.service;
 
 import com.example.manageeducation.dto.request.SyllabusRequest;
+import com.example.manageeducation.dto.response.SyllabusResponse;
 import com.example.manageeducation.entity.Syllabus;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public interface SyllabusService {
     String createSyllabus(String id, SyllabusRequest dto);
+    SyllabusResponse syllabus(UUID id);
 }
