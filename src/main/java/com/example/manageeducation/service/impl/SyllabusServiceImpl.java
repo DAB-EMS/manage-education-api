@@ -1,6 +1,7 @@
 package com.example.manageeducation.service.impl;
 
 import com.example.manageeducation.dto.request.*;
+import com.example.manageeducation.dto.response.SyllabusResponse;
 import com.example.manageeducation.entity.*;
 import com.example.manageeducation.enums.MaterialStatus;
 import com.example.manageeducation.enums.SyllabusDayStatus;
@@ -56,8 +57,6 @@ public class SyllabusServiceImpl implements SyllabusService {
     public String createSyllabus(String id, SyllabusRequest dto) {
         LocalDate currentDate = LocalDate.now();
         Date date = java.sql.Date.valueOf(currentDate);
-        AssessmentScheme assessmentScheme = getAssessmentScheme(dto);
-        AssessmentScheme saveAssessmentScheme = assessmentSchemeRepository.save(assessmentScheme);
 
         //check validation level
         Optional<SyllabusLevel> syllabusLevelOptional = syllabusLevelRepository.findById(dto.getSyllabusLevel());
@@ -72,8 +71,12 @@ public class SyllabusServiceImpl implements SyllabusService {
         }
 
         //save syllabus
-        Syllabus syllabus = getSyllabus(dto, saveAssessmentScheme, syllabusLevelOptional, id, date);
+        Syllabus syllabus = getSyllabus(dto, syllabusLevelOptional, id, date);
         Syllabus savedSyllabus = syllabusRepository.save(syllabus);
+
+        //save scheme
+        AssessmentScheme assessmentScheme = getAssessmentScheme(dto, savedSyllabus);
+        AssessmentScheme saveAssessmentScheme = assessmentSchemeRepository.save(assessmentScheme);
 
         //save syllabus days
         for(SyllabusDayRequest syllabusDay: dto.getSyllabusDays()){
@@ -81,6 +84,7 @@ public class SyllabusServiceImpl implements SyllabusService {
             syllabusDay1.setDayNo(syllabusDay.getDayNo());
             syllabusDay1.setSyllabus(savedSyllabus);
             syllabusDay1.setStatus(SyllabusDayStatus.AVAILABLE);
+            syllabusDay1.setSyllabus(savedSyllabus);
             SyllabusDay savedSyllabusDay = syllabusDayRepository.save(syllabusDay1);
 
             //save syllabus unit
@@ -136,7 +140,17 @@ public class SyllabusServiceImpl implements SyllabusService {
         return "create successful";
     }
 
-    private static Syllabus getSyllabus(SyllabusRequest dto, AssessmentScheme saveAssessmentScheme, Optional<SyllabusLevel> syllabusLevelOptional, String id, Date date) {
+    @Override
+    public SyllabusResponse syllabus(UUID id) {
+        Optional<Syllabus> syllabusOptional = syllabusRepository.findById(id);
+        if(syllabusOptional.isPresent()){
+            return modelMapper.map(syllabusOptional.get(),SyllabusResponse.class);
+        }else {
+            throw new BadRequestException("Syllabus id is not found.");
+        }
+    }
+
+    private static Syllabus getSyllabus(SyllabusRequest dto, Optional<SyllabusLevel> syllabusLevelOptional, String id, Date date) {
         Syllabus syllabus = new Syllabus();
         syllabus.setName(dto.getName());
         syllabus.setCode(dto.getCode());
@@ -152,12 +166,11 @@ public class SyllabusServiceImpl implements SyllabusService {
         syllabus.setCreatedDate(date);
         syllabus.setUpdatedBy(id);
         syllabus.setUpdatedDate(date);
-        syllabus.setAssessmentScheme(saveAssessmentScheme);
         syllabus.setSyllabusLevel(syllabusLevelOptional.get());
         return syllabus;
     }
 
-    private static AssessmentScheme getAssessmentScheme(SyllabusRequest dto) {
+    private static AssessmentScheme getAssessmentScheme(SyllabusRequest dto, Syllabus savedSyllabus) {
         AssessmentScheme assessmentScheme = new AssessmentScheme();
         assessmentScheme.setAssignment(dto.getAssessmentScheme().getAssignment());
         assessmentScheme.setQuiz(dto.getAssessmentScheme().getQuiz());
@@ -166,6 +179,7 @@ public class SyllabusServiceImpl implements SyllabusService {
         assessmentScheme.setFinalPoint(dto.getAssessmentScheme().getFinalPoint());
         assessmentScheme.setFinalPractice(dto.getAssessmentScheme().getFinalPractice());
         assessmentScheme.setFinalTheory(dto.getAssessmentScheme().getFinalTheory());
+        assessmentScheme.setSyllabus(savedSyllabus);
         return assessmentScheme;
     }
 }

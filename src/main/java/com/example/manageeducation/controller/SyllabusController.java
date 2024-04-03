@@ -21,4 +21,9 @@ public class SyllabusController {
     public ResponseEntity<?> createSyllabus(@PathVariable("customer-id") String id, @RequestBody SyllabusRequest dto) {
         return ResponseEntity.ok(syllabusService.createSyllabus(id,dto));
     }
+
+    @GetMapping("/{syllabus-id}")
+    public ResponseEntity<?> getSyllabus(@PathVariable("syllabus-id") UUID id) {
+        return ResponseEntity.ok(syllabusService.syllabus(id));
+    }
 }
