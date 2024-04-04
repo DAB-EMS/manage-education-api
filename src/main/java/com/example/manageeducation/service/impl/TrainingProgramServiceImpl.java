@@ -1,8 +1,6 @@
 package com.example.manageeducation.service.impl;
 
 import com.example.manageeducation.dto.request.ProgramSyllabusRequest;
-import com.example.manageeducation.dto.request.SyllabusDayRequest;
-import com.example.manageeducation.dto.request.SyllabusUnitRequest;
 import com.example.manageeducation.dto.request.TrainingProgramRequest;
 import com.example.manageeducation.dto.response.SyllabusResponse;
 import com.example.manageeducation.dto.response.TrainingProgramResponse;
@@ -130,5 +128,23 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
         }else {
             throw new BadRequestException("Training program id is not found.");
         }
+    }
+
+    @Override
+    public String deActiveTrainingProgram(UUID id) {
+        Optional<TrainingProgram> trainingProgramOptional = trainingProgramRepository.findById(id);
+        if(trainingProgramOptional.isPresent()){
+            TrainingProgram trainingProgram = trainingProgramOptional.get();
+            trainingProgram.setStatus(TrainingProgramStatus.INACTIVE);
+            trainingProgramRepository.save(trainingProgram);
+            return "In-active successful.";
+        }else{
+            throw new BadRequestException("Training program is not found.");
+        }
+    }
+
+    @Override
+    public String duplicatedTrainingProgram(UUID id) {
+        return null;
     }
 }

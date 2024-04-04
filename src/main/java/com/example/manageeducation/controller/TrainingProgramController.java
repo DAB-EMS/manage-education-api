@@ -25,4 +25,9 @@ public class TrainingProgramController {
     public ResponseEntity<?> createTrainingProgram(@PathVariable("training-program-id") UUID id) {
         return ResponseEntity.ok(trainingProgramService.viewTrainingProgram(id));
     }
+
+    @PutMapping("customer/training-program/{training-program-id}")
+    public ResponseEntity<?> inActiveTrainingProgram(@PathVariable("training-program-id") UUID id) {
+        return ResponseEntity.ok(trainingProgramService.deActiveTrainingProgram(id));
+    }
 }

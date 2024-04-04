@@ -10,4 +10,6 @@ import java.util.UUID;
 public interface TrainingProgramService {
     String createTrainingProgram(String customerId, TrainingProgramRequest dto);
     TrainingProgramResponse viewTrainingProgram(UUID id);
+    String deActiveTrainingProgram(UUID id);
+    String duplicatedTrainingProgram(UUID id);
 }
