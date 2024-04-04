@@ -137,7 +137,7 @@ public class TrainingClass implements Serializable {
 
     @OneToOne
     @JsonIgnore
-    @JoinColumn(name = "training_program_id")
+    @JoinColumn(name = "training_program_id", unique = true)
     private TrainingProgram trainingProgram;
 
     @ManyToMany(fetch = FetchType.EAGER)
