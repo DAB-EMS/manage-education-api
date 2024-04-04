@@ -33,24 +33,17 @@ public class TrainingProgram {
 
     private boolean isTemplate;
 
-    @Type(type = "org.hibernate.type.UUIDCharType")
-    private UUID createdBy;
+    private String createdBy;
 
     private Date createdDate;
 
-    @Type(type = "org.hibernate.type.UUIDCharType")
-    private UUID updatedBy;
+    private String updatedBy;
 
     private Date updatedDate;
     private String version;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private TrainingProgramStatus status;
-
-    @OneToOne
-    @JoinColumn(name = "class_id", unique = true)
-    @JsonIgnore
-    private TrainingClass trainingClass;
 
     @OneToMany(mappedBy = "trainingProgram", cascade = CascadeType.ALL)
     @JsonIgnore
