@@ -50,4 +50,9 @@ public class SyllabusController {
     public ResponseEntity<?> putSyllabus(@PathVariable("syllabus-id") UUID id, @RequestBody SyllabusUpdateRequest dto) {
         return ResponseEntity.ok(syllabusService.updateSyllabus(id,dto));
     }
+
+    @PutMapping("/customer/syllabus/{syllabus-id}/de-active")
+    public ResponseEntity<?> deActiveSyllabus(@PathVariable("syllabus-id") UUID id) {
+        return ResponseEntity.ok(syllabusService.deActive(id));
+    }
 }

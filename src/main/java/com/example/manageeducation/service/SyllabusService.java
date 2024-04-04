@@ -19,4 +19,5 @@ public interface SyllabusService {
     String duplicatedSyllabus(UUID id);
     String deleteSyllabus(UUID id);
     Syllabus updateSyllabus(UUID id, SyllabusUpdateRequest dto);
+    String deActive(UUID id);
 }

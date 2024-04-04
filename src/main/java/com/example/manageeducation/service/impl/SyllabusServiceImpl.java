@@ -304,6 +304,19 @@ public class SyllabusServiceImpl implements SyllabusService {
         }
     }
 
+    @Override
+    public String deActive(UUID id) {
+        Optional<Syllabus> syllabusOptional = syllabusRepository.findById(id);
+        if(syllabusOptional.isPresent()){
+            Syllabus syllabus = syllabusOptional.get();
+            syllabus.setStatus(SyllabusStatus.DEACTIVE);
+            syllabusRepository.save(syllabus);
+            return "De-active successful.";
+        }else{
+            throw new BadRequestException("Syllabus id is not found.");
+        }
+    }
+
     private ViewSyllabusResponse mapToViewSyllabusResponse(Syllabus suSyllabus) {
         ViewSyllabusResponse viewSyllabusResponse = new ViewSyllabusResponse();
         viewSyllabusResponse.setId(suSyllabus.getId());
