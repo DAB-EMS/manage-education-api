@@ -25,40 +25,39 @@ public class TrainingProgram {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Type(type = "org.hibernate.type.UUIDCharType")
     @Column(name = "id", updatable = false, nullable = false)
+    @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID id;
-
     @Column(columnDefinition = "varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL, FULLTEXT KEY name(name)")
     private String name;
 
     private boolean isTemplate;
 
+    @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID createdBy;
 
     private Date createdDate;
 
+    @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID updatedBy;
 
     private Date updatedDate;
     private String version;
 
-
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private TrainingProgramStatus status;
 
-    @OneToOne // đánh dấu có mối quan hệ 1-1 với Tranning class ở dưới
-    @JoinColumn(name = "class_id", unique = true) // Liên kết với nhau qua khóa ngoại class_id
+    @OneToOne
+    @JoinColumn(name = "class_id", unique = true)
     @JsonIgnore
     private TrainingClass trainingClass;
 
-    // Training Syllabus
     @OneToMany(mappedBy = "trainingProgram", cascade = CascadeType.ALL)
     @JsonIgnore
     @JsonManagedReference
     @ToString.Exclude
     @OrderBy(value = "position ASC")
-    private List<ProgramSyllabus> programSyllabusAssociation; // relationship association
+    private List<ProgramSyllabus> programSyllabusAssociation;
 
     @Override
     public boolean equals(Object o) {
