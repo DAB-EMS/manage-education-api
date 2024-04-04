@@ -26,12 +26,17 @@ public class TrainingProgramController {
         return ResponseEntity.ok(trainingProgramService.viewTrainingProgram(id));
     }
 
+    @GetMapping("customer/training-program")
+    public ResponseEntity<?> TrainingPrograms() {
+        return ResponseEntity.ok(trainingProgramService.trainingPrograms());
+    }
+
     @PutMapping("customer/training-program/{training-program-id}")
     public ResponseEntity<?> inActiveTrainingProgram(@PathVariable("training-program-id") UUID id) {
         return ResponseEntity.ok(trainingProgramService.deActiveTrainingProgram(id));
     }
 
-    @PostMapping("customer/{customer-id}/training-program/{training-program-id}")
+    @PostMapping("customer/{customer-id}/training-program/{training-program-id}/duplicated")
     public ResponseEntity<?> duplicatedTrainingProgram(@PathVariable("customer-id") String customerId, @PathVariable("training-program-id") UUID id) {
         return ResponseEntity.ok(trainingProgramService.duplicatedTrainingProgram(customerId,id));
     }
