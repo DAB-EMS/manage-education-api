@@ -4,6 +4,7 @@ import com.example.manageeducation.dto.request.ProgramSyllabusRequest;
 import com.example.manageeducation.dto.request.TrainingProgramRequest;
 import com.example.manageeducation.dto.response.SyllabusResponse;
 import com.example.manageeducation.dto.response.TrainingProgramResponse;
+import com.example.manageeducation.dto.response.TrainingProgramsResponse;
 import com.example.manageeducation.entity.*;
 import com.example.manageeducation.enums.TrainingProgramStatus;
 import com.example.manageeducation.exception.BadRequestException;
@@ -189,5 +190,36 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
         }else{
             throw new BadRequestException("Training program is not found.");
         }
+    }
+
+    @Override
+    public List<TrainingProgramsResponse> trainingPrograms() {
+        List<TrainingProgramsResponse> trainingProgramsResponses = new ArrayList<>();
+        List<TrainingProgram> trainingPrograms = trainingProgramRepository.findAllByStatus(TrainingProgramStatus.ACTIVE);
+        for (TrainingProgram trainingProgram : trainingPrograms) {
+            int days = 0;
+            TrainingProgramsResponse trainingProgramsResponse = new TrainingProgramsResponse();
+
+            //get customer
+            Optional<Customer> customerOptional = customerRepository.findById(trainingProgram.getCreatedBy());
+            if (customerOptional.isPresent()) {
+                trainingProgramsResponse.setCreatedBy(customerOptional.get().getFullName());
+            } else {
+                throw new BadRequestException("Customer id is not found");
+            }
+            trainingProgramsResponse.setId(trainingProgram.getId());
+            trainingProgramsResponse.setName(trainingProgram.getName());
+            trainingProgramsResponse.setCreatedDate(trainingProgram.getCreatedDate());
+            trainingProgramsResponse.setStatus(trainingProgram.getStatus());
+
+            //get duration
+            for (ProgramSyllabus syllabus : trainingProgram.getProgramSyllabusAssociation()) {
+                Syllabus programSyllabus = syllabus.getSyllabus();
+                days = programSyllabus.getSyllabusDays().size();
+            }
+            trainingProgramsResponse.setDay(days);
+            trainingProgramsResponses.add(trainingProgramsResponse);
+        }
+        return trainingProgramsResponses;
     }
 }
