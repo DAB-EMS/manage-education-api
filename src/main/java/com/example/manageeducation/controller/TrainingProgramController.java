@@ -30,4 +30,9 @@ public class TrainingProgramController {
     public ResponseEntity<?> inActiveTrainingProgram(@PathVariable("training-program-id") UUID id) {
         return ResponseEntity.ok(trainingProgramService.deActiveTrainingProgram(id));
     }
+
+    @PostMapping("customer/{customer-id}/training-program/{training-program-id}")
+    public ResponseEntity<?> duplicatedTrainingProgram(@PathVariable("customer-id") String customerId, @PathVariable("training-program-id") UUID id) {
+        return ResponseEntity.ok(trainingProgramService.duplicatedTrainingProgram(customerId,id));
+    }
 }

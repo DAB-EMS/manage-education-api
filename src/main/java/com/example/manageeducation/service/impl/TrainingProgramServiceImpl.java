@@ -144,7 +144,50 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
     }
 
     @Override
-    public String duplicatedTrainingProgram(UUID id) {
-        return null;
+    public String duplicatedTrainingProgram(String customerId, UUID id) {
+        LocalDate currentDate = LocalDate.now();
+        Date date = java.sql.Date.valueOf(currentDate);
+
+        Optional<TrainingProgram> trainingProgramOptional = trainingProgramRepository.findById(id);
+        if(trainingProgramOptional.isPresent()){
+            TrainingProgram trainingProgram = trainingProgramOptional.get();
+
+            //duplicated
+            TrainingProgram duplicatedTrainingProgram = new TrainingProgram();
+            duplicatedTrainingProgram.setName(trainingProgram.getName());
+            duplicatedTrainingProgram.setTemplate(trainingProgram.isTemplate());
+            duplicatedTrainingProgram.setCreatedDate(date);
+
+
+            Optional<Customer> customerOptional = customerRepository.findById(customerId);
+            if(customerOptional.isPresent()){
+                duplicatedTrainingProgram.setCreatedBy(customerOptional.get().getId());
+            }else {
+                throw new BadRequestException("Customer id is not found.");
+            }
+            duplicatedTrainingProgram.setUpdatedDate(trainingProgram.getUpdatedDate());
+            duplicatedTrainingProgram.setUpdatedBy(trainingProgram.getUpdatedBy());
+            duplicatedTrainingProgram.setVersion(trainingProgram.getVersion());
+            duplicatedTrainingProgram.setStatus(trainingProgram.getStatus());
+            TrainingProgram saved = trainingProgramRepository.save(duplicatedTrainingProgram);
+
+            //save program syllabus
+            for(ProgramSyllabus programSyllabus:trainingProgram.getProgramSyllabusAssociation()){
+                ProgramSyllabus programSyllabus1 = new ProgramSyllabus();
+
+                ProgramSyllabusId programSyllabusId = new ProgramSyllabusId();
+                programSyllabusId.setTrainingProgramId(saved.getId());
+                programSyllabusId.setSyllabusId(programSyllabus.getSyllabus().getId());
+                programSyllabus1.setId(programSyllabusId);
+                programSyllabus1.setTrainingProgram(saved);
+                programSyllabus1.setSyllabus(programSyllabus.getSyllabus());
+                programSyllabus1.setPosition(programSyllabus.getPosition());
+                programSyllabusRepository.save(programSyllabus1);
+
+            }
+            return "duplicated successful.";
+        }else{
+            throw new BadRequestException("Training program is not found.");
+        }
     }
 }
