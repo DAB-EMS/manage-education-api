@@ -38,7 +38,6 @@ public class TrainingClass implements Serializable {
 
     private String name;
 
-    // courseCode bên DTO
     @Column(unique = true)
     private String courseCode;
 
