@@ -1,5 +1,6 @@
 package com.example.manageeducation.controller;
 
+import com.example.manageeducation.dto.request.CustomerUpdateRequest;
 import com.example.manageeducation.enums.RoleType;
 import com.example.manageeducation.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,11 @@ public class CustomerController {
     @PutMapping("/customer/{customer-id}/change-role")
     public ResponseEntity<?> changeRoleCustomer(@PathVariable("customer-id") String id, RoleType role) {
         return ResponseEntity.ok(customerService.changeRole(id,role));
+    }
+
+    @PutMapping("/customer/{customer-id}")
+    public ResponseEntity<?> updateCustomer(@PathVariable("customer-id") String id, CustomerUpdateRequest dto) {
+        return ResponseEntity.ok(customerService.updateCustomer(id,dto));
     }
 
     @DeleteMapping("/customer/{customer-id}")
