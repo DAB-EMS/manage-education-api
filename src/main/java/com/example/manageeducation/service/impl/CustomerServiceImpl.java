@@ -10,13 +10,29 @@ import com.example.manageeducation.exception.BadRequestException;
 import com.example.manageeducation.repository.CustomerRepository;
 import com.example.manageeducation.repository.RoleRepository;
 import com.example.manageeducation.service.CustomerService;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static java.sql.Types.NUMERIC;
+import static org.apache.tomcat.util.bcel.classfile.ElementValue.STRING;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -105,5 +121,37 @@ public class CustomerServiceImpl implements CustomerService {
         }else{
             throw new BadRequestException("Customer id is not found.");
         }
+    }
+
+    @Override
+    public String createCustomerByExcel(MultipartFile file) throws IOException {
+        try (InputStream inputStream = file.getInputStream()) {
+            // Tạo workbook từ InputStream
+            XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
+
+            // Lấy ra sheet đầu tiên từ workbook
+            XSSFSheet sheet = workbook.getSheetAt(0);
+
+            // Tạo đối tượng FormulaEvaluator để tính giá trị của các công thức
+            FormulaEvaluator formulaEvaluator = workbook.getCreationHelper().createFormulaEvaluator();
+
+            // Duyệt qua từng hàng trong sheet
+            for (Row row : sheet) {
+                // Duyệt qua từng ô trong hàng
+                for (Cell cell : row) {
+                    switch (formulaEvaluator.evaluateInCell(cell).getCellTypeEnum()) {
+                        case NUMERIC:   // Ô kiểu số
+                            System.out.print(cell.getNumericCellValue() + "\t\t");
+                            break;
+                        case STRING:    // Ô kiểu chuỗi
+                            System.out.print(cell.getStringCellValue() + "\t\t");
+                            break;
+                    }
+                }
+                System.out.println();
+            }
+        }
+
+        return "Customer created successfully!";
     }
 }
