@@ -1,5 +1,6 @@
 package com.example.manageeducation.controller;
 
+import com.example.manageeducation.enums.RoleType;
 import com.example.manageeducation.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,11 @@ public class CustomerController {
     @PutMapping("/customer/{customer-id}/de-active")
     public ResponseEntity<?> putDeActiveCustomer(@PathVariable("customer-id") String id) {
         return ResponseEntity.ok(customerService.deActiveCustomer(id));
+    }
+
+    @PutMapping("/customer/{customer-id}/change-role")
+    public ResponseEntity<?> changeRoleCustomer(@PathVariable("customer-id") String id, RoleType role) {
+        return ResponseEntity.ok(customerService.changeRole(id,role));
     }
 
     @DeleteMapping("/customer/{customer-id}")
