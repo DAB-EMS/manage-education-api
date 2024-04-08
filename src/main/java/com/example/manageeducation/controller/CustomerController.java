@@ -4,7 +4,6 @@ import com.example.manageeducation.dto.request.CustomerUpdateRequest;
 import com.example.manageeducation.enums.RoleType;
 import com.example.manageeducation.service.CustomerService;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -47,15 +45,12 @@ public class CustomerController {
     }
 
     @ApiOperation(value = "Upload a file", response = ResponseEntity.class)
-    @PostMapping(value = "/upload/image", consumes = "multipart/form-data")
+    @PostMapping(value = "/customer/import", consumes = "multipart/form-data")
     public ResponseEntity<?> updateCustomer(@RequestPart MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             return new ResponseEntity<>("Please select a file!", HttpStatus.BAD_REQUEST);
         }
 
-        // Xử lý tệp Excel ở đây
-        customerService.createCustomerByExcel(file);
-
-        return ResponseEntity.ok("File uploaded successfully!");
+        return ResponseEntity.ok(customerService.createCustomerByExcel(file));
     }
 }

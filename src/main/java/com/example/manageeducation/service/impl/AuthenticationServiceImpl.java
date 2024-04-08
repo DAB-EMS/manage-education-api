@@ -5,6 +5,7 @@ import com.example.manageeducation.dto.request.RegisterRequest;
 import com.example.manageeducation.dto.response.AuthenticationResponse;
 import com.example.manageeducation.entity.Customer;
 import com.example.manageeducation.entity.RefreshToken;
+import com.example.manageeducation.enums.CustomerStatus;
 import com.example.manageeducation.enums.Gender;
 import com.example.manageeducation.enums.TokenType;
 import com.example.manageeducation.repository.CustomerRepository;
@@ -24,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -47,14 +49,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public AuthenticationResponse register(RegisterRequest request) {
+        LocalDate currentDate = LocalDate.now();
+        java.sql.Date sqlDate = java.sql.Date.valueOf(currentDate);
+        java.util.Date utilDate = new java.util.Date(sqlDate.getTime());
+        java.time.Instant instant = utilDate.toInstant();
         var user = Customer.builder()
                 .id(request.getId())
                 .fullName(request.getName())
                 .avatar(request.getAvatar())
+                .birthday(request.getBirthday())
+                .createdDate(instant)
+                .status(CustomerStatus.ACTIVE)
+                .level(request.getLevel())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .gender(Gender.MALE)
-                .level("")
+                .gender(request.getGender()==null?Gender.MALE:request.getGender())
                 .role(request.getRole())//Role.USER
                 .build();
         var savedUser = customerRepository.save(user);
