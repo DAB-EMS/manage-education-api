@@ -3,6 +3,7 @@ package com.example.manageeducation.controller;
 import com.example.manageeducation.dto.request.CustomerUpdateRequest;
 import com.example.manageeducation.enums.RoleType;
 import com.example.manageeducation.service.CustomerService;
+import com.example.manageeducation.service.impl.FirebaseService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,9 @@ public class CustomerController {
 
     @Autowired
     CustomerService customerService;
+
+    @Autowired
+    FirebaseService firebaseService;
 
     @GetMapping("/customers")
     public ResponseEntity<?> getCustomer(String search) {
@@ -52,5 +56,18 @@ public class CustomerController {
         }
 
         return ResponseEntity.ok(customerService.createCustomerByExcel(file));
+    }
+
+    @ApiOperation(value = "Upload a file", response = ResponseEntity.class)
+    @PostMapping(value = "/upload/image", consumes = "multipart/form-data")
+    public ResponseEntity<String> uploadFile(
+            @RequestPart("file") MultipartFile file) {
+        try {
+            String fileName = firebaseService.pushImage(file);
+            return ResponseEntity.ok(fileName);
+        } catch (Exception e) {
+            //  throw internal error;
+        }
+        return ResponseEntity.ok().build();
     }
 }
