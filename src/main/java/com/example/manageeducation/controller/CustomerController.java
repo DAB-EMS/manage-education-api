@@ -23,4 +23,9 @@ public class CustomerController {
     public ResponseEntity<?> putDeActiveCustomer(@PathVariable("customer-id") String id) {
         return ResponseEntity.ok(customerService.deActiveCustomer(id));
     }
+
+    @DeleteMapping("/customer/{customer-id}")
+    public ResponseEntity<?> deleteCustomer(@PathVariable("customer-id") String id) {
+        return ResponseEntity.ok(customerService.deleteCustomer(id));
+    }
 }
