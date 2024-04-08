@@ -58,7 +58,7 @@ public class Customer implements UserDetails {
     @OneToMany(mappedBy = "approvedBy")
     private List<TrainingClass> approvedClasses;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "customer")
     private OTP otp;
 
     @Override

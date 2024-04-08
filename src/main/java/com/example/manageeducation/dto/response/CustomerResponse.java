@@ -1,6 +1,7 @@
 package com.example.manageeducation.dto.response;
 
 import com.example.manageeducation.entity.Role;
+import com.example.manageeducation.enums.CustomerStatus;
 import com.example.manageeducation.enums.Gender;
 import lombok.*;
 import java.util.Date;
@@ -21,5 +22,5 @@ public class CustomerResponse {
     private String level;
 
     private Role role;
-    private String status;
+    private CustomerStatus status;
 }

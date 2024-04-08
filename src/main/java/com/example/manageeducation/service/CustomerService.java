@@ -10,4 +10,5 @@ import java.util.List;
 public interface CustomerService {
     Customer GetCustomerByEmail(String email);
     List<CustomerResponse> userList(String search);
+    String deActiveCustomer(String customerId);
 }

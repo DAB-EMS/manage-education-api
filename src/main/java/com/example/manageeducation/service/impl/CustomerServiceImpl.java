@@ -2,6 +2,7 @@ package com.example.manageeducation.service.impl;
 
 import com.example.manageeducation.dto.response.CustomerResponse;
 import com.example.manageeducation.entity.Customer;
+import com.example.manageeducation.enums.CustomerStatus;
 import com.example.manageeducation.exception.BadRequestException;
 import com.example.manageeducation.repository.CustomerRepository;
 import com.example.manageeducation.service.CustomerService;
@@ -41,5 +42,18 @@ public class CustomerServiceImpl implements CustomerService {
         return customerList.stream()
                 .map(customer -> modelMapper.map(customer, CustomerResponse.class))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public String deActiveCustomer(String customerId) {
+        Optional<Customer> customerOptional = customerRepository.findById(customerId);
+        if(customerOptional.isPresent()){
+            Customer customer = customerOptional.get();
+            customer.setStatus(CustomerStatus.DEACTIVE);
+            customerRepository.save(customer);
+            return "De-active customer successful.";
+        }else{
+            throw new BadRequestException("Customer id is not found.");
+        }
     }
 }
