@@ -2,9 +2,12 @@ package com.example.manageeducation.service.impl;
 
 import com.example.manageeducation.dto.response.CustomerResponse;
 import com.example.manageeducation.entity.Customer;
+import com.example.manageeducation.entity.Role;
 import com.example.manageeducation.enums.CustomerStatus;
+import com.example.manageeducation.enums.RoleType;
 import com.example.manageeducation.exception.BadRequestException;
 import com.example.manageeducation.repository.CustomerRepository;
+import com.example.manageeducation.repository.RoleRepository;
 import com.example.manageeducation.service.CustomerService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
     CustomerRepository customerRepository;
+
+    @Autowired
+    RoleRepository roleRepository;
 
     @Autowired
     ModelMapper modelMapper;
@@ -64,7 +70,24 @@ public class CustomerServiceImpl implements CustomerService {
             Customer customer = customerOptional.get();
             customer.setStatus(CustomerStatus.DELETE);
             customerRepository.save(customer);
-            return "De-active customer successful.";
+            return "Delete customer successful.";
+        }else{
+            throw new BadRequestException("Customer id is not found.");
+        }
+    }
+
+    @Override
+    public String changeRole(String customerId, RoleType role) {
+        Optional<Role> roleOptional = roleRepository.findByName(role);
+        if(roleOptional.isEmpty()){
+            throw new BadRequestException("Role is not exist.");
+        }
+        Optional<Customer> customerOptional = customerRepository.findById(customerId);
+        if(customerOptional.isPresent()){
+            Customer customer = customerOptional.get();
+            customer.setRole(roleOptional.get());
+            customerRepository.save(customer);
+            return "Change role customer successful.";
         }else{
             throw new BadRequestException("Customer id is not found.");
         }
