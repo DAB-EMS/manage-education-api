@@ -56,4 +56,17 @@ public class CustomerServiceImpl implements CustomerService {
             throw new BadRequestException("Customer id is not found.");
         }
     }
+
+    @Override
+    public String deleteCustomer(String customerId) {
+        Optional<Customer> customerOptional = customerRepository.findById(customerId);
+        if(customerOptional.isPresent()){
+            Customer customer = customerOptional.get();
+            customer.setStatus(CustomerStatus.DELETE);
+            customerRepository.save(customer);
+            return "De-active customer successful.";
+        }else{
+            throw new BadRequestException("Customer id is not found.");
+        }
+    }
 }

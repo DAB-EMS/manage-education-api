@@ -11,4 +11,5 @@ public interface CustomerService {
     Customer GetCustomerByEmail(String email);
     List<CustomerResponse> userList(String search);
     String deActiveCustomer(String customerId);
+    String deleteCustomer(String customerId);
 }
