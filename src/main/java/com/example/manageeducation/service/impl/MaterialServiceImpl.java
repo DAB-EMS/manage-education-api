@@ -1,5 +1,6 @@
 package com.example.manageeducation.service.impl;
 
+import com.example.manageeducation.Utils.SecurityUtil;
 import com.example.manageeducation.dto.request.MaterialRequest;
 import com.example.manageeducation.dto.response.MaterialResponse;
 import com.example.manageeducation.entity.Customer;
@@ -15,6 +16,7 @@ import com.example.manageeducation.service.MaterialService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -30,13 +32,16 @@ public class MaterialServiceImpl implements MaterialService {
     @Autowired
     SyllabusUnitChapterRepository syllabusUnitChapterRepository;
 
+    @Autowired
+    SecurityUtil securityUtil;
+
     @Override
-    public Material createMaterial(String customerId, UUID chapterId, MaterialRequest dto) {
+    public Material createMaterial(Principal principal, UUID chapterId, MaterialRequest dto) {
         LocalDate currentDate = LocalDate.now();
         Date date = java.sql.Date.valueOf(currentDate);
 
         //check validation customer
-        Optional<Customer> customerOptional = customerRepository.findById(customerId);
+        Optional<Customer> customerOptional = customerRepository.findById(securityUtil.getLoginUser(principal).getId());
         if(customerOptional.isEmpty()){
             throw new BadRequestException("Customer id not found.");
         }
@@ -60,11 +65,11 @@ public class MaterialServiceImpl implements MaterialService {
     }
 
     @Override
-    public Material updateMaterial(String customerId, UUID materialId, MaterialRequest dto) {
+    public Material updateMaterial(Principal principal, UUID materialId, MaterialRequest dto) {
         LocalDate currentDate = LocalDate.now();
         Date date = java.sql.Date.valueOf(currentDate);
         //check validation customer
-        Optional<Customer> customerOptional = customerRepository.findById(customerId);
+        Optional<Customer> customerOptional = customerRepository.findById(securityUtil.getLoginUser(principal).getId());
         if(customerOptional.isEmpty()){
             throw new BadRequestException("Customer id not found.");
         }

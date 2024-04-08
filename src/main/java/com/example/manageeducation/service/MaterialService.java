@@ -5,13 +5,14 @@ import com.example.manageeducation.dto.response.MaterialResponse;
 import com.example.manageeducation.entity.Material;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 public interface MaterialService {
-    Material createMaterial(String customerId, UUID chapterId, MaterialRequest dto);
-    Material updateMaterial(String customerId, UUID materialId, MaterialRequest dto);
+    Material createMaterial(Principal principal, UUID chapterId, MaterialRequest dto);
+    Material updateMaterial(Principal principal, UUID materialId, MaterialRequest dto);
     String deleteMaterial(UUID materialId);
     List<MaterialResponse> materials(UUID chapterId);
 

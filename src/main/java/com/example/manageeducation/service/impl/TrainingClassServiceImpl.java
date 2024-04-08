@@ -1,5 +1,6 @@
 package com.example.manageeducation.service.impl;
 
+import com.example.manageeducation.Utils.SecurityUtil;
 import com.example.manageeducation.dto.request.CustomerRequest;
 import com.example.manageeducation.dto.request.TrainingClassRequest;
 import com.example.manageeducation.entity.Customer;
@@ -13,6 +14,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -37,8 +39,11 @@ public class TrainingClassServiceImpl implements TrainingClassService {
     @Autowired
     ModelMapper modelMapper;
 
+    @Autowired
+    SecurityUtil securityUtil;
+
     @Override
-    public String createTrainingClass(String customerId, UUID trainingProgramId, TrainingClassRequest dto) {
+    public String createTrainingClass(Principal principal, UUID trainingProgramId, TrainingClassRequest dto) {
         LocalDateTime currentDate = LocalDateTime.now();
         //check validation training program
         Optional<TrainingProgram> trainingProgramOptional = trainingProgramRepository.findById(trainingProgramId);
@@ -47,7 +52,7 @@ public class TrainingClassServiceImpl implements TrainingClassService {
         }
 
         //check validation
-        Optional<Customer> customerOptional = customerRepository.findById(customerId);
+        Optional<Customer> customerOptional = customerRepository.findById(securityUtil.getLoginUser(principal).getId());
         if(customerOptional.isEmpty()){
             throw new BadRequestException("Customer id is not found.");
         }

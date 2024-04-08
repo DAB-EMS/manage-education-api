@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.UUID;
 
 @RestController
@@ -20,14 +21,14 @@ public class MaterialController {
         return ResponseEntity.ok(materialService.deleteMaterial(id));
     }
 
-    @PutMapping("/customer/{customer-id}/syllabus/syllabus-day/syllabus-unit/unit-chapter/material/{material-id}")
-    public ResponseEntity<?> updateDeliveryType(@PathVariable("customer-id") String customerId, @PathVariable("material-id") UUID materialId, @RequestBody MaterialRequest dto) {
-        return ResponseEntity.ok(materialService.updateMaterial(customerId,materialId,dto));
+    @PutMapping("/customer/syllabus/syllabus-day/syllabus-unit/unit-chapter/material/{material-id}")
+    public ResponseEntity<?> updateDeliveryType(Principal principal, @PathVariable("material-id") UUID materialId, @RequestBody MaterialRequest dto) {
+        return ResponseEntity.ok(materialService.updateMaterial(principal,materialId,dto));
     }
 
-    @PostMapping("/customer/{customer-id}/syllabus/syllabus-day/syllabus-unit/unit-chapter/{unit-chapter-id}/material")
-    public ResponseEntity<?> postDeliveryType(@PathVariable("customer-id") String customerId, @PathVariable("unit-chapter-id") UUID chapterId, @RequestBody MaterialRequest dto) {
-        return ResponseEntity.ok(materialService.createMaterial(customerId,chapterId,dto));
+    @PostMapping("/customer/syllabus/syllabus-day/syllabus-unit/unit-chapter/{unit-chapter-id}/material")
+    public ResponseEntity<?> postDeliveryType(Principal principal, @PathVariable("unit-chapter-id") UUID chapterId, @RequestBody MaterialRequest dto) {
+        return ResponseEntity.ok(materialService.createMaterial(principal,chapterId,dto));
     }
 
     @GetMapping("/syllabus/syllabus-day/syllabus-unit/unit-chapter/{unit-chapter-id}/materials")

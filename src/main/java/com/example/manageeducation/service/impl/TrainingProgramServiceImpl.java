@@ -1,5 +1,6 @@
 package com.example.manageeducation.service.impl;
 
+import com.example.manageeducation.Utils.SecurityUtil;
 import com.example.manageeducation.dto.request.ProgramSyllabusRequest;
 import com.example.manageeducation.dto.request.TrainingProgramRequest;
 import com.example.manageeducation.dto.response.SyllabusResponse;
@@ -17,6 +18,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -38,11 +40,14 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
     @Autowired
     ModelMapper modelMapper;
 
+    @Autowired
+    SecurityUtil securityUtil;
+
     @Override
-    public String createTrainingProgram(String customerId, TrainingProgramRequest dto) {
+    public String createTrainingProgram(Principal principal, TrainingProgramRequest dto) {
         LocalDate currentDate = LocalDate.now();
         Date date = java.sql.Date.valueOf(currentDate);
-        Optional<Customer> customerOptional = customerRepository.findById(customerId);
+        Optional<Customer> customerOptional = customerRepository.findById(securityUtil.getLoginUser(principal).getId());
         if(customerOptional.isPresent()){
             Customer customer = customerOptional.get();
 
@@ -145,7 +150,7 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
     }
 
     @Override
-    public String duplicatedTrainingProgram(String customerId, UUID id) {
+    public String duplicatedTrainingProgram(Principal principal, UUID id) {
         LocalDate currentDate = LocalDate.now();
         Date date = java.sql.Date.valueOf(currentDate);
 
@@ -160,7 +165,7 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
             duplicatedTrainingProgram.setCreatedDate(date);
 
 
-            Optional<Customer> customerOptional = customerRepository.findById(customerId);
+            Optional<Customer> customerOptional = customerRepository.findById(securityUtil.getLoginUser(principal).getId());
             if(customerOptional.isPresent()){
                 duplicatedTrainingProgram.setCreatedBy(customerOptional.get().getId());
             }else {

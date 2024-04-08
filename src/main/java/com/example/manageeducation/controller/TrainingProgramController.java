@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.UUID;
 
 
@@ -16,9 +17,9 @@ public class TrainingProgramController {
     @Autowired
     TrainingProgramService trainingProgramService;
 
-    @PostMapping("customer/{customer-id}/training-program")
-    public ResponseEntity<?> createTrainingProgram(@PathVariable("customer-id") String customerId, @RequestBody TrainingProgramRequest dto) {
-        return ResponseEntity.ok(trainingProgramService.createTrainingProgram(customerId,dto));
+    @PostMapping("customer/training-program")
+    public ResponseEntity<?> createTrainingProgram(Principal principal, @RequestBody TrainingProgramRequest dto) {
+        return ResponseEntity.ok(trainingProgramService.createTrainingProgram(principal,dto));
     }
 
     @GetMapping("customer/training-program/{training-program-id}")
@@ -36,8 +37,8 @@ public class TrainingProgramController {
         return ResponseEntity.ok(trainingProgramService.deActiveTrainingProgram(id));
     }
 
-    @PostMapping("customer/{customer-id}/training-program/{training-program-id}/duplicated")
-    public ResponseEntity<?> duplicatedTrainingProgram(@PathVariable("customer-id") String customerId, @PathVariable("training-program-id") UUID id) {
-        return ResponseEntity.ok(trainingProgramService.duplicatedTrainingProgram(customerId,id));
+    @PostMapping("customer/training-program/{training-program-id}/duplicated")
+    public ResponseEntity<?> duplicatedTrainingProgram(Principal principal, @PathVariable("training-program-id") UUID id) {
+        return ResponseEntity.ok(trainingProgramService.duplicatedTrainingProgram(principal,id));
     }
 }
