@@ -1,5 +1,6 @@
 package com.example.manageeducation.service.impl;
 
+import com.example.manageeducation.dto.request.CustomerUpdateRequest;
 import com.example.manageeducation.dto.response.CustomerResponse;
 import com.example.manageeducation.entity.Customer;
 import com.example.manageeducation.entity.Role;
@@ -88,6 +89,19 @@ public class CustomerServiceImpl implements CustomerService {
             customer.setRole(roleOptional.get());
             customerRepository.save(customer);
             return "Change role customer successful.";
+        }else{
+            throw new BadRequestException("Customer id is not found.");
+        }
+    }
+
+    @Override
+    public String updateCustomer(String customerId, CustomerUpdateRequest dto) {
+        Optional<Customer> customerOptional = customerRepository.findById(customerId);
+        if(customerOptional.isPresent()){
+            Customer customer = customerOptional.get();
+            modelMapper.map(customer,dto);
+            customerRepository.save(customer);
+            return "Update customer successful.";
         }else{
             throw new BadRequestException("Customer id is not found.");
         }

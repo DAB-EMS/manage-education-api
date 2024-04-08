@@ -1,5 +1,6 @@
 package com.example.manageeducation.service;
 
+import com.example.manageeducation.dto.request.CustomerUpdateRequest;
 import com.example.manageeducation.dto.response.CustomerResponse;
 import com.example.manageeducation.entity.Customer;
 import com.example.manageeducation.enums.RoleType;
@@ -14,4 +15,5 @@ public interface CustomerService {
     String deActiveCustomer(String customerId);
     String deleteCustomer(String customerId);
     String changeRole(String customerId, RoleType role);
+    String updateCustomer(String customerId, CustomerUpdateRequest dto);
 }
