@@ -2,9 +2,11 @@ package com.example.manageeducation.controller;
 
 import com.example.manageeducation.dto.request.TrainingProgramRequest;
 import com.example.manageeducation.service.TrainingProgramService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.UUID;
@@ -40,5 +42,17 @@ public class TrainingProgramController {
     @PostMapping("customer/training-program/{training-program-id}/duplicated")
     public ResponseEntity<?> duplicatedTrainingProgram(Principal principal, @PathVariable("training-program-id") UUID id) {
         return ResponseEntity.ok(trainingProgramService.duplicatedTrainingProgram(principal,id));
+    }
+
+    @ApiOperation(value = "Upload a file", response = ResponseEntity.class)
+    @PostMapping(value = "customer/training-program/import", consumes = "multipart/form-data")
+    public ResponseEntity<?> uploadFile(
+            @RequestPart("file") MultipartFile file) {
+        try {
+            return ResponseEntity.ok(trainingProgramService.importTrainingProgram(file));
+        } catch (Exception e) {
+            //  throw internal error;
+        }
+        return ResponseEntity.ok().build();
     }
 }
