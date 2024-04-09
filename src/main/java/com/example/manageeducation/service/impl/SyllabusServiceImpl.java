@@ -27,6 +27,8 @@ import java.io.InputStream;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -156,13 +158,13 @@ public class SyllabusServiceImpl implements SyllabusService {
     }
 
     @Override
-    public SyllabusRequest importSyllabus(Principal principal, MultipartFile file) {
-        SyllabusRequest request = new SyllabusRequest();
+    public SyllabusImportRequest importSyllabus(Principal principal, MultipartFile file) {
+        DeliveryPrincipleImportRequest request = new DeliveryPrincipleImportRequest();
         try (InputStream inputStream = file.getInputStream()) {
             XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
             XSSFSheet sheet = workbook.getSheetAt(0);
 
-            SyllabusRequest syllabusRequest = new SyllabusRequest();
+            SyllabusImportRequest syllabusRequest = new SyllabusImportRequest();
             DataFormatter dataFormatter = new DataFormatter();
 
             Row syllabusInfoRow = sheet.getRow(2);
@@ -187,9 +189,64 @@ public class SyllabusServiceImpl implements SyllabusService {
             assessmentSchemeRequest.setFinalPoint(assessmentSchemeRequest.getQuiz()+assessmentSchemeRequest.getAssignment());
             syllabusRequest.setAssessmentScheme(assessmentSchemeRequest);
 
+            //get Delivery Principle from file excel
+            DeliveryPrincipleImportRequest deliveryPrincipleImportRequest = new DeliveryPrincipleImportRequest();
+            deliveryPrincipleImportRequest.setTrainees(dataFormatter.formatCellValue(sheet.getRow(28).getCell(4)));
+            deliveryPrincipleImportRequest.setTrainer(dataFormatter.formatCellValue(sheet.getRow(29).getCell(4)));
+            deliveryPrincipleImportRequest.setTraining(dataFormatter.formatCellValue(sheet.getRow(30).getCell(4)));
+            deliveryPrincipleImportRequest.setRe_test(dataFormatter.formatCellValue(sheet.getRow(31).getCell(4)));
+            deliveryPrincipleImportRequest.setMarking(dataFormatter.formatCellValue(sheet.getRow(32).getCell(4)));
+            deliveryPrincipleImportRequest.setWaiverCriteria(dataFormatter.formatCellValue(sheet.getRow(33).getCell(4)));
+            deliveryPrincipleImportRequest.setOthers(dataFormatter.formatCellValue(sheet.getRow(34).getCell(4)));
+            syllabusRequest.setDeliveryPrinciple(deliveryPrincipleImportRequest);
+
+            //get day
+            List<SyllabusDayRequest> syllabusDays = new ArrayList<>();
+            String days = dataFormatter.formatCellValue(sheet.getRow(12).getCell(3));
+            List<Integer> dayNumbers = extractDayNumbers(days);
+            for (int day : dayNumbers) {
+                SyllabusDayRequest syllabusDayRequest = new SyllabusDayRequest();
+                syllabusDayRequest.setDayNo(day);
+                syllabusDayRequest.setStatus(SyllabusDayStatus.AVAILABLE);
+                syllabusDays.add(syllabusDayRequest);
+            }
+            syllabusRequest.setSyllabusDays(syllabusDays);
+
+            //sheet 2
+            XSSFSheet sheet2 = workbook.getSheetAt(1);
+            SyllabusUnitRequest syllabusUnitRequest = new SyllabusUnitRequest();
+            syllabusUnitRequest.setName(getStringAfterUnderscore(dataFormatter.formatCellValue(sheet2.getRow(2).getCell(1))));
+            syllabusUnitRequest.setUnitNo(getUnitNumber(dataFormatter.formatCellValue(sheet2.getRow(2).getCell(1))));
+            syllabusUnitRequest.setDuration(Integer.parseInt(dataFormatter.formatCellValue(sheet2.getRow(2).getCell(5))) + Integer.parseInt(dataFormatter.formatCellValue(sheet2.getRow(3).getCell(5))) + Integer.parseInt(dataFormatter.formatCellValue(sheet2.getRow(4).getCell(5))) + Integer.parseInt(dataFormatter.formatCellValue(sheet2.getRow(5).getCell(5))) + Integer.parseInt(dataFormatter.formatCellValue(sheet2.getRow(6).getCell(5))));
+            //List unit chapter
+            List<SyllabusUnitChapterRequest> syllabusUnitChapterRequests = new ArrayList<>();
+            SyllabusUnitChapterRequest syllabusUnitChapterRequest1 = new SyllabusUnitChapterRequest();
+            syllabusUnitChapterRequest1.setName(dataFormatter.formatCellValue(sheet2.getRow(2).getCell(3)));
+            syllabusUnitChapterRequest1.setOnline(true);
+            syllabusUnitChapterRequest1.setDuration(Double.parseDouble(dataFormatter.formatCellValue(sheet2.getRow(2).getCell(5))));
+            //get ID delivery
+            Optional<DeliveryType> deliveryTypeOptional = deliveryTypeRepository.findByNameIgnoreCase(dataFormatter.formatCellValue(sheet2.getRow(2).getCell(4)));
+            if(deliveryTypeOptional.isEmpty()){
+                throw new BadRequestException("Delivery is not found.");
+            }
+            syllabusUnitChapterRequest1.setDeliveryTypeId(deliveryTypeOptional.get().getId());
+            syllabusUnitChapterRequest1.setOutputStandardId(null);
+
+            //get material
+            List<MaterialRequest> materialRequests = new ArrayList<>();
+            List<String> resultList = splitByNewLine(dataFormatter.formatCellValue(sheet2.getRow(2).getCell(6)));
+            for (String str : resultList) {
+                MaterialRequest materialRequest = new MaterialRequest();
+                materialRequest.setName(str);
+                materialRequest.setUrl(null);
+                materialRequests.add(materialRequest);
+            }
+
+            syllabusUnitChapterRequest1.setMaterials(materialRequests);
 
 
             un( principal,  file);
+            un1( principal,  file);
             return syllabusRequest;
         } catch (IOException e) {
             throw new BadRequestException("Please fill in all information and use the correct excel file downloaded from the system.");
@@ -203,6 +260,36 @@ public class SyllabusServiceImpl implements SyllabusService {
         try (InputStream inputStream = file.getInputStream()) {
             XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
             XSSFSheet sheet = workbook.getSheetAt(0);
+            Iterator<Row> rowIterator = sheet.iterator();
+
+            int rowIndex = 0;
+
+            DataFormatter dataFormatter = new DataFormatter();
+            while (rowIterator.hasNext()) {
+                Row row = rowIterator.next();
+                int columnIndex = 0;
+                for (Cell cell : row) {
+                    // Xử lý dữ liệu ở đây
+                    String cellValue = dataFormatter.formatCellValue(cell);
+                    System.out.println("Row: " + rowIndex + ", Column: " + columnIndex + ", Value: " + cellValue);
+
+                    columnIndex++;
+                }
+
+                rowIndex++;
+            }
+
+        } catch (IOException e) {
+            throw new BadRequestException("Please fill in all information and use the correct excel file downloaded from the system.");
+        }
+    }
+
+    public void un1(Principal principal, MultipartFile file){
+        System.out.println("###################################################################################");
+        SyllabusRequest request = new SyllabusRequest();
+        try (InputStream inputStream = file.getInputStream()) {
+            XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
+            XSSFSheet sheet = workbook.getSheetAt(1);
             Iterator<Row> rowIterator = sheet.iterator();
 
             int rowIndex = 0;
@@ -459,5 +546,51 @@ public class SyllabusServiceImpl implements SyllabusService {
         assessmentScheme.setFinalTheory(dto.getAssessmentScheme().getFinalTheory());
         assessmentScheme.setSyllabus(savedSyllabus);
         return assessmentScheme;
+    }
+
+    public static List<Integer> extractDayNumbers(String input) {
+        List<Integer> dayNumbers = new ArrayList<>();
+        Pattern pattern = Pattern.compile("Day(\\d+):");
+        Matcher matcher = pattern.matcher(input);
+
+        while (matcher.find()) {
+            String dayNumberStr = matcher.group(1);
+            int dayNumber = Integer.parseInt(dayNumberStr);
+            dayNumbers.add(dayNumber);
+        }
+
+        return dayNumbers;
+    }
+
+    public static String getStringAfterUnderscore(String input) {
+        int index = input.indexOf('_');
+        if (index != -1) {
+            return input.substring(index + 1);
+        } else {
+            return input;
+        }
+    }
+
+    public static int getUnitNumber(String input) {
+        Pattern pattern = Pattern.compile("Unit(\\d+)_");
+        Matcher matcher = pattern.matcher(input);
+
+        if (matcher.find()) {
+            String numberString = matcher.group(1);
+            return Integer.parseInt(numberString);
+        } else {
+            return -1;
+        }
+    }
+
+    public static List<String> splitByNewLine(String input) {
+        List<String> result = new ArrayList<>();
+        String[] parts = input.split("\n");
+
+        for (String part : parts) {
+            result.add(part.trim());
+        }
+
+        return result;
     }
 }
