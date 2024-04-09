@@ -8,6 +8,7 @@ import com.example.manageeducation.dto.response.TrainingProgramsResponse;
 import com.example.manageeducation.entity.*;
 import com.example.manageeducation.enums.Gender;
 import com.example.manageeducation.enums.RoleType;
+import com.example.manageeducation.enums.SyllabusStatus;
 import com.example.manageeducation.enums.TrainingProgramStatus;
 import com.example.manageeducation.exception.BadRequestException;
 import com.example.manageeducation.repository.CustomerRepository;
@@ -241,19 +242,15 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
     }
 
     @Override
-    public TrainingProgramImportRequest importTrainingProgram(MultipartFile file) {
+    public String importTrainingProgram(MultipartFile file, Principal principal) {
         TrainingProgramImportRequest trainingProgram = new TrainingProgramImportRequest();
         List<SyllabusTNImportRequest> syllabuses = new ArrayList<>();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         try (InputStream inputStream = file.getInputStream()) {
             XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
-
             XSSFSheet sheet = workbook.getSheetAt(0);
-
-            FormulaEvaluator formulaEvaluator = workbook.getCreationHelper().createFormulaEvaluator();
-
             Iterator<Row> rowIterator = sheet.iterator();
 
+            boolean rowIsEmpty = false;
             while (rowIterator.hasNext()) {
                 Row row = rowIterator.next();
                 Cell firstCell = row.getCell(0);
@@ -266,13 +263,13 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
                     while (rowIterator.hasNext()) {
                         row = rowIterator.next();
 
-                        // Kiểm tra xem đã bỏ qua hàng đầu tiên chưa
+                        //check ignore first row
                         if (!firstRowSkipped) {
-                            firstRowSkipped = true; // Đánh dấu là đã bỏ qua hàng đầu tiên
-                            continue; // Bỏ qua xử lý cho hàng đầu tiên
+                            firstRowSkipped = true;
+                            continue;
                         }
 
-                        boolean rowIsEmpty = false;
+                        //check null cell to stop while
                         for (int cellIndex = 0; cellIndex < row.getLastCellNum(); cellIndex++) {
                             String c = row.getCell(cellIndex).toString();
                             if (row.getCell(cellIndex).toString().equals("")) {
@@ -281,12 +278,11 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
                             }
                         }
 
-                        // Nếu dòng hiện tại không có dữ liệu, kết thúc vòng lặp
+                        // check is null
                         if (rowIsEmpty) {
                             break;
                         }
 
-                        // Xử lý các hàng tiếp theo
                         SyllabusTNImportRequest syllabus = new SyllabusTNImportRequest();
                         syllabus.setName(row.getCell(0).getStringCellValue());
                         syllabus.setCode(row.getCell(1).getStringCellValue());
@@ -296,30 +292,51 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
 
                     trainingProgram.setSyllabuses(syllabuses);
                 }
+                if(rowIsEmpty){
+                    break;
+                }
             }
-            return trainingProgram;
+            return checkValidationDataTrainingProgram(principal,trainingProgram);
         } catch (IOException e) {
             throw new BadRequestException("Please fill in all information and use the correct excel file downloaded from the system.");
         }
     }
 
-    private String getStringCellValue(Cell cell, FormulaEvaluator formulaEvaluator) {
-        if (cell == null) {
-            return null;
-        }
-        switch (formulaEvaluator.evaluateInCell(cell).getCellTypeEnum()) {
-            case STRING:
-                return cell.getStringCellValue();
-            case NUMERIC:
-                if (DateUtil.isCellDateFormatted(cell)) {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                    return dateFormat.format(cell.getDateCellValue());
-                } else {
-                    cell.setCellType(CellType.STRING);
-                    return cell.getStringCellValue();
+    private String checkValidationDataTrainingProgram(Principal principal, TrainingProgramImportRequest dto){
+        try{
+            TrainingProgramRequest request = new TrainingProgramRequest();
+            request.setName(dto.getName());
+            request.setVersion("1.0");
+            request.setTemplate(true);
+            request.setStatus(TrainingProgramStatus.ACTIVE);
+            List<ProgramSyllabusRequest> programSyllabuses = new ArrayList<>();
+            for(SyllabusTNImportRequest importRequest: dto.getSyllabuses()){
+                List<Syllabus> syllabuses = syllabusRepository.findByNameIgnoreCaseAndCodeIgnoreCaseAndVersionIgnoreCaseAndStatus(importRequest.getName(),importRequest.getCode(), importRequest.getVersion(), SyllabusStatus.ACTIVE);
+                if(syllabuses!=null){
+                    ProgramSyllabusRequest programSyllabusRequest = new ProgramSyllabusRequest();
+                    for(Syllabus syllabus:syllabuses){
+                        programSyllabusRequest.setSyllabusId(syllabus.getId());
+                        programSyllabusRequest.setPosition(1);
+                        programSyllabuses.add(programSyllabusRequest);
+                        break;
+                    }
+
+                }else{
+                    throw new BadRequestException("Syllabus name: " + importRequest.getName() + " is not exist in system.");
                 }
-            default:
-                return null;
+
+            }
+            request.setProgramSyllabuses(programSyllabuses);
+            if(request.getProgramSyllabuses()!=null){
+                createTrainingProgram(principal,request);
+                return "Create successful.";
+            }else{
+                return "Create fail.";
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return "Create fail.";
         }
+
     }
 }
