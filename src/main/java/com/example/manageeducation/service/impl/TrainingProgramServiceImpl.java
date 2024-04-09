@@ -1,12 +1,13 @@
 package com.example.manageeducation.service.impl;
 
 import com.example.manageeducation.Utils.SecurityUtil;
-import com.example.manageeducation.dto.request.ProgramSyllabusRequest;
-import com.example.manageeducation.dto.request.TrainingProgramRequest;
+import com.example.manageeducation.dto.request.*;
 import com.example.manageeducation.dto.response.SyllabusResponse;
 import com.example.manageeducation.dto.response.TrainingProgramResponse;
 import com.example.manageeducation.dto.response.TrainingProgramsResponse;
 import com.example.manageeducation.entity.*;
+import com.example.manageeducation.enums.Gender;
+import com.example.manageeducation.enums.RoleType;
 import com.example.manageeducation.enums.TrainingProgramStatus;
 import com.example.manageeducation.exception.BadRequestException;
 import com.example.manageeducation.repository.CustomerRepository;
@@ -14,13 +15,24 @@ import com.example.manageeducation.repository.ProgramSyllabusRepository;
 import com.example.manageeducation.repository.SyllabusRepository;
 import com.example.manageeducation.repository.TrainingProgramRepository;
 import com.example.manageeducation.service.TrainingProgramService;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.Principal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
+
+import static java.sql.Types.NUMERIC;
+import static org.apache.tomcat.util.bcel.classfile.ElementValue.STRING;
 
 @Service
 public class TrainingProgramServiceImpl implements TrainingProgramService {
@@ -226,5 +238,88 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
             trainingProgramsResponses.add(trainingProgramsResponse);
         }
         return trainingProgramsResponses;
+    }
+
+    @Override
+    public TrainingProgramImportRequest importTrainingProgram(MultipartFile file) {
+        TrainingProgramImportRequest trainingProgram = new TrainingProgramImportRequest();
+        List<SyllabusTNImportRequest> syllabuses = new ArrayList<>();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        try (InputStream inputStream = file.getInputStream()) {
+            XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
+
+            XSSFSheet sheet = workbook.getSheetAt(0);
+
+            FormulaEvaluator formulaEvaluator = workbook.getCreationHelper().createFormulaEvaluator();
+
+            Iterator<Row> rowIterator = sheet.iterator();
+
+            while (rowIterator.hasNext()) {
+                Row row = rowIterator.next();
+                Cell firstCell = row.getCell(0);
+
+                if (firstCell != null) {
+                    trainingProgram.setName(firstCell.toString());
+
+                    boolean firstRowSkipped = false;
+
+                    while (rowIterator.hasNext()) {
+                        row = rowIterator.next();
+
+                        // Kiểm tra xem đã bỏ qua hàng đầu tiên chưa
+                        if (!firstRowSkipped) {
+                            firstRowSkipped = true; // Đánh dấu là đã bỏ qua hàng đầu tiên
+                            continue; // Bỏ qua xử lý cho hàng đầu tiên
+                        }
+
+                        boolean rowIsEmpty = false;
+                        for (int cellIndex = 0; cellIndex < row.getLastCellNum(); cellIndex++) {
+                            String c = row.getCell(cellIndex).toString();
+                            if (row.getCell(cellIndex).toString().equals("")) {
+                                rowIsEmpty = true;
+                                break;
+                            }
+                        }
+
+                        // Nếu dòng hiện tại không có dữ liệu, kết thúc vòng lặp
+                        if (rowIsEmpty) {
+                            break;
+                        }
+
+                        // Xử lý các hàng tiếp theo
+                        SyllabusTNImportRequest syllabus = new SyllabusTNImportRequest();
+                        syllabus.setName(row.getCell(0).getStringCellValue());
+                        syllabus.setCode(row.getCell(1).getStringCellValue());
+                        syllabus.setVersion(row.getCell(2).getStringCellValue());
+                        syllabuses.add(syllabus);
+                    }
+
+                    trainingProgram.setSyllabuses(syllabuses);
+                }
+            }
+            return trainingProgram;
+        } catch (IOException e) {
+            throw new BadRequestException("Please fill in all information and use the correct excel file downloaded from the system.");
+        }
+    }
+
+    private String getStringCellValue(Cell cell, FormulaEvaluator formulaEvaluator) {
+        if (cell == null) {
+            return null;
+        }
+        switch (formulaEvaluator.evaluateInCell(cell).getCellTypeEnum()) {
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                    return dateFormat.format(cell.getDateCellValue());
+                } else {
+                    cell.setCellType(CellType.STRING);
+                    return cell.getStringCellValue();
+                }
+            default:
+                return null;
+        }
     }
 }
