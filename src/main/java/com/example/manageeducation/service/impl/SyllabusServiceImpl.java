@@ -1,5 +1,6 @@
 package com.example.manageeducation.service.impl;
 
+import com.example.manageeducation.Utils.SecurityUtil;
 import com.example.manageeducation.dto.request.*;
 import com.example.manageeducation.dto.response.OutputStandardResponse;
 import com.example.manageeducation.dto.response.SyllabusResponse;
@@ -11,10 +12,19 @@ import com.example.manageeducation.enums.SyllabusStatus;
 import com.example.manageeducation.exception.BadRequestException;
 import com.example.manageeducation.repository.*;
 import com.example.manageeducation.service.SyllabusService;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -55,8 +65,11 @@ public class SyllabusServiceImpl implements SyllabusService {
     @Autowired
     ModelMapper modelMapper;
 
+    @Autowired
+    SecurityUtil securityUtil;
+
     @Override
-    public String createSyllabus(String id, SyllabusRequest dto) {
+    public String createSyllabus(Principal principal, SyllabusRequest dto) {
         LocalDate currentDate = LocalDate.now();
         Date date = java.sql.Date.valueOf(currentDate);
 
@@ -67,13 +80,13 @@ public class SyllabusServiceImpl implements SyllabusService {
         }
 
         //check validation customer
-        Optional<Customer> customerOptional = customerRepository.findById(id);
+        Optional<Customer> customerOptional = customerRepository.findById(securityUtil.getLoginUser(principal).getId());
         if(customerOptional.isEmpty()){
             throw new BadRequestException("Create by id not found.");
         }
 
         //save syllabus
-        Syllabus syllabus = getSyllabus(dto, syllabusLevelOptional, id, date);
+        Syllabus syllabus = getSyllabus(dto, syllabusLevelOptional, securityUtil.getLoginUser(principal).getId(), date);
         Syllabus savedSyllabus = syllabusRepository.save(syllabus);
 
         //save scheme
@@ -140,6 +153,78 @@ public class SyllabusServiceImpl implements SyllabusService {
             }
         }
         return "create successful";
+    }
+
+    @Override
+    public SyllabusRequest importSyllabus(Principal principal, MultipartFile file) {
+        SyllabusRequest request = new SyllabusRequest();
+        try (InputStream inputStream = file.getInputStream()) {
+            XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
+            XSSFSheet sheet = workbook.getSheetAt(0);
+
+            SyllabusRequest syllabusRequest = new SyllabusRequest();
+            DataFormatter dataFormatter = new DataFormatter();
+
+            Row syllabusInfoRow = sheet.getRow(2);
+            syllabusRequest.setName(dataFormatter.formatCellValue(syllabusInfoRow.getCell(3))); // Name
+            syllabusRequest.setCode(dataFormatter.formatCellValue(sheet.getRow(3).getCell(3))); // Code
+            syllabusRequest.setVersion(dataFormatter.formatCellValue(sheet.getRow(4).getCell(3))); // Version
+
+            Row technicalRequirementRow = sheet.getRow(22);
+            syllabusRequest.setTechnicalRequirement(dataFormatter.formatCellValue(technicalRequirementRow.getCell(4))); // Technical Requirement
+
+            Row courseObjectiveRow = sheet.getRow(6);
+            syllabusRequest.setCourseObjective(dataFormatter.formatCellValue(courseObjectiveRow.getCell(3))); // Course Objective
+            syllabusRequest.setCourseObjective(syllabusRequest.getCourseObjective() + " " + dataFormatter.formatCellValue(sheet.getRow(11).getCell(3))); // Course Objective
+
+            //get Assessment SchemeRequest from file excel
+            AssessmentSchemeRequest assessmentSchemeRequest = new AssessmentSchemeRequest();
+            assessmentSchemeRequest.setQuiz(Double.valueOf(dataFormatter.formatCellValue(sheet.getRow(23).getCell(4))));
+            assessmentSchemeRequest.setAssignment(Double.valueOf(dataFormatter.formatCellValue(sheet.getRow(24).getCell(4))));
+            assessmentSchemeRequest.setFinalTheory(Double.valueOf(dataFormatter.formatCellValue(sheet.getRow(25).getCell(4))));
+            assessmentSchemeRequest.setFinalPractice(Double.valueOf(dataFormatter.formatCellValue(sheet.getRow(26).getCell(4))));
+            assessmentSchemeRequest.setGpa(Double.valueOf(dataFormatter.formatCellValue(sheet.getRow(27).getCell(4))));
+            assessmentSchemeRequest.setFinalPoint(assessmentSchemeRequest.getQuiz()+assessmentSchemeRequest.getAssignment());
+            syllabusRequest.setAssessmentScheme(assessmentSchemeRequest);
+
+
+
+            un( principal,  file);
+            return syllabusRequest;
+        } catch (IOException e) {
+            throw new BadRequestException("Please fill in all information and use the correct excel file downloaded from the system.");
+        }
+
+    }
+
+    public void un(Principal principal, MultipartFile file){
+        System.out.println("###################################################################################");
+        SyllabusRequest request = new SyllabusRequest();
+        try (InputStream inputStream = file.getInputStream()) {
+            XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
+            XSSFSheet sheet = workbook.getSheetAt(0);
+            Iterator<Row> rowIterator = sheet.iterator();
+
+            int rowIndex = 0;
+
+            DataFormatter dataFormatter = new DataFormatter();
+            while (rowIterator.hasNext()) {
+                Row row = rowIterator.next();
+                int columnIndex = 0;
+                for (Cell cell : row) {
+                    // Xử lý dữ liệu ở đây
+                    String cellValue = dataFormatter.formatCellValue(cell);
+                    System.out.println("Row: " + rowIndex + ", Column: " + columnIndex + ", Value: " + cellValue);
+
+                    columnIndex++;
+                }
+
+                rowIndex++;
+            }
+
+        } catch (IOException e) {
+            throw new BadRequestException("Please fill in all information and use the correct excel file downloaded from the system.");
+        }
     }
 
     @Override
