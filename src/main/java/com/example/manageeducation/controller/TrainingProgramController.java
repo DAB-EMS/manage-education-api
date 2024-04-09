@@ -47,9 +47,9 @@ public class TrainingProgramController {
     @ApiOperation(value = "Upload a file", response = ResponseEntity.class)
     @PostMapping(value = "customer/training-program/import", consumes = "multipart/form-data")
     public ResponseEntity<?> uploadFile(
-            @RequestPart("file") MultipartFile file) {
+            @RequestPart("file") MultipartFile file, Principal principal) {
         try {
-            return ResponseEntity.ok(trainingProgramService.importTrainingProgram(file));
+            return ResponseEntity.ok(trainingProgramService.importTrainingProgram(file,principal));
         } catch (Exception e) {
             //  throw internal error;
         }
