@@ -4,11 +4,14 @@ import com.example.manageeducation.dto.request.SyllabusRequest;
 import com.example.manageeducation.dto.request.SyllabusUpdateRequest;
 import com.example.manageeducation.entity.Syllabus;
 import com.example.manageeducation.service.SyllabusService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
 import java.util.Date;
 import java.util.UUID;
 
@@ -19,9 +22,9 @@ public class SyllabusController {
     @Autowired
     SyllabusService syllabusService;
 
-    @PostMapping("/customer/{customer-id}/syllabus")
-    public ResponseEntity<?> createSyllabus(@PathVariable("customer-id") String id, @RequestBody SyllabusRequest dto) {
-        return ResponseEntity.ok(syllabusService.createSyllabus(id,dto));
+    @PostMapping("/customer/syllabus")
+    public ResponseEntity<?> createSyllabus(Principal principal, @RequestBody SyllabusRequest dto) {
+        return ResponseEntity.ok(syllabusService.createSyllabus(principal,dto));
     }
 
     @PostMapping("/customer/syllabus/{syllabus-id}/duplicated")
@@ -54,5 +57,17 @@ public class SyllabusController {
     @PutMapping("/customer/syllabus/{syllabus-id}/de-active")
     public ResponseEntity<?> deActiveSyllabus(@PathVariable("syllabus-id") UUID id) {
         return ResponseEntity.ok(syllabusService.deActive(id));
+    }
+
+    @ApiOperation(value = "Upload a file", response = ResponseEntity.class)
+    @PostMapping(value = "customer/training-program/import/56", consumes = "multipart/form-data")
+    public ResponseEntity<?> uploadFile(
+            @RequestPart("file") MultipartFile file, Principal principal) {
+        try {
+            return ResponseEntity.ok(syllabusService.importSyllabus(principal,file));
+        } catch (Exception e) {
+            //  throw internal error;
+        }
+        return ResponseEntity.ok().build();
     }
 }
