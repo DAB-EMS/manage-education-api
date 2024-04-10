@@ -4,6 +4,7 @@ import com.example.manageeducation.Utils.SecurityUtil;
 import com.example.manageeducation.dto.request.*;
 import com.example.manageeducation.dto.response.OutputStandardResponse;
 import com.example.manageeducation.dto.response.SyllabusResponse;
+import com.example.manageeducation.dto.response.TimeAllocationResponse;
 import com.example.manageeducation.dto.response.ViewSyllabusResponse;
 import com.example.manageeducation.entity.*;
 import com.example.manageeducation.enums.MaterialStatus;
@@ -443,7 +444,6 @@ public class SyllabusServiceImpl implements SyllabusService {
 
 
         //save syllabus days
-        int c = dto.getSyllabusDays().size();
         for(SyllabusDayRequest syllabusDay: dto.getSyllabusDays()){
             SyllabusDay syllabusDay1 = new SyllabusDay();
             syllabusDay1.setDayNo(syllabusDay.getDayNo());
@@ -562,7 +562,36 @@ public class SyllabusServiceImpl implements SyllabusService {
     public SyllabusResponse syllabus(UUID id) {
         Optional<Syllabus> syllabusOptional = syllabusRepository.findByIdAndStatus(id,SyllabusStatus.ACTIVE);
         if(syllabusOptional.isPresent()){
-            return modelMapper.map(syllabusOptional.get(),SyllabusResponse.class);
+            //logic calculation point component
+            double test = Objects.requireNonNullElse(syllabusRepository.sumDurationBySyllabusIdAndDeliveryId(id, UUID.fromString("08e635bd-3a1d-40cc-b890-b723e4228ddf")), 0.0);
+            double assignment = Objects.requireNonNullElse(syllabusRepository.sumDurationBySyllabusIdAndDeliveryId(id,UUID.fromString("9a226b15-038b-42ca-9a4d-ebf2f13a479a")),0.0);
+            double concept = Objects.requireNonNullElse(syllabusRepository.sumDurationBySyllabusIdAndDeliveryId(id,UUID.fromString("bdd335ee-d8ae-4024-b01d-ed49d14aae9c")),0.0);
+            double exam = Objects.requireNonNullElse(syllabusRepository.sumDurationBySyllabusIdAndDeliveryId(id,UUID.fromString("e3786dd5-4e73-41f8-bc97-1d7cffe8a313")),0.0);
+            double guide = Objects.requireNonNullElse(syllabusRepository.sumDurationBySyllabusIdAndDeliveryId(id,UUID.fromString("e447bbe0-e681-4805-8486-924da7e2e40d")),0.0);
+            double seminar = Objects.requireNonNullElse(syllabusRepository.sumDurationBySyllabusIdAndDeliveryId(id,UUID.fromString("af835041-2072-49e2-951b-f43b985573d5")),0.0);
+            double sum = test + assignment + seminar + concept + exam + guide;
+
+            double testPercentage = (test / sum) * 100;
+            double assignmentPercentage = (assignment / sum) * 100;
+            double seminarPercentage = (seminar / sum) * 100;
+            double conceptPercentage = (concept / sum) * 100;
+            double examPercentage = (exam / sum) * 100;
+            double guidePercentage = (guide / sum) * 100;
+
+            //other
+            double remainingPercentage = 100 - (testPercentage + assignmentPercentage + seminarPercentage + conceptPercentage + examPercentage + guidePercentage);
+
+            TimeAllocationResponse response = new TimeAllocationResponse();
+            response.setTest(testPercentage);
+            response.setAssignment(assignmentPercentage);
+            response.setExam(examPercentage);
+            response.setConcept(conceptPercentage);
+            response.setGuides(guidePercentage);
+
+            SyllabusResponse syllabusResponse = new SyllabusResponse();
+            syllabusResponse.setTimeAllocationResponse(response);
+            modelMapper.map(syllabusOptional.get(),syllabusResponse);
+            return syllabusResponse;
         }else {
             throw new BadRequestException("Syllabus id is not found.");
         }

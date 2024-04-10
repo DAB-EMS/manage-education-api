@@ -35,5 +35,9 @@ public class SyllabusResponse {
 
     private SyllabusLevelResponse syllabusLevel;
 
+    private DeliveryPrincipleResponse deliveryPrinciple;
+
+    private TimeAllocationResponse timeAllocationResponse;
+
     private List<SyllabusDayViewResponse> syllabusDays;
 }
