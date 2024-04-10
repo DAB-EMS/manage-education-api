@@ -1,7 +1,5 @@
 package com.example.manageeducation.service;
 
-import com.example.manageeducation.dto.request.DeliveryPrincipleImportRequest;
-import com.example.manageeducation.dto.request.SyllabusImportRequest;
 import com.example.manageeducation.dto.request.SyllabusRequest;
 import com.example.manageeducation.dto.request.SyllabusUpdateRequest;
 import com.example.manageeducation.dto.response.SyllabusResponse;
@@ -18,7 +16,7 @@ import java.util.UUID;
 @Service
 public interface SyllabusService {
     String createSyllabus(Principal principal, SyllabusRequest dto);
-    SyllabusImportRequest importSyllabus(Principal principal, MultipartFile file);
+    String importSyllabus(Principal principal, MultipartFile file);
     SyllabusResponse syllabus(UUID id);
     List<ViewSyllabusResponse> syllabuses(String search, Date date);
     String duplicatedSyllabus(UUID id);

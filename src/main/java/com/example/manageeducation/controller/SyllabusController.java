@@ -2,12 +2,10 @@ package com.example.manageeducation.controller;
 
 import com.example.manageeducation.dto.request.SyllabusRequest;
 import com.example.manageeducation.dto.request.SyllabusUpdateRequest;
-import com.example.manageeducation.entity.Syllabus;
 import com.example.manageeducation.service.SyllabusService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -60,7 +58,7 @@ public class SyllabusController {
     }
 
     @ApiOperation(value = "Upload a file", response = ResponseEntity.class)
-    @PostMapping(value = "customer/training-program/import/56", consumes = "multipart/form-data")
+    @PostMapping(value = "customer/syllabus/import", consumes = "multipart/form-data")
     public ResponseEntity<?> uploadFile(
             @RequestPart("file") MultipartFile file, Principal principal) {
         try {
