@@ -34,4 +34,5 @@ public class SyllabusImportRequest {
     private DeliveryPrincipleImportRequest deliveryPrinciple;
 
     private List<SyllabusDayRequest> syllabusDays;
+    private List<OutputStandardRequest> standardRequests;
 }
