@@ -11,6 +11,7 @@ import com.example.manageeducation.enums.SyllabusDayStatus;
 import com.example.manageeducation.enums.SyllabusStatus;
 import com.example.manageeducation.exception.BadRequestException;
 import com.example.manageeducation.repository.*;
+import com.example.manageeducation.service.OutputStandardService;
 import com.example.manageeducation.service.SyllabusService;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -36,6 +37,9 @@ public class SyllabusServiceImpl implements SyllabusService {
 
     @Autowired
     SyllabusRepository syllabusRepository;
+
+    @Autowired
+    DeliveryPrincipleRepository deliveryPrincipleRepository;
 
     @Autowired
     SyllabusDayRepository syllabusDayRepository;
@@ -70,6 +74,9 @@ public class SyllabusServiceImpl implements SyllabusService {
     @Autowired
     SecurityUtil securityUtil;
 
+    @Autowired
+    OutputStandardService outputStandardService;
+
     @Override
     public String createSyllabus(Principal principal, SyllabusRequest dto) {
         LocalDate currentDate = LocalDate.now();
@@ -93,7 +100,7 @@ public class SyllabusServiceImpl implements SyllabusService {
 
         //save scheme
         AssessmentScheme assessmentScheme = getAssessmentScheme(dto, savedSyllabus);
-        AssessmentScheme saveAssessmentScheme = assessmentSchemeRepository.save(assessmentScheme);
+        assessmentSchemeRepository.save(assessmentScheme);
 
         //save syllabus days
         for(SyllabusDayRequest syllabusDay: dto.getSyllabusDays()){
@@ -158,8 +165,7 @@ public class SyllabusServiceImpl implements SyllabusService {
     }
 
     @Override
-    public SyllabusImportRequest importSyllabus(Principal principal, MultipartFile file) {
-        DeliveryPrincipleImportRequest request = new DeliveryPrincipleImportRequest();
+    public String importSyllabus(Principal principal, MultipartFile file) {
         try (InputStream inputStream = file.getInputStream()) {
             XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
             XSSFSheet sheet = workbook.getSheetAt(0);
@@ -381,73 +387,176 @@ public class SyllabusServiceImpl implements SyllabusService {
             }
             syllabusRequest.setSyllabusDays(syllabusDays);
             syllabusRequest.setDeliveryPrinciple(deliveryPrincipleImportRequest);
-            un(principal, file);
-            return syllabusRequest;
+
+            //save data excel into database
+            return createSyllabusByImport(principal, syllabusRequest);
+//            un(principal, file);
+//            return syllabusRequest;
         } catch (IOException e) {
             throw new BadRequestException("Please fill in all information and use the correct excel file downloaded from the system.");
         }
 
     }
 
-    public void un(Principal principal, MultipartFile file){
-        System.out.println("###################################################################################");
-        SyllabusRequest request = new SyllabusRequest();
-        try (InputStream inputStream = file.getInputStream()) {
-            XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
-            XSSFSheet sheet = workbook.getSheetAt(0);
-            Iterator<Row> rowIterator = sheet.iterator();
+    public String createSyllabusByImport(Principal principal, SyllabusImportRequest dto) {
+        LocalDate currentDate = LocalDate.now();
+        Date date = java.sql.Date.valueOf(currentDate);
 
-            int rowIndex = 0;
+        //save standard from file excel
+        for(OutputStandardRequest outputStandardRequest: dto.getStandardRequests()){
+            outputStandardService.createOutputStandard(outputStandardRequest);
+        }
 
-            DataFormatter dataFormatter = new DataFormatter();
-            while (rowIterator.hasNext()) {
-                Row row = rowIterator.next();
-                int columnIndex = 0;
-                for (Cell cell : row) {
-                    // Xử lý dữ liệu ở đây
-                    String cellValue = dataFormatter.formatCellValue(cell);
-                    System.out.println("Row: " + rowIndex + ", Column: " + columnIndex + ", Value: " + cellValue);
 
-                    columnIndex++;
-                }
+        //check validation customer
+        Optional<Customer> customerOptional = customerRepository.findById(securityUtil.getLoginUser(principal).getId());
+        if(customerOptional.isEmpty()){
+            throw new BadRequestException("Create by id not found.");
+        }
 
-                rowIndex++;
+        int days = 0;
+        int hours = 0;
+        for(SyllabusDayRequest syllabusDayCount: dto.getSyllabusDays()){
+            days++;
+            for(SyllabusUnitRequest syllabusUnit: syllabusDayCount.getSyllabusUnits()){
+                hours += syllabusUnit.getDuration();
             }
-
-        } catch (IOException e) {
-            throw new BadRequestException("Please fill in all information and use the correct excel file downloaded from the system.");
         }
-    }
+        //save syllabus
+        dto.setStatus(SyllabusStatus.ACTIVE);
+        dto.setDays(days);
+        dto.setHours(hours);
+        Syllabus syllabus = getSyllabusImport(modelMapper.map(dto,SyllabusRequest.class), securityUtil.getLoginUser(principal).getId(), date);
+        Syllabus savedSyllabus = syllabusRepository.save(syllabus);
 
-    public void un1(Principal principal, MultipartFile file){
-        System.out.println("###################################################################################");
-        SyllabusRequest request = new SyllabusRequest();
-        try (InputStream inputStream = file.getInputStream()) {
-            XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
-            XSSFSheet sheet = workbook.getSheetAt(1);
-            Iterator<Row> rowIterator = sheet.iterator();
+        //save Delivery Principle
+        DeliveryPrinciple deliveryPrinciple = new DeliveryPrinciple();
+        deliveryPrinciple.setSyllabus(savedSyllabus);
+        modelMapper.map(dto.getDeliveryPrinciple(),deliveryPrinciple);
+        deliveryPrincipleRepository.save(deliveryPrinciple);
 
-            int rowIndex = 0;
+        //save scheme
+        AssessmentScheme assessmentScheme = new AssessmentScheme();
+        assessmentScheme.setSyllabus(savedSyllabus);
+        modelMapper.map(dto.getAssessmentScheme(),assessmentScheme);
+        assessmentSchemeRepository.save(assessmentScheme);
 
-            DataFormatter dataFormatter = new DataFormatter();
-            while (rowIterator.hasNext()) {
-                Row row = rowIterator.next();
-                int columnIndex = 0;
-                for (Cell cell : row) {
-                    // Xử lý dữ liệu ở đây
-                    String cellValue = dataFormatter.formatCellValue(cell);
-                    System.out.println("Row: " + rowIndex + ", Column: " + columnIndex + ", Value: " + cellValue);
 
-                    columnIndex++;
+        //save syllabus days
+        int c = dto.getSyllabusDays().size();
+        for(SyllabusDayRequest syllabusDay: dto.getSyllabusDays()){
+            SyllabusDay syllabusDay1 = new SyllabusDay();
+            syllabusDay1.setDayNo(syllabusDay.getDayNo());
+            syllabusDay1.setSyllabus(savedSyllabus);
+            syllabusDay1.setStatus(SyllabusDayStatus.AVAILABLE);
+            syllabusDay1.setSyllabus(savedSyllabus);
+            SyllabusDay savedSyllabusDay = syllabusDayRepository.save(syllabusDay1);
+
+            //save syllabus unit
+            for(SyllabusUnitRequest syllabusUnitRequest: syllabusDay.getSyllabusUnits()){
+                SyllabusUnit syllabusUnit = new SyllabusUnit();
+                syllabusUnit.setName(syllabusUnitRequest.getName());
+                syllabusUnit.setDuration(syllabusUnitRequest.getDuration());
+                syllabusUnit.setUnitNo(syllabusUnitRequest.getUnitNo());
+                syllabusUnit.setSyllabus(savedSyllabus);
+                syllabusUnit.setSyllabusDay(savedSyllabusDay);
+                SyllabusUnit savedSyllabusUnit = syllabusUnitRepository.save(syllabusUnit);
+
+                //save unit chapter
+                for(SyllabusUnitChapterRequest syllabusUnitChapterRequest: syllabusUnitRequest.getSyllabusUnitChapters()){
+                    SyllabusUnitChapter syllabusUnitChapter = new SyllabusUnitChapter();
+                    syllabusUnitChapter.setDuration(syllabusUnitChapterRequest.getDuration());
+                    syllabusUnitChapter.setOnline(syllabusUnitChapterRequest.isOnline());
+                    syllabusUnitChapter.setName(syllabusUnitChapterRequest.getName());
+                    syllabusUnitChapter.setSyllabusUnit(savedSyllabusUnit);
+
+                    //check delivery type
+                    Optional<DeliveryType> deliveryTypeOptional = deliveryTypeRepository.findById(syllabusUnitChapterRequest.getDeliveryTypeId());
+                    if(deliveryTypeOptional.isEmpty()){
+                        throw new BadRequestException("Delivery type id is not found.");
+                    }
+
+                    syllabusUnitChapter.setOutputStandard(null);
+                    syllabusUnitChapter.setDeliveryType(deliveryTypeOptional.get());
+                    SyllabusUnitChapter savedSyllabusUnitChapter = syllabusUnitChapterRepository.save(syllabusUnitChapter);
+
+                    //save material
+                    for(MaterialRequest materialRequest: syllabusUnitChapterRequest.getMaterials()){
+                        Material material = new Material();
+                        material.setName(materialRequest.getName());
+                        material.setUrl(materialRequest.getUrl());
+                        material.setCreatedBy(customerOptional.get().getId());
+                        material.setCreatedDate(date);
+                        material.setUpdatedBy(customerOptional.get().getId());
+                        material.setUpdatedDate(date);
+                        material.setMaterialStatus(MaterialStatus.ACTIVE);
+                        material.setUnitChapter(savedSyllabusUnitChapter);
+                        materialRepository.save(material);
+                    }
                 }
-
-                rowIndex++;
             }
-
-        } catch (IOException e) {
-            throw new BadRequestException("Please fill in all information and use the correct excel file downloaded from the system.");
         }
+        return "create successful";
     }
+
+//    public void un(Principal principal, MultipartFile file){
+//        System.out.println("###################################################################################");
+//        SyllabusRequest request = new SyllabusRequest();
+//        try (InputStream inputStream = file.getInputStream()) {
+//            XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
+//            XSSFSheet sheet = workbook.getSheetAt(0);
+//            Iterator<Row> rowIterator = sheet.iterator();
+//
+//            int rowIndex = 0;
+//
+//            DataFormatter dataFormatter = new DataFormatter();
+//            while (rowIterator.hasNext()) {
+//                Row row = rowIterator.next();
+//                int columnIndex = 0;
+//                for (Cell cell : row) {
+//                    // Xử lý dữ liệu ở đây
+//                    String cellValue = dataFormatter.formatCellValue(cell);
+//                    System.out.println("Row: " + rowIndex + ", Column: " + columnIndex + ", Value: " + cellValue);
+//
+//                    columnIndex++;
+//                }
+//
+//                rowIndex++;
+//            }
+//
+//        } catch (IOException e) {
+//            throw new BadRequestException("Please fill in all information and use the correct excel file downloaded from the system.");
+//        }
+//    }
+//
+//    public void un1(Principal principal, MultipartFile file){
+//        System.out.println("###################################################################################");
+//        try (InputStream inputStream = file.getInputStream()) {
+//            XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
+//            XSSFSheet sheet = workbook.getSheetAt(1);
+//            Iterator<Row> rowIterator = sheet.iterator();
+//
+//            int rowIndex = 0;
+//
+//            DataFormatter dataFormatter = new DataFormatter();
+//            while (rowIterator.hasNext()) {
+//                Row row = rowIterator.next();
+//                int columnIndex = 0;
+//                for (Cell cell : row) {
+//                    // Xử lý dữ liệu ở đây
+//                    String cellValue = dataFormatter.formatCellValue(cell);
+//                    System.out.println("Row: " + rowIndex + ", Column: " + columnIndex + ", Value: " + cellValue);
+//
+//                    columnIndex++;
+//                }
+//
+//                rowIndex++;
+//            }
+//
+//        } catch (IOException e) {
+//            throw new BadRequestException("Please fill in all information and use the correct excel file downloaded from the system.");
+//        }
+//    }
 
     @Override
     public SyllabusResponse syllabus(UUID id) {
@@ -667,6 +776,26 @@ public class SyllabusServiceImpl implements SyllabusService {
         syllabus.setUpdatedBy(id);
         syllabus.setUpdatedDate(date);
         syllabus.setSyllabusLevel(syllabusLevelOptional.get());
+        return syllabus;
+    }
+
+    private static Syllabus getSyllabusImport(SyllabusRequest dto, String id, Date date) {
+        Syllabus syllabus = new Syllabus();
+        syllabus.setName(dto.getName());
+        syllabus.setCode(dto.getCode());
+        syllabus.setVersion(dto.getVersion());
+        syllabus.setAttendeeNumber(dto.getAttendeeNumber());
+        syllabus.setTechnicalRequirement(dto.getTechnicalRequirement());
+        syllabus.setCourseObjective(dto.getCourseObjective());
+        syllabus.setDays(dto.getDays());
+        syllabus.setHours(dto.getHours());
+        syllabus.setStatus(dto.getStatus());
+        syllabus.setTemplate(dto.isTemplate());
+        syllabus.setCreatedBy(id);
+        syllabus.setCreatedDate(date);
+        syllabus.setUpdatedBy(id);
+        syllabus.setUpdatedDate(date);
+        syllabus.setSyllabusLevel(null);
         return syllabus;
     }
 
