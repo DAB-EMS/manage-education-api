@@ -208,45 +208,169 @@ public class SyllabusServiceImpl implements SyllabusService {
                 SyllabusDayRequest syllabusDayRequest = new SyllabusDayRequest();
                 syllabusDayRequest.setDayNo(day);
                 syllabusDayRequest.setStatus(SyllabusDayStatus.AVAILABLE);
-                syllabusDays.add(syllabusDayRequest);
+                List<SyllabusUnitRequest> syllabusUnitRequests = new ArrayList<>();
+                //sheet 2
+                XSSFSheet sheet2 = workbook.getSheetAt(1);
+                SyllabusUnitRequest syllabusUnitRequest = new SyllabusUnitRequest();
+                if(day==1){
+                    syllabusUnitRequest.setName(getStringAfterUnderscore(dataFormatter.formatCellValue(sheet2.getRow(2).getCell(1))));
+                    syllabusUnitRequest.setUnitNo(getUnitNumber(dataFormatter.formatCellValue(sheet2.getRow(3).getCell(1))));
+                    Double d = Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(3).getCell(5))) + Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(4).getCell(5))) + Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(5).getCell(5))) + Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(6).getCell(5))) + Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(7).getCell(5)));
+                    Integer f = (int) Math.round(d);
+                    syllabusUnitRequest.setDuration(f);
+                }else if(day==2){
+                    syllabusUnitRequest.setName(getStringAfterUnderscore(dataFormatter.formatCellValue(sheet2.getRow(8).getCell(1))));
+                    syllabusUnitRequest.setUnitNo(getUnitNumber(dataFormatter.formatCellValue(sheet2.getRow(8).getCell(1))));
+                    Double d = Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(8).getCell(5))) + Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(9).getCell(5))) + Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(10).getCell(5))) + Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(11).getCell(5))) + Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(12).getCell(5) )) + Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(13).getCell(5) )) + Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(14).getCell(5) ));
+                    Integer f = (int) Math.round(d);
+                    syllabusUnitRequest.setDuration(f);
+                }else if(day==3){
+                    syllabusUnitRequest.setName(getStringAfterUnderscore(dataFormatter.formatCellValue(sheet2.getRow(15).getCell(1))));
+                    syllabusUnitRequest.setUnitNo(getUnitNumber(dataFormatter.formatCellValue(sheet2.getRow(15).getCell(1))));
+                    Double d = Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(15).getCell(5))) + Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(16).getCell(5))) + Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(17).getCell(5))) + Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(18).getCell(5))) + Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(19).getCell(5) )) + Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(20).getCell(5) )) + Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(21).getCell(5) ));
+                    Integer f = (int) Math.round(d);
+                    syllabusUnitRequest.setDuration(f);
+                }else{
+                    syllabusUnitRequest.setName(getStringAfterUnderscore(dataFormatter.formatCellValue(sheet2.getRow(22).getCell(1))));
+                    syllabusUnitRequest.setUnitNo(getUnitNumber(dataFormatter.formatCellValue(sheet2.getRow(22).getCell(1))));
+                    Double d = Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(22).getCell(5))) + Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(23).getCell(5))) + Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(24).getCell(5))) + Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(25).getCell(5))) + Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(26).getCell(5) )) + Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(27).getCell(5) )) + Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(28).getCell(5) )) + Double.valueOf(dataFormatter.formatCellValue(sheet2.getRow(29).getCell(5) ));
+                    Integer f = (int) Math.round(d);
+                    syllabusUnitRequest.setDuration(f);
+                }
+
+
+                //List unit chapter
+                List<SyllabusUnitChapterRequest> syllabusUnitChapterRequests = new ArrayList<>();
+                if(day==1){
+                    for(int i = 3; i<=7;i++ ){
+                        SyllabusUnitChapterRequest syllabusUnitChapterRequest1 = new SyllabusUnitChapterRequest();
+                        syllabusUnitChapterRequest1.setName(dataFormatter.formatCellValue(sheet2.getRow(i).getCell(3)));
+                        syllabusUnitChapterRequest1.setOnline(true);
+                        syllabusUnitChapterRequest1.setDuration(Double.parseDouble(dataFormatter.formatCellValue(sheet2.getRow(i).getCell(5))));
+                        //get ID delivery
+                        Optional<DeliveryType> deliveryTypeOptional = deliveryTypeRepository.findByNameIgnoreCase(dataFormatter.formatCellValue(sheet2.getRow(i).getCell(4)));
+                        if(deliveryTypeOptional.isEmpty()){
+                            throw new BadRequestException("Delivery is not found.");
+                        }
+                        syllabusUnitChapterRequest1.setDeliveryTypeId(deliveryTypeOptional.get().getId());
+                        syllabusUnitChapterRequest1.setOutputStandardId(null);
+
+                        //get material
+                        List<MaterialRequest> materialRequests = new ArrayList<>();
+                        List<String> resultList = splitByNewLine(dataFormatter.formatCellValue(sheet2.getRow(i).getCell(6)));
+                        for (String str : resultList) {
+                            MaterialRequest materialRequest = new MaterialRequest();
+                            materialRequest.setName(str);
+                            materialRequest.setUrl(null);
+                            materialRequests.add(materialRequest);
+                        }
+
+                        syllabusUnitChapterRequest1.setMaterials(materialRequests);
+                        syllabusUnitChapterRequests.add(syllabusUnitChapterRequest1);
+                    }
+                    syllabusUnitRequest.setSyllabusUnitChapters(syllabusUnitChapterRequests);
+                    syllabusUnitRequests.add(syllabusUnitRequest);
+                    syllabusDayRequest.setSyllabusUnits(syllabusUnitRequests);
+                    syllabusDays.add(syllabusDayRequest);
+                }else if(day==2){
+                    for(int i = 8; i<=14;i++ ){
+                        SyllabusUnitChapterRequest syllabusUnitChapterRequest1 = new SyllabusUnitChapterRequest();
+                        syllabusUnitChapterRequest1.setName(dataFormatter.formatCellValue(sheet2.getRow(i).getCell(3)));
+                        syllabusUnitChapterRequest1.setOnline(true);
+                        syllabusUnitChapterRequest1.setDuration(Double.parseDouble(dataFormatter.formatCellValue(sheet2.getRow(i).getCell(5))));
+                        //get ID delivery
+                        Optional<DeliveryType> deliveryTypeOptional = deliveryTypeRepository.findByNameIgnoreCase(dataFormatter.formatCellValue(sheet2.getRow(i).getCell(4)));
+                        if(deliveryTypeOptional.isEmpty()){
+                            throw new BadRequestException("Delivery is not found.");
+                        }
+                        syllabusUnitChapterRequest1.setDeliveryTypeId(deliveryTypeOptional.get().getId());
+                        syllabusUnitChapterRequest1.setOutputStandardId(null);
+
+                        //get material
+                        List<MaterialRequest> materialRequests = new ArrayList<>();
+                        List<String> resultList = splitByNewLine(dataFormatter.formatCellValue(sheet2.getRow(i).getCell(6)));
+                        for (String str : resultList) {
+                            MaterialRequest materialRequest = new MaterialRequest();
+                            materialRequest.setName(str);
+                            materialRequest.setUrl(null);
+                            materialRequests.add(materialRequest);
+                        }
+
+                        syllabusUnitChapterRequest1.setMaterials(materialRequests);
+                        syllabusUnitChapterRequests.add(syllabusUnitChapterRequest1);
+                    }
+                    syllabusUnitRequest.setSyllabusUnitChapters(syllabusUnitChapterRequests);
+                    syllabusUnitRequests.add(syllabusUnitRequest);
+                    syllabusDayRequest.setSyllabusUnits(syllabusUnitRequests);
+                    syllabusDays.add(syllabusDayRequest);
+                }else if(day==3){
+                    for(int i = 15; i<=21;i++ ){
+                        SyllabusUnitChapterRequest syllabusUnitChapterRequest1 = new SyllabusUnitChapterRequest();
+                        syllabusUnitChapterRequest1.setName(dataFormatter.formatCellValue(sheet2.getRow(i).getCell(3)));
+                        syllabusUnitChapterRequest1.setOnline(true);
+                        syllabusUnitChapterRequest1.setDuration(Double.parseDouble(dataFormatter.formatCellValue(sheet2.getRow(i).getCell(5))));
+                        //get ID delivery
+                        Optional<DeliveryType> deliveryTypeOptional = deliveryTypeRepository.findByNameIgnoreCase(dataFormatter.formatCellValue(sheet2.getRow(i).getCell(4)));
+                        if(deliveryTypeOptional.isEmpty()){
+                            throw new BadRequestException("Delivery is not found.");
+                        }
+                        syllabusUnitChapterRequest1.setDeliveryTypeId(deliveryTypeOptional.get().getId());
+                        syllabusUnitChapterRequest1.setOutputStandardId(null);
+
+                        //get material
+                        List<MaterialRequest> materialRequests = new ArrayList<>();
+                        List<String> resultList = splitByNewLine(dataFormatter.formatCellValue(sheet2.getRow(i).getCell(6)));
+                        for (String str : resultList) {
+                            MaterialRequest materialRequest = new MaterialRequest();
+                            materialRequest.setName(str);
+                            materialRequest.setUrl(null);
+                            materialRequests.add(materialRequest);
+                        }
+
+                        syllabusUnitChapterRequest1.setMaterials(materialRequests);
+                        syllabusUnitChapterRequests.add(syllabusUnitChapterRequest1);
+                    }
+                    syllabusUnitRequest.setSyllabusUnitChapters(syllabusUnitChapterRequests);
+                    syllabusUnitRequests.add(syllabusUnitRequest);
+                    syllabusDayRequest.setSyllabusUnits(syllabusUnitRequests);
+                    syllabusDays.add(syllabusDayRequest);
+                }else{
+                    for(int i = 22; i<=29;i++ ){
+                        SyllabusUnitChapterRequest syllabusUnitChapterRequest1 = new SyllabusUnitChapterRequest();
+                        syllabusUnitChapterRequest1.setName(dataFormatter.formatCellValue(sheet2.getRow(i).getCell(3)));
+                        syllabusUnitChapterRequest1.setOnline(true);
+                        syllabusUnitChapterRequest1.setDuration(Double.parseDouble(dataFormatter.formatCellValue(sheet2.getRow(i).getCell(5))));
+                        //get ID delivery
+                        Optional<DeliveryType> deliveryTypeOptional = deliveryTypeRepository.findByNameIgnoreCase(dataFormatter.formatCellValue(sheet2.getRow(i).getCell(4)));
+                        if(deliveryTypeOptional.isEmpty()){
+                            throw new BadRequestException("Delivery is not found.");
+                        }
+                        syllabusUnitChapterRequest1.setDeliveryTypeId(deliveryTypeOptional.get().getId());
+                        syllabusUnitChapterRequest1.setOutputStandardId(null);
+
+                        //get material
+                        List<MaterialRequest> materialRequests = new ArrayList<>();
+                        List<String> resultList = splitByNewLine(dataFormatter.formatCellValue(sheet2.getRow(i).getCell(6)));
+                        for (String str : resultList) {
+                            MaterialRequest materialRequest = new MaterialRequest();
+                            materialRequest.setName(str);
+                            materialRequest.setUrl(null);
+                            materialRequests.add(materialRequest);
+                        }
+
+                        syllabusUnitChapterRequest1.setMaterials(materialRequests);
+                        syllabusUnitChapterRequests.add(syllabusUnitChapterRequest1);
+                    }
+                    syllabusUnitRequest.setSyllabusUnitChapters(syllabusUnitChapterRequests);
+                    syllabusUnitRequests.add(syllabusUnitRequest);
+                    syllabusDayRequest.setSyllabusUnits(syllabusUnitRequests);
+                    syllabusDays.add(syllabusDayRequest);
+                }
+
             }
             syllabusRequest.setSyllabusDays(syllabusDays);
-
-            //sheet 2
-            XSSFSheet sheet2 = workbook.getSheetAt(1);
-            SyllabusUnitRequest syllabusUnitRequest = new SyllabusUnitRequest();
-            syllabusUnitRequest.setName(getStringAfterUnderscore(dataFormatter.formatCellValue(sheet2.getRow(2).getCell(1))));
-            syllabusUnitRequest.setUnitNo(getUnitNumber(dataFormatter.formatCellValue(sheet2.getRow(2).getCell(1))));
-            syllabusUnitRequest.setDuration(Integer.parseInt(dataFormatter.formatCellValue(sheet2.getRow(2).getCell(5))) + Integer.parseInt(dataFormatter.formatCellValue(sheet2.getRow(3).getCell(5))) + Integer.parseInt(dataFormatter.formatCellValue(sheet2.getRow(4).getCell(5))) + Integer.parseInt(dataFormatter.formatCellValue(sheet2.getRow(5).getCell(5))) + Integer.parseInt(dataFormatter.formatCellValue(sheet2.getRow(6).getCell(5))));
-            //List unit chapter
-            List<SyllabusUnitChapterRequest> syllabusUnitChapterRequests = new ArrayList<>();
-            SyllabusUnitChapterRequest syllabusUnitChapterRequest1 = new SyllabusUnitChapterRequest();
-            syllabusUnitChapterRequest1.setName(dataFormatter.formatCellValue(sheet2.getRow(2).getCell(3)));
-            syllabusUnitChapterRequest1.setOnline(true);
-            syllabusUnitChapterRequest1.setDuration(Double.parseDouble(dataFormatter.formatCellValue(sheet2.getRow(2).getCell(5))));
-            //get ID delivery
-            Optional<DeliveryType> deliveryTypeOptional = deliveryTypeRepository.findByNameIgnoreCase(dataFormatter.formatCellValue(sheet2.getRow(2).getCell(4)));
-            if(deliveryTypeOptional.isEmpty()){
-                throw new BadRequestException("Delivery is not found.");
-            }
-            syllabusUnitChapterRequest1.setDeliveryTypeId(deliveryTypeOptional.get().getId());
-            syllabusUnitChapterRequest1.setOutputStandardId(null);
-
-            //get material
-            List<MaterialRequest> materialRequests = new ArrayList<>();
-            List<String> resultList = splitByNewLine(dataFormatter.formatCellValue(sheet2.getRow(2).getCell(6)));
-            for (String str : resultList) {
-                MaterialRequest materialRequest = new MaterialRequest();
-                materialRequest.setName(str);
-                materialRequest.setUrl(null);
-                materialRequests.add(materialRequest);
-            }
-
-            syllabusUnitChapterRequest1.setMaterials(materialRequests);
-
-
-            un( principal,  file);
-            un1( principal,  file);
+            syllabusRequest.setDeliveryPrinciple(deliveryPrincipleImportRequest);
+            un1(principal, file);
             return syllabusRequest;
         } catch (IOException e) {
             throw new BadRequestException("Please fill in all information and use the correct excel file downloaded from the system.");
