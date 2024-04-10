@@ -200,6 +200,17 @@ public class SyllabusServiceImpl implements SyllabusService {
             deliveryPrincipleImportRequest.setOthers(dataFormatter.formatCellValue(sheet.getRow(34).getCell(4)));
             syllabusRequest.setDeliveryPrinciple(deliveryPrincipleImportRequest);
 
+            //List standard output
+            List<OutputStandardRequest> standardRequests = new ArrayList<>();
+            for(int i = 8; i<11;i++){
+                OutputStandardRequest outputStandardRequest = new OutputStandardRequest();
+                outputStandardRequest.setCode(dataFormatter.formatCellValue(sheet.getRow(i).getCell(4)));
+                outputStandardRequest.setName(dataFormatter.formatCellValue(sheet.getRow(i).getCell(3)));
+                outputStandardRequest.setDescription(dataFormatter.formatCellValue(sheet.getRow(i).getCell(5)));
+                standardRequests.add(outputStandardRequest);
+            }
+            syllabusRequest.setStandardRequests(standardRequests);
+
             //get day
             List<SyllabusDayRequest> syllabusDays = new ArrayList<>();
             String days = dataFormatter.formatCellValue(sheet.getRow(12).getCell(3));
@@ -370,7 +381,7 @@ public class SyllabusServiceImpl implements SyllabusService {
             }
             syllabusRequest.setSyllabusDays(syllabusDays);
             syllabusRequest.setDeliveryPrinciple(deliveryPrincipleImportRequest);
-            un1(principal, file);
+            un(principal, file);
             return syllabusRequest;
         } catch (IOException e) {
             throw new BadRequestException("Please fill in all information and use the correct excel file downloaded from the system.");
