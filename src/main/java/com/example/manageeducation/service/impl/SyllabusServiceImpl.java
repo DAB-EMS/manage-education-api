@@ -621,10 +621,14 @@ public class SyllabusServiceImpl implements SyllabusService {
             Date date = java.sql.Date.valueOf(currentDate);
 
             //check validation level
-            Optional<SyllabusLevel> syllabusLevelOptional = syllabusLevelRepository.findById(syllabusFirst.getSyllabusLevel().getId());
-            if(syllabusLevelOptional.isEmpty()){
-                throw new BadRequestException("Syllabus level id not found.");
+            Optional<SyllabusLevel> syllabusLevelOptional = null;
+            if(syllabusFirst.getSyllabusLevel() != null && syllabusFirst.getSyllabusLevel().getId() != null){
+                syllabusLevelOptional = syllabusLevelRepository.findById(syllabusFirst.getSyllabusLevel().getId());
+                if(syllabusLevelOptional.isEmpty()){
+                    throw new BadRequestException("Syllabus level id not found.");
+                }
             }
+
 
             //check validation customer
             Optional<Customer> customerOptional = customerRepository.findById(syllabusFirst.getCreatedBy());
@@ -668,10 +672,14 @@ public class SyllabusServiceImpl implements SyllabusService {
                         syllabusUnitChapter.setSyllabusUnit(savedSyllabusUnit);
 
                         //check output standard
-                        Optional<OutputStandard> outputStandardOptional = outputStandardRepository.findById(syllabusUnitChapterRequest.getOutputStandard().getId());
-                        if(outputStandardOptional.isEmpty()){
-                            throw new BadRequestException("Output standard id is not found.");
+                        Optional<OutputStandard> outputStandardOptional=null;
+                        if (syllabusUnitChapterRequest.getOutputStandard() != null && syllabusUnitChapterRequest.getOutputStandard().getId() != null) {
+                            outputStandardOptional = outputStandardRepository.findById(syllabusUnitChapterRequest.getOutputStandard().getId());
+                            if (outputStandardOptional.isEmpty()) {
+                                throw new BadRequestException("Output standard id is not found.");
+                            }
                         }
+
 
                         //check delivery type
                         Optional<DeliveryType> deliveryTypeOptional = deliveryTypeRepository.findById(syllabusUnitChapterRequest.getDeliveryType().getId());
@@ -679,7 +687,11 @@ public class SyllabusServiceImpl implements SyllabusService {
                             throw new BadRequestException("Delivery type id is not found.");
                         }
 
-                        syllabusUnitChapter.setOutputStandard(outputStandardOptional.get());
+                        if(outputStandardOptional==null){
+                            syllabusUnitChapter.setOutputStandard(null);
+                        }else{
+                            syllabusUnitChapter.setOutputStandard(outputStandardOptional.get());
+                        }
                         syllabusUnitChapter.setDeliveryType(deliveryTypeOptional.get());
                         SyllabusUnitChapter savedSyllabusUnitChapter = syllabusUnitChapterRepository.save(syllabusUnitChapter);
 
@@ -771,16 +783,22 @@ public class SyllabusServiceImpl implements SyllabusService {
         viewSyllabusResponse.setCreateBy(suSyllabus.getCreatedBy());
         viewSyllabusResponse.setDuration(suSyllabus.getSyllabusDays().size());
 
+        Set<String> outputStandardCodes = new HashSet<>();
         List<OutputStandardResponse> outputStandardResponses = suSyllabus.getSyllabusDays().stream()
                 .flatMap(syllabusDay -> syllabusDay.getSyllabusUnits().stream())
                 .flatMap(syllabusUnit -> syllabusUnit.getSyllabusUnitChapters().stream())
+                .filter(syllabusUnitChapter -> syllabusUnitChapter.getOutputStandard() != null)
                 .map(syllabusUnitChapter -> {
-                    OutputStandardResponse outputStandardResponse = new OutputStandardResponse();
-                    outputStandardResponse.setId(syllabusUnitChapter.getOutputStandard().getId());
-                    outputStandardResponse.setName(syllabusUnitChapter.getOutputStandard().getCode());
-                    return outputStandardResponse;
+                    String code = syllabusUnitChapter.getOutputStandard().getCode();
+                    if (!outputStandardCodes.contains(code)) {
+                        outputStandardCodes.add(code);
+                        OutputStandardResponse outputStandardResponse = new OutputStandardResponse();
+                        outputStandardResponse.setCode(code);
+                        return outputStandardResponse;
+                    }
+                    return null;
                 })
-                .distinct()
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
         viewSyllabusResponse.setOutputStandard(outputStandardResponses);
@@ -804,7 +822,11 @@ public class SyllabusServiceImpl implements SyllabusService {
         syllabus.setCreatedDate(date);
         syllabus.setUpdatedBy(id);
         syllabus.setUpdatedDate(date);
-        syllabus.setSyllabusLevel(syllabusLevelOptional.get());
+        if(syllabusLevelOptional==null){
+            syllabus.setSyllabusLevel(null);
+        }else{
+            syllabus.setSyllabusLevel(syllabusLevelOptional.get());
+        }
         return syllabus;
     }
 
