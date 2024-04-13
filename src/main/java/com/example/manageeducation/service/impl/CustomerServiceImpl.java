@@ -198,6 +198,32 @@ public class CustomerServiceImpl implements CustomerService {
         }
     }
 
+    @Override
+    public CustomerResponse getUser(String Id) {
+        Optional<Customer> customerOptional = customerRepository.findById(Id);
+        if(customerOptional.isPresent()){
+            return modelMapper.map(customerOptional.get(),CustomerResponse.class);
+        }else {
+            throw new BadRequestException("Customer id is not found.");
+        }
+    }
+
+    @Override
+    public String createUser(CustomerImportRequest dto) {
+
+        if(dto.getPassword().length()<6){
+            throw new BadRequestException("Password is large than or equal 6.");
+        }
+
+        Optional<Customer> customerOptional = customerRepository.findByEmail(dto.getEmail());
+        if(customerOptional.isPresent()){
+            throw new BadRequestException("Email is existed.");
+        }
+
+        createCustomerWithFirebase(dto);
+        return "Create successful.";
+    }
+
     private boolean createCustomerWithSystem(List<CustomerImportRequest> customers){
         try{
             for(CustomerImportRequest customer: customers){

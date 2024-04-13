@@ -1,5 +1,6 @@
 package com.example.manageeducation.controller;
 
+import com.example.manageeducation.dto.request.CustomerImportRequest;
 import com.example.manageeducation.dto.request.CustomerUpdateRequest;
 import com.example.manageeducation.enums.RoleType;
 import com.example.manageeducation.service.CustomerService;
@@ -28,6 +29,11 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.userList(search));
     }
 
+    @PostMapping("/customer")
+    public ResponseEntity<?> postCustomer(@RequestBody CustomerImportRequest dto) {
+        return ResponseEntity.ok(customerService.createUser(dto));
+    }
+
     @PutMapping("/customer/{customer-id}/de-active")
     public ResponseEntity<?> putDeActiveCustomer(@PathVariable("customer-id") String id) {
         return ResponseEntity.ok(customerService.deActiveCustomer(id));
@@ -46,6 +52,11 @@ public class CustomerController {
     @DeleteMapping("/customer/{customer-id}")
     public ResponseEntity<?> deleteCustomer(@PathVariable("customer-id") String id) {
         return ResponseEntity.ok(customerService.deleteCustomer(id));
+    }
+
+    @GetMapping("/customer/{customer-id}")
+    public ResponseEntity<?> getCustomerById(@PathVariable("customer-id") String id) {
+        return ResponseEntity.ok(customerService.getUser(id));
     }
 
     @ApiOperation(value = "Upload a file", response = ResponseEntity.class)
