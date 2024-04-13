@@ -64,11 +64,17 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<CustomerResponse> userList(String search) {
-        List<Customer> customerList = customerRepository.findAll();
+        List<Customer> customerList;
+        if (search != null && !search.isEmpty()) {
+            customerList = customerRepository.findByFullNameContainingIgnoreCase(search);
+        } else {
+            customerList = customerRepository.findAllByStatus(CustomerStatus.ACTIVE);
+        }
         return customerList.stream()
                 .map(customer -> modelMapper.map(customer, CustomerResponse.class))
                 .collect(Collectors.toList());
     }
+
 
     @Override
     public String deActiveCustomer(String customerId) {
@@ -190,6 +196,32 @@ public class CustomerServiceImpl implements CustomerService {
         } catch (ParseException e) {
             throw new BadRequestException("Please fill in all information and use the correct excel file downloaded from the system.");
         }
+    }
+
+    @Override
+    public CustomerResponse getUser(String Id) {
+        Optional<Customer> customerOptional = customerRepository.findById(Id);
+        if(customerOptional.isPresent()){
+            return modelMapper.map(customerOptional.get(),CustomerResponse.class);
+        }else {
+            throw new BadRequestException("Customer id is not found.");
+        }
+    }
+
+    @Override
+    public String createUser(CustomerImportRequest dto) {
+
+        if(dto.getPassword().length()<6){
+            throw new BadRequestException("Password is large than or equal 6.");
+        }
+
+        Optional<Customer> customerOptional = customerRepository.findByEmail(dto.getEmail());
+        if(customerOptional.isPresent()){
+            throw new BadRequestException("Email is existed.");
+        }
+
+        createCustomerWithFirebase(dto);
+        return "Create successful.";
     }
 
     private boolean createCustomerWithSystem(List<CustomerImportRequest> customers){

@@ -20,4 +20,6 @@ public interface CustomerService {
     String changeRole(String customerId, RoleType role);
     String updateCustomer(String customerId, CustomerUpdateRequest dto);
     String createCustomerByExcel(MultipartFile file) throws IOException;
+    CustomerResponse getUser(String Id);
+    String createUser(CustomerImportRequest dto);
 }
