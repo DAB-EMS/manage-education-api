@@ -2,28 +2,39 @@ package com.example.manageeducation.entity;
 
 import com.example.manageeducation.enums.CustomerStatus;
 import com.example.manageeducation.enums.Gender;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Size;
 import java.time.Instant;
 import java.util.*;
 
+@Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = "email"))
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@Entity
 @Getter
 @Setter
+@Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer"})
 public class Customer implements UserDetails {
     @Id
     private String id;
 
     @NonNull
+    @Email
     private String email;
+    @Lob
     private String avatar;
+    @JsonIgnore
+    @Size(min = 6, max = 100)
     private String password;
 
     private Instant expiredDate;

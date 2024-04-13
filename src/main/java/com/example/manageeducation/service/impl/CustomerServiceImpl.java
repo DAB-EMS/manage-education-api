@@ -64,11 +64,17 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<CustomerResponse> userList(String search) {
-        List<Customer> customerList = customerRepository.findAll();
+        List<Customer> customerList;
+        if (search != null && !search.isEmpty()) {
+            customerList = customerRepository.findByFullNameContainingIgnoreCase(search);
+        } else {
+            customerList = customerRepository.findAllByStatus(CustomerStatus.ACTIVE);
+        }
         return customerList.stream()
                 .map(customer -> modelMapper.map(customer, CustomerResponse.class))
                 .collect(Collectors.toList());
     }
+
 
     @Override
     public String deActiveCustomer(String customerId) {

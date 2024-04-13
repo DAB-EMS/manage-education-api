@@ -2,6 +2,9 @@ package com.example.manageeducation.entity;
 
 import com.example.manageeducation.enums.RoleType;
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +16,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
+@JsonIgnoreProperties({"hibernateLazyInitializer"})
 public class Role {
     @Id
     private String id;
@@ -22,5 +26,6 @@ public class Role {
     private RoleType name;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "role")
+    @JsonIgnore
     private List<Customer> customers;
 }

@@ -24,7 +24,7 @@ public class CustomerController {
     FirebaseService firebaseService;
 
     @GetMapping("/customers")
-    public ResponseEntity<?> getCustomer(String search) {
+    public ResponseEntity<?> getCustomer(@RequestParam(required = false) String search) {
         return ResponseEntity.ok(customerService.userList(search));
     }
 
