@@ -30,7 +30,7 @@ public class SyllabusController {
         return ResponseEntity.ok(syllabusService.duplicatedSyllabus(id));
     }
 
-    @GetMapping("/{syllabus-id}")
+    @GetMapping("/syllabus/{syllabus-id}")
     public ResponseEntity<?> getSyllabus(@PathVariable("syllabus-id") UUID id) {
         return ResponseEntity.ok(syllabusService.syllabus(id));
     }
