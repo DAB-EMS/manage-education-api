@@ -1,6 +1,7 @@
 package com.example.manageeducation.entity;
 
 import com.example.manageeducation.Utils.DateTimeUtils;
+import com.example.manageeducation.enums.TrainingClassStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
@@ -98,6 +99,9 @@ public class TrainingClass implements Serializable {
     private int plannedAttendee;
     private int acceptedAttendee;
     private int actualAttendee;
+
+    @Enumerated(EnumType.STRING)
+    private TrainingClassStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
