@@ -13,4 +13,5 @@ public interface TrainingClassService {
     String createTrainingClass(Principal principal, UUID trainingProgramId, TrainingClassRequest dto);
     List<TrainingClassesResponse> TrainingClassesResponses();
     String deleteTrainingClass(UUID id);
+    String duplicated(Principal principal, UUID id);
 }

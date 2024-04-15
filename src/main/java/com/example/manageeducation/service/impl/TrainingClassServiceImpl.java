@@ -10,6 +10,7 @@ import com.example.manageeducation.enums.TrainingClassStatus;
 import com.example.manageeducation.exception.BadRequestException;
 import com.example.manageeducation.repository.*;
 import com.example.manageeducation.service.TrainingClassService;
+import com.example.manageeducation.service.TrainingProgramService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,6 +63,9 @@ public class TrainingClassServiceImpl implements TrainingClassService {
 
     @Autowired
     SecurityUtil securityUtil;
+
+    @Autowired
+    TrainingProgramService trainingProgramService;
 
     @Override
     public String createTrainingClass(Principal principal, UUID trainingProgramId, TrainingClassRequest dto) {
@@ -263,6 +267,26 @@ public class TrainingClassServiceImpl implements TrainingClassService {
             return "Delete successful.";
         }else {
             throw new BadRequestException("Training class id is not found.");
+        }
+    }
+
+    @Override
+    public String duplicated(Principal principal, UUID id) {
+        Optional<TrainingClass> trainingClassOptional = trainingClassRepository.findById(id);
+        if(trainingClassOptional.isPresent()){
+            TrainingClass trainingClass = trainingClassOptional.get();
+            TrainingProgram trainingProgram = trainingProgramService.duplicatedTrainingProgram(principal,trainingClass.getTrainingProgram().getId());
+
+            TrainingClass newTrainingClass = new TrainingClass();
+            modelMapper.map(trainingClass,newTrainingClass);
+            newTrainingClass.setId(null);
+            newTrainingClass.setTrainingProgram(trainingProgram);
+            UUID uuid = UUID.randomUUID();
+            newTrainingClass.setCourseCode(trainingClass.getCourseCode() + uuid);
+            trainingClassRepository.save(newTrainingClass);
+            return "Training class duplicated successful.";
+        }else{
+            throw new BadRequestException("Training program id is not found.");
         }
     }
 }

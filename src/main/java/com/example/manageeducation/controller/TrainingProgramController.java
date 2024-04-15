@@ -46,7 +46,11 @@ public class TrainingProgramController {
 
     @PostMapping("customer/training-program/{training-program-id}/duplicated")
     public ResponseEntity<?> duplicatedTrainingProgram(Principal principal, @PathVariable("training-program-id") UUID id) {
-        return ResponseEntity.ok(trainingProgramService.duplicatedTrainingProgram(principal,id));
+        if(trainingProgramService.duplicatedTrainingProgram(principal,id)!=null){
+            return ResponseEntity.ok("duplicated successful.");
+        }else{
+            return ResponseEntity.ok("duplicated fail.");
+        }
     }
 
     @ApiOperation(value = "Upload a file", response = ResponseEntity.class)
