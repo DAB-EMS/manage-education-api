@@ -12,4 +12,5 @@ import java.util.UUID;
 public interface TrainingClassService {
     String createTrainingClass(Principal principal, UUID trainingProgramId, TrainingClassRequest dto);
     List<TrainingClassesResponse> TrainingClassesResponses();
+    String deleteTrainingClass(UUID id);
 }

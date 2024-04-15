@@ -235,7 +235,7 @@ public class TrainingClassServiceImpl implements TrainingClassService {
     @Override
     public List<TrainingClassesResponse> TrainingClassesResponses() {
         List<TrainingClassesResponse> trainingClassesResponses = new ArrayList<>();
-        List<TrainingClass> trainingClasses = trainingClassRepository.findAll();
+        List<TrainingClass> trainingClasses = trainingClassRepository.findAllByStatus(TrainingClassStatus.ACTIVE);
         for(TrainingClass trainingClass:trainingClasses){
             TrainingClassesResponse trainingClassesResponse = new TrainingClassesResponse();
             trainingClassesResponse.setId(trainingClass.getId());
@@ -251,5 +251,18 @@ public class TrainingClassServiceImpl implements TrainingClassService {
 
         }
         return trainingClassesResponses;
+    }
+
+    @Override
+    public String deleteTrainingClass(UUID id) {
+        Optional<TrainingClass> trainingClassOptional = trainingClassRepository.findById(id);
+        if(trainingClassOptional.isPresent()){
+            TrainingClass trainingClass = trainingClassOptional.get();
+            trainingClass.setStatus(TrainingClassStatus.DELETED);
+            trainingClassRepository.save(trainingClass);
+            return "Delete successful.";
+        }else {
+            throw new BadRequestException("Training class id is not found.");
+        }
     }
 }
