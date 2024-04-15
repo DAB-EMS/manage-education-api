@@ -176,7 +176,7 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
     }
 
     @Override
-    public String duplicatedTrainingProgram(Principal principal, UUID id) {
+    public TrainingProgram duplicatedTrainingProgram(Principal principal, UUID id) {
         LocalDate currentDate = LocalDate.now();
         Date date = java.sql.Date.valueOf(currentDate);
 
@@ -217,7 +217,7 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
                 programSyllabusRepository.save(programSyllabus1);
 
             }
-            return "duplicated successful.";
+            return saved;
         }else{
             throw new BadRequestException("Training program is not found.");
         }

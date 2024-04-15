@@ -21,6 +21,11 @@ public class TrainingClassController {
         return ResponseEntity.ok(trainingClassService.createTrainingClass(principal,id,dto));
     }
 
+    @PostMapping("customer/training-program/training-class/{training-class-id}/duplicated")
+    public ResponseEntity<?> createTrainingProgram(Principal principal, @PathVariable("training-class-id") UUID id) {
+        return ResponseEntity.ok(trainingClassService.duplicated(principal,id));
+    }
+
     @DeleteMapping("customer/training-program/training-class/{training-class-id}")
     public ResponseEntity<?> deleteTrainingProgram(@PathVariable("training-class-id") UUID id) {
         return ResponseEntity.ok(trainingClassService.deleteTrainingClass(id));
