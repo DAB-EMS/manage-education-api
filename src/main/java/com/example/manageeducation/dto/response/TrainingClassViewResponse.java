@@ -94,7 +94,7 @@ public class TrainingClassViewResponse {
 
     private FsuResponse fsu;
 
-    private TrainingProgramsResponse trainingProgram;
+    private TrainingProgramResponse trainingProgram;
 
     private Set<CustomerCollapseResponse> account_trainers;
 
