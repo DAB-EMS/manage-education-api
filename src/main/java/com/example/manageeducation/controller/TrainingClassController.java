@@ -35,4 +35,9 @@ public class TrainingClassController {
     public ResponseEntity<?> trainingProgramList() {
         return ResponseEntity.ok(trainingClassService.TrainingClassesResponses());
     }
+
+    @GetMapping("customer/training-program/training-classes/{training-class-id}")
+    public ResponseEntity<?> trainingProgramView(@PathVariable("training-class-id") UUID id) {
+        return ResponseEntity.ok(trainingClassService.viewTrainingClass(id));
+    }
 }

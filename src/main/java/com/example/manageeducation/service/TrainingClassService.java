@@ -1,6 +1,7 @@
 package com.example.manageeducation.service;
 
 import com.example.manageeducation.dto.request.TrainingClassRequest;
+import com.example.manageeducation.dto.response.TrainingClassViewResponse;
 import com.example.manageeducation.dto.response.TrainingClassesResponse;
 import org.springframework.stereotype.Service;
 
@@ -14,4 +15,5 @@ public interface TrainingClassService {
     List<TrainingClassesResponse> TrainingClassesResponses();
     String deleteTrainingClass(UUID id);
     String duplicated(Principal principal, UUID id);
+    TrainingClassViewResponse viewTrainingClass(UUID id);
 }
