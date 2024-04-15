@@ -4,7 +4,9 @@ import com.example.manageeducation.Utils.SecurityUtil;
 import com.example.manageeducation.dto.request.ClassCalendarRequest;
 import com.example.manageeducation.dto.request.CustomerRequest;
 import com.example.manageeducation.dto.request.TrainingClassRequest;
+import com.example.manageeducation.dto.response.TrainingClassesResponse;
 import com.example.manageeducation.entity.*;
+import com.example.manageeducation.enums.TrainingClassStatus;
 import com.example.manageeducation.exception.BadRequestException;
 import com.example.manageeducation.repository.*;
 import com.example.manageeducation.service.TrainingClassService;
@@ -99,6 +101,7 @@ public class TrainingClassServiceImpl implements TrainingClassService {
         trainingClass.setPlannedAttendee(dto.getPlannedAttendee());
         trainingClass.setAcceptedAttendee(dto.getAcceptedAttendee());
         trainingClass.setActualAttendee(dto.getActualAttendee());
+        trainingClass.setStatus(TrainingClassStatus.ACTIVE);
 
         //check approve validation
         Optional<Customer> customerApOptional = customerRepository.findById(dto.getApprovedBy());
@@ -227,5 +230,26 @@ public class TrainingClassServiceImpl implements TrainingClassService {
         }
 
         return "create successful.";
+    }
+
+    @Override
+    public List<TrainingClassesResponse> TrainingClassesResponses() {
+        List<TrainingClassesResponse> trainingClassesResponses = new ArrayList<>();
+        List<TrainingClass> trainingClasses = trainingClassRepository.findAll();
+        for(TrainingClass trainingClass:trainingClasses){
+            TrainingClassesResponse trainingClassesResponse = new TrainingClassesResponse();
+            trainingClassesResponse.setId(trainingClass.getId());
+            trainingClassesResponse.setName(trainingClass.getName());
+            trainingClassesResponse.setCode(trainingClass.getCourseCode());
+            trainingClassesResponse.setCreatedDate(trainingClass.getCreatedDate());
+            trainingClassesResponse.setDuration(trainingClass.getDuration());
+            trainingClassesResponse.setFsu(trainingClass.getFsu().getName());
+            trainingClassesResponse.setLocation(trainingClass.getClassLocation().getName());
+            trainingClassesResponse.setAttend(trainingClass.getAttendeeLevel().getName());
+            trainingClassesResponse.setCreatedBy(trainingClass.getCreatedBy().getFullName());
+            trainingClassesResponses.add(trainingClassesResponse);
+
+        }
+        return trainingClassesResponses;
     }
 }
