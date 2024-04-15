@@ -1,9 +1,14 @@
 package com.example.manageeducation.dto.request;
 
+import com.example.manageeducation.entity.ClassCalendar;
+import com.example.manageeducation.entity.Customer;
+import com.example.manageeducation.entity.TrainingProgram;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -16,8 +21,10 @@ public class TrainingClassRequest {
 
     private String courseCode;
 
+    @JsonFormat(pattern="HH:mm:ss")
     private LocalTime startTime;
 
+    @JsonFormat(pattern="HH:mm:ss")
     private LocalTime endTime;
 
     private LocalDate startDate;
@@ -26,11 +33,11 @@ public class TrainingClassRequest {
 
     private int duration;
 
-    private UUID reviewedBy;
+    private String reviewedBy;
 
     private LocalDateTime reviewedDate;
 
-    private UUID approvedBy;
+    private String approvedBy;
 
     private LocalDateTime approvedDate;
 
@@ -53,6 +60,10 @@ public class TrainingClassRequest {
     private ProgramContentRequest programContent;
 
     private Set<CustomerRequest> account_admins;
+
+    private Set<CustomerRequest> account_trainers;
+    private List<CustomerRequest> account_trainee;
+    private Set<ClassCalendarRequest> classCalendars;
 
     private FsuRequest fsu;
 }

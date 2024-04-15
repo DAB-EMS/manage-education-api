@@ -1,12 +1,10 @@
 package com.example.manageeducation.service.impl;
 
 import com.example.manageeducation.Utils.SecurityUtil;
+import com.example.manageeducation.dto.request.ClassCalendarRequest;
 import com.example.manageeducation.dto.request.CustomerRequest;
 import com.example.manageeducation.dto.request.TrainingClassRequest;
-import com.example.manageeducation.entity.Customer;
-import com.example.manageeducation.entity.Fsu;
-import com.example.manageeducation.entity.TrainingClass;
-import com.example.manageeducation.entity.TrainingProgram;
+import com.example.manageeducation.entity.*;
 import com.example.manageeducation.exception.BadRequestException;
 import com.example.manageeducation.repository.*;
 import com.example.manageeducation.service.TrainingClassService;
@@ -23,6 +21,27 @@ public class TrainingClassServiceImpl implements TrainingClassService {
 
     @Autowired
     TrainingClassRepository trainingClassRepository;
+
+    @Autowired
+    ClassLocationRepository classLocationRepository;
+
+    @Autowired
+    AttendLevelRepository attendLevelRepository;
+
+    @Autowired
+    FormatTypeRepository formatTypeRepository;
+
+    @Autowired
+    ClassStatusRepository classStatusRepository;
+
+    @Autowired
+    TechnicalGroupRepository technicalGroupRepository;
+
+    @Autowired
+    ClassCalendarRepository classCalendarRepository;
+
+    @Autowired
+    ProgramContentRepository programContentRepository;
 
     @Autowired
     CustomerRepository customerRepository;
@@ -67,9 +86,36 @@ public class TrainingClassServiceImpl implements TrainingClassService {
         trainingClass.setCreatedDate(currentDate);
         trainingClass.setUpdatedDate(currentDate);
         trainingClass.setTrainingProgram(trainingProgram);
+        trainingClass.setName(dto.getName());
+        trainingClass.setCourseCode(dto.getCourseCode());
+        trainingClass.setStartDate(dto.getStartDate());
+        trainingClass.setEndDate(dto.getEndDate());
+        trainingClass.setStartTime(dto.getStartTime());
+        trainingClass.setEndTime(dto.getEndTime());
+        trainingClass.setDuration(dto.getDuration());
+        trainingClass.setReviewedDate(dto.getReviewedDate());
+        trainingClass.setApprovedDate(dto.getApprovedDate());
+        trainingClass.setUniversityCode(dto.getUniversityCode());
+        trainingClass.setPlannedAttendee(dto.getPlannedAttendee());
+        trainingClass.setAcceptedAttendee(dto.getAcceptedAttendee());
+        trainingClass.setActualAttendee(dto.getActualAttendee());
+
+        //check approve validation
+        Optional<Customer> customerApOptional = customerRepository.findById(dto.getApprovedBy());
+        if(customerApOptional.isEmpty()){
+            throw new BadRequestException("Customer id is not found.");
+        }
+        trainingClass.setApprovedBy(customerApOptional.get());
+
+        //check accept validation
+        Optional<Customer> customerReOptional = customerRepository.findById(dto.getReviewedBy());
+        if(customerReOptional.isEmpty()){
+            throw new BadRequestException("Customer id is not found.");
+        }
+        trainingClass.setReviewedBy(customerReOptional.get());
 
         //set Admin
-        List<Customer> admins = new ArrayList<>();
+        Set<Customer> admins = new HashSet<>();
         for(CustomerRequest customer1: dto.getAccount_admins()){
             Optional<Customer> AdminOptional = customerRepository.findById(customer1.getId());
             if(AdminOptional.isPresent()){
@@ -77,6 +123,85 @@ public class TrainingClassServiceImpl implements TrainingClassService {
             }else {
                 throw new BadRequestException("Admin id is not found.");
             }
+        }
+        trainingClass.setAccount_admins(admins);
+
+        //set trainee
+        List<Customer> trainee = new ArrayList<>();
+        for(CustomerRequest customer1: dto.getAccount_admins()){
+            Optional<Customer> AdminOptional = customerRepository.findById(customer1.getId());
+            if(AdminOptional.isPresent()){
+                trainee.add(customerOptional.get());
+            }else {
+                throw new BadRequestException("Admin id is not found.");
+            }
+        }
+        trainingClass.setAccount_trainee(trainee);
+
+        //set trainee
+        Set<Customer> trainer = new HashSet<>();
+        for(CustomerRequest customer1: dto.getAccount_admins()){
+            Optional<Customer> AdminOptional = customerRepository.findById(customer1.getId());
+            if(AdminOptional.isPresent()){
+                trainer.add(customerOptional.get());
+            }else {
+                throw new BadRequestException("Admin id is not found.");
+            }
+        }
+        trainingClass.setAccount_trainers(trainer);
+
+        //set class location
+        Optional<ClassLocation> classLocationOptional = classLocationRepository.findById(dto.getClassLocation().getId());
+        if(classLocationOptional.isPresent()){
+            ClassLocation classLocation = classLocationOptional.get();
+            trainingClass.setClassLocation(classLocation);
+        }else {
+            throw new BadRequestException("Class location id is not found.");
+        }
+
+        //set attendee level
+        Optional<AttendLevel> attendLevelOptional = attendLevelRepository.findById(dto.getAttendeeLevel().getId());
+        if(attendLevelOptional.isPresent()){
+            AttendLevel attendLevel = attendLevelOptional.get();
+            trainingClass.setAttendeeLevel(attendLevel);
+        }else {
+            throw new BadRequestException("Attend level is not found.");
+        }
+
+        //set format type
+        Optional<FormatType> formatTypeOptional = formatTypeRepository.findById(dto.getFormatType().getId());
+        if(formatTypeOptional.isPresent()){
+            FormatType formatType = formatTypeOptional.get();
+            trainingClass.setFormatType(formatType);
+        }else {
+            throw new BadRequestException("Format type is not found.");
+        }
+
+        //set class status
+        Optional<ClassStatus> classStatusOptional = classStatusRepository.findById(dto.getClassStatus().getId());
+        if(classStatusOptional.isPresent()){
+            ClassStatus classStatus = classStatusOptional.get();
+            trainingClass.setClassStatus(classStatus);
+        }else {
+            throw new BadRequestException("Class status is not found.");
+        }
+
+        //set technical group
+        Optional<TechnicalGroup> technicalGroupOptional = technicalGroupRepository.findById(dto.getTechnicalGroup().getId());
+        if(technicalGroupOptional.isPresent()){
+            TechnicalGroup technicalGroup = technicalGroupOptional.get();
+            trainingClass.setTechnicalGroup(technicalGroup);
+        }else {
+            throw new BadRequestException("Technical group is not found.");
+        }
+
+        //set program content
+        Optional<ProgramContent> programContentOptional = programContentRepository.findById(dto.getProgramContent().getId());
+        if(programContentOptional.isPresent()){
+            ProgramContent programContent = programContentOptional.get();
+            trainingClass.setProgramContent(programContent);
+        }else {
+            throw new BadRequestException("Program content is not found.");
         }
 
         //setFsu
@@ -88,7 +213,20 @@ public class TrainingClassServiceImpl implements TrainingClassService {
             throw new BadRequestException("Fsu id is not found.");
         }
         modelMapper.map(dto,trainingClass);
-        trainingClassRepository.save(trainingClass);
-        return "Save successful.";
+        TrainingClass savedTrainingClass = trainingClassRepository.save(trainingClass);
+
+        //set class calendar
+        for(ClassCalendarRequest calendar: dto.getClassCalendars()){
+            ClassCalendar classCalendar = new ClassCalendar();
+            classCalendar.setDay_no(calendar.getDay_no());
+            classCalendar.setDateTime(calendar.getDateTime());
+            classCalendar.setBeginTime(calendar.getBeginTime());
+            classCalendar.setEndTime(calendar.getEndTime());
+            classCalendar.setTrainingClass(savedTrainingClass);
+            classCalendarRepository.save(classCalendar);
+        }
+        trainingClass.setAccount_trainers(trainer);
+
+        return "create successful.";
     }
 }
