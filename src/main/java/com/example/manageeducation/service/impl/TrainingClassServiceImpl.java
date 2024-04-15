@@ -6,6 +6,7 @@ import com.example.manageeducation.dto.request.CustomerRequest;
 import com.example.manageeducation.dto.request.TrainingClassRequest;
 import com.example.manageeducation.dto.response.TrainingClassViewResponse;
 import com.example.manageeducation.dto.response.TrainingClassesResponse;
+import com.example.manageeducation.dto.response.TrainingProgramResponse;
 import com.example.manageeducation.entity.*;
 import com.example.manageeducation.enums.TrainingClassStatus;
 import com.example.manageeducation.exception.BadRequestException;
@@ -296,7 +297,13 @@ public class TrainingClassServiceImpl implements TrainingClassService {
         Optional<TrainingClass> trainingClassOptional = trainingClassRepository.findById(id);
         if(trainingClassOptional.isPresent()){
             TrainingClass trainingClass = trainingClassOptional.get();
-            return modelMapper.map(trainingClass,TrainingClassViewResponse.class);
+
+            //init new
+            TrainingClassViewResponse trainingClassViewResponse = new TrainingClassViewResponse();
+            TrainingProgramResponse trainingProgramResponse = trainingProgramService.viewTrainingProgram(trainingClass.getTrainingProgram().getId());
+            trainingClassViewResponse.setTrainingProgram(trainingProgramResponse);
+            modelMapper.map(trainingClassViewResponse,trainingClass);
+            return trainingClassViewResponse;
         }else {
             throw new BadRequestException("Training class id is not found.");
         }
