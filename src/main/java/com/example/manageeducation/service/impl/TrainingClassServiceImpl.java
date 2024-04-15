@@ -4,6 +4,7 @@ import com.example.manageeducation.Utils.SecurityUtil;
 import com.example.manageeducation.dto.request.ClassCalendarRequest;
 import com.example.manageeducation.dto.request.CustomerRequest;
 import com.example.manageeducation.dto.request.TrainingClassRequest;
+import com.example.manageeducation.dto.response.TrainingClassViewResponse;
 import com.example.manageeducation.dto.response.TrainingClassesResponse;
 import com.example.manageeducation.entity.*;
 import com.example.manageeducation.enums.TrainingClassStatus;
@@ -287,6 +288,17 @@ public class TrainingClassServiceImpl implements TrainingClassService {
             return "Training class duplicated successful.";
         }else{
             throw new BadRequestException("Training program id is not found.");
+        }
+    }
+
+    @Override
+    public TrainingClassViewResponse viewTrainingClass(UUID id) {
+        Optional<TrainingClass> trainingClassOptional = trainingClassRepository.findById(id);
+        if(trainingClassOptional.isPresent()){
+            TrainingClass trainingClass = trainingClassOptional.get();
+            return modelMapper.map(trainingClass,TrainingClassViewResponse.class);
+        }else {
+            throw new BadRequestException("Training class id is not found.");
         }
     }
 }
