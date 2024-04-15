@@ -119,7 +119,7 @@ public class TrainingClassServiceImpl implements TrainingClassService {
         for(CustomerRequest customer1: dto.getAccount_admins()){
             Optional<Customer> AdminOptional = customerRepository.findById(customer1.getId());
             if(AdminOptional.isPresent()){
-                admins.add(customerOptional.get());
+                admins.add(AdminOptional.get());
             }else {
                 throw new BadRequestException("Admin id is not found.");
             }
@@ -128,22 +128,22 @@ public class TrainingClassServiceImpl implements TrainingClassService {
 
         //set trainee
         List<Customer> trainee = new ArrayList<>();
-        for(CustomerRequest customer1: dto.getAccount_admins()){
-            Optional<Customer> AdminOptional = customerRepository.findById(customer1.getId());
-            if(AdminOptional.isPresent()){
-                trainee.add(customerOptional.get());
+        for(CustomerRequest customer1: dto.getAccount_trainee()){
+            Optional<Customer> TraineeOptional = customerRepository.findById(customer1.getId());
+            if(TraineeOptional.isPresent()){
+                trainee.add(TraineeOptional.get());
             }else {
                 throw new BadRequestException("Admin id is not found.");
             }
         }
         trainingClass.setAccount_trainee(trainee);
 
-        //set trainee
+        //set trainer
         Set<Customer> trainer = new HashSet<>();
-        for(CustomerRequest customer1: dto.getAccount_admins()){
-            Optional<Customer> AdminOptional = customerRepository.findById(customer1.getId());
-            if(AdminOptional.isPresent()){
-                trainer.add(customerOptional.get());
+        for(CustomerRequest customer1: dto.getAccount_trainers()){
+            Optional<Customer> TrainerOptional = customerRepository.findById(customer1.getId());
+            if(TrainerOptional.isPresent()){
+                trainer.add(TrainerOptional.get());
             }else {
                 throw new BadRequestException("Admin id is not found.");
             }
@@ -225,7 +225,6 @@ public class TrainingClassServiceImpl implements TrainingClassService {
             classCalendar.setTrainingClass(savedTrainingClass);
             classCalendarRepository.save(classCalendar);
         }
-        trainingClass.setAccount_trainers(trainer);
 
         return "create successful.";
     }
