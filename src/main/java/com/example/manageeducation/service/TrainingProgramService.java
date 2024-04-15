@@ -17,6 +17,7 @@ public interface TrainingProgramService {
     String createTrainingProgram(Principal principal, TrainingProgramRequest dto);
     TrainingProgramResponse viewTrainingProgram(UUID id);
     String deActiveTrainingProgram(UUID id);
+    String deleteTrainingProgram(UUID id);
     String duplicatedTrainingProgram(Principal principal, UUID id);
     List<TrainingProgramsResponse> trainingPrograms();
     String importTrainingProgram(MultipartFile file, Principal principal);

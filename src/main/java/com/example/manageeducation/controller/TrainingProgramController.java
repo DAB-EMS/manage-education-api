@@ -34,9 +34,14 @@ public class TrainingProgramController {
         return ResponseEntity.ok(trainingProgramService.trainingPrograms());
     }
 
-    @PutMapping("customer/training-program/{training-program-id}")
+    @PutMapping("customer/training-program/{training-program-id}/de-active")
     public ResponseEntity<?> inActiveTrainingProgram(@PathVariable("training-program-id") UUID id) {
         return ResponseEntity.ok(trainingProgramService.deActiveTrainingProgram(id));
+    }
+
+    @DeleteMapping("customer/training-program/{training-program-id}")
+    public ResponseEntity<?> deleteTrainingProgram(@PathVariable("training-program-id") UUID id) {
+        return ResponseEntity.ok(trainingProgramService.deleteTrainingProgram(id));
     }
 
     @PostMapping("customer/training-program/{training-program-id}/duplicated")

@@ -163,6 +163,19 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
     }
 
     @Override
+    public String deleteTrainingProgram(UUID id) {
+        Optional<TrainingProgram> trainingProgramOptional = trainingProgramRepository.findById(id);
+        if(trainingProgramOptional.isPresent()){
+            TrainingProgram trainingProgram = trainingProgramOptional.get();
+            trainingProgram.setStatus(TrainingProgramStatus.DELETED);
+            trainingProgramRepository.save(trainingProgram);
+            return "In-active successful.";
+        }else{
+            throw new BadRequestException("Training program is not found.");
+        }
+    }
+
+    @Override
     public String duplicatedTrainingProgram(Principal principal, UUID id) {
         LocalDate currentDate = LocalDate.now();
         Date date = java.sql.Date.valueOf(currentDate);
@@ -286,7 +299,7 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
                         SyllabusTNImportRequest syllabus = new SyllabusTNImportRequest();
                         syllabus.setName(row.getCell(0).getStringCellValue());
                         syllabus.setCode(row.getCell(1).getStringCellValue());
-                        syllabus.setVersion(row.getCell(2).getStringCellValue());
+                        syllabus.setVersion(String.valueOf(row.getCell(2).getNumericCellValue()));
                         syllabuses.add(syllabus);
                     }
 
