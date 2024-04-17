@@ -42,6 +42,11 @@ public class SyllabusController {
         return ResponseEntity.ok(syllabusService.syllabuses(search, date));
     }
 
+    @GetMapping("/syllabuses/program-syllabus")
+    public ResponseEntity<?> getSyllabusesProgram() {
+        return ResponseEntity.ok(syllabusService.viewSyllabusProgram());
+    }
+
     @DeleteMapping("/customer/syllabus/{syllabus-id}")
     public ResponseEntity<?> deleteSyllabus(@PathVariable("syllabus-id") UUID id) {
         return ResponseEntity.ok(syllabusService.deleteSyllabus(id));

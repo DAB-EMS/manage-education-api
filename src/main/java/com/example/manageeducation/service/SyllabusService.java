@@ -3,6 +3,7 @@ package com.example.manageeducation.service;
 import com.example.manageeducation.dto.request.SyllabusRequest;
 import com.example.manageeducation.dto.request.SyllabusUpdateRequest;
 import com.example.manageeducation.dto.response.SyllabusResponse;
+import com.example.manageeducation.dto.response.SyllabusViewProgramResponse;
 import com.example.manageeducation.dto.response.ViewSyllabusResponse;
 import com.example.manageeducation.entity.Syllabus;
 import org.springframework.stereotype.Service;
@@ -23,4 +24,5 @@ public interface SyllabusService {
     String deleteSyllabus(UUID id);
     Syllabus updateSyllabus(UUID id, SyllabusUpdateRequest dto);
     String deActive(UUID id);
+    List<SyllabusViewProgramResponse> viewSyllabusProgram();
 }

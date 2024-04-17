@@ -302,7 +302,7 @@ public class TrainingClassServiceImpl implements TrainingClassService {
             TrainingClassViewResponse trainingClassViewResponse = new TrainingClassViewResponse();
             TrainingProgramResponse trainingProgramResponse = trainingProgramService.viewTrainingProgram(trainingClass.getTrainingProgram().getId());
             trainingClassViewResponse.setTrainingProgram(trainingProgramResponse);
-            modelMapper.map(trainingClassViewResponse,trainingClass);
+            modelMapper.map(trainingClass,trainingClassViewResponse);
             return trainingClassViewResponse;
         }else {
             throw new BadRequestException("Training class id is not found.");

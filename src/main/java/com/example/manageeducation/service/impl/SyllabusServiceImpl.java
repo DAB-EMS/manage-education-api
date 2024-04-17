@@ -2,10 +2,7 @@ package com.example.manageeducation.service.impl;
 
 import com.example.manageeducation.Utils.SecurityUtil;
 import com.example.manageeducation.dto.request.*;
-import com.example.manageeducation.dto.response.OutputStandardResponse;
-import com.example.manageeducation.dto.response.SyllabusResponse;
-import com.example.manageeducation.dto.response.TimeAllocationResponse;
-import com.example.manageeducation.dto.response.ViewSyllabusResponse;
+import com.example.manageeducation.dto.response.*;
 import com.example.manageeducation.entity.*;
 import com.example.manageeducation.enums.MaterialStatus;
 import com.example.manageeducation.enums.SyllabusDayStatus;
@@ -772,6 +769,15 @@ public class SyllabusServiceImpl implements SyllabusService {
         }else{
             throw new BadRequestException("Syllabus id is not found.");
         }
+    }
+
+    @Override
+    public List<SyllabusViewProgramResponse> viewSyllabusProgram() {
+        List<Syllabus> syllabusList = syllabusRepository.findAllByStatus(SyllabusStatus.ACTIVE);
+        return syllabusList
+                .stream()
+                .map(syllabus -> modelMapper.map(syllabus, SyllabusViewProgramResponse.class))
+                .collect(Collectors.toList());
     }
 
     private ViewSyllabusResponse mapToViewSyllabusResponse(Syllabus suSyllabus) {
