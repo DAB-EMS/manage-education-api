@@ -50,7 +50,7 @@ public class SecurityConfig {
         http
                 .cors().configurationSource(request -> {
                     CorsConfiguration cors = new CorsConfiguration();
-                    cors.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+                    cors.setAllowedOrigins(Arrays.asList("http://localhost:3001","http://localhost:3000"));
                     cors.setAllowedMethods(Arrays.asList("*"));
                     cors.setAllowedHeaders(Arrays.asList("*"));
                     cors.setAllowCredentials(true);
