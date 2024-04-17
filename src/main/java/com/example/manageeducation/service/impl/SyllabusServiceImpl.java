@@ -774,6 +774,15 @@ public class SyllabusServiceImpl implements SyllabusService {
     @Override
     public List<SyllabusViewProgramResponse> viewSyllabusProgram() {
         List<Syllabus> syllabusList = syllabusRepository.findAllByStatus(SyllabusStatus.ACTIVE);
+        for(Syllabus syllabus: syllabusList){
+            Optional<Customer> customerOptional = customerRepository.findById(syllabus.getCreatedBy());
+            if(customerOptional.isPresent()){
+                Customer customer = customerOptional.get();
+                syllabus.setCreatedBy(customer.getFullName());
+            }else{
+                throw new BadRequestException("Customer id is not found.");
+            }
+        }
         return syllabusList
                 .stream()
                 .map(syllabus -> modelMapper.map(syllabus, SyllabusViewProgramResponse.class))
