@@ -100,6 +100,10 @@ public class SyllabusServiceImpl implements SyllabusService {
         AssessmentScheme assessmentScheme = getAssessmentScheme(dto, savedSyllabus);
         assessmentSchemeRepository.save(assessmentScheme);
 
+        //save delivery principle
+        DeliveryPrinciple deliveryPrinciple = getDeliveryPrinciple(dto, savedSyllabus);
+        deliveryPrincipleRepository.save(deliveryPrinciple);
+
         //save syllabus days
         for(SyllabusDayRequest syllabusDay: dto.getSyllabusDays()){
             SyllabusDay syllabusDay1 = new SyllabusDay();
@@ -876,6 +880,19 @@ public class SyllabusServiceImpl implements SyllabusService {
         assessmentScheme.setFinalTheory(dto.getAssessmentScheme().getFinalTheory());
         assessmentScheme.setSyllabus(savedSyllabus);
         return assessmentScheme;
+    }
+
+    private static DeliveryPrinciple getDeliveryPrinciple(SyllabusRequest dto, Syllabus savedSyllabus) {
+        DeliveryPrinciple deliveryPrinciple = new DeliveryPrinciple();
+        deliveryPrinciple.setTrainees(dto.getDeliveryPrinciple().getTrainees());
+        deliveryPrinciple.setTrainer(dto.getDeliveryPrinciple().getTrainer());
+        deliveryPrinciple.setTraining(dto.getDeliveryPrinciple().getTraining());
+        deliveryPrinciple.setRe_test(dto.getDeliveryPrinciple().getRe_test());
+        deliveryPrinciple.setMarking(dto.getDeliveryPrinciple().getMarking());
+        deliveryPrinciple.setWaiverCriteria(dto.getDeliveryPrinciple().getWaiverCriteria());
+        deliveryPrinciple.setOthers(dto.getDeliveryPrinciple().getOthers());
+        deliveryPrinciple.setSyllabus(savedSyllabus);
+        return deliveryPrinciple;
     }
 
     public static List<Integer> extractDayNumbers(String input) {

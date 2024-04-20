@@ -156,7 +156,7 @@ public class TrainingClass implements Serializable {
     @ManyToMany(fetch = FetchType.EAGER)
     @JsonIgnore
     @JoinTable(name = "class_trainee", joinColumns = @JoinColumn(name = "class_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "trainee_id", referencedColumnName = "id"))
-    private List<Customer> account_trainee; // relationship association
+    private List<Customer> account_trainee;
 
     @OneToMany(mappedBy = "trainingClass")
     @JsonIgnore

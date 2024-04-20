@@ -30,6 +30,8 @@ public class SyllabusRequest {
 
     private AssessmentSchemeRequest assessmentScheme;
 
+    private DeliveryPrincipleImportRequest deliveryPrinciple;
+
     private UUID syllabusLevel;
 
     private List<SyllabusDayRequest> syllabusDays;
