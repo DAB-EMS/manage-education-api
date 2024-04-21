@@ -115,9 +115,14 @@ public class SyllabusServiceImpl implements SyllabusService {
 
             //save syllabus unit
             for(SyllabusUnitRequest syllabusUnitRequest: syllabusDay.getSyllabusUnits()){
+                int durations = 0;
                 SyllabusUnit syllabusUnit = new SyllabusUnit();
                 syllabusUnit.setName(syllabusUnitRequest.getName());
-                syllabusUnit.setDuration(syllabusUnitRequest.getDuration());
+                //get duration
+                for(SyllabusUnitChapterRequest syllabusUnitChapterRequest: syllabusUnitRequest.getSyllabusUnitChapters()){
+                    durations += (int) syllabusUnitChapterRequest.getDuration();
+                }
+                syllabusUnit.setDuration(durations);
                 syllabusUnit.setUnitNo(syllabusUnitRequest.getUnitNo());
                 syllabusUnit.setSyllabus(savedSyllabus);
                 syllabusUnit.setSyllabusDay(savedSyllabusDay);
@@ -163,7 +168,26 @@ public class SyllabusServiceImpl implements SyllabusService {
                 }
             }
         }
-        return "create successful";
+
+        //update hour and day of syllabus
+        Optional<Syllabus> syllabusOptional = syllabusRepository.findById(savedSyllabus.getId());
+        if(syllabusOptional.isPresent()){
+            int days = 0;
+            int hours = 0;
+            Syllabus syllabus1 = syllabusOptional.get();
+            for(SyllabusDay syllabusDay: syllabus1.getSyllabusDays()){
+                days++;
+                for(SyllabusUnit syllabusUnit: syllabusDay.getSyllabusUnits()){
+                    hours += syllabusUnit.getDuration();
+                }
+            }
+            syllabus1.setHours(hours);
+            syllabus1.setDays(days);
+            syllabusRepository.save(syllabus1);
+            return "create successful";
+        }else{
+            throw new BadRequestException("Syllabus id is not found.");
+        }
     }
 
     @Override
@@ -220,17 +244,17 @@ public class SyllabusServiceImpl implements SyllabusService {
             syllabusRequest.setStandardRequests(standardRequests);
 
             //get day
-            List<SyllabusDayRequest> syllabusDays = new ArrayList<>();
+            List<SyllabusDayImportRequest> syllabusDays = new ArrayList<>();
             String days = dataFormatter.formatCellValue(sheet.getRow(12).getCell(3));
             List<Integer> dayNumbers = extractDayNumbers(days);
             for (int day : dayNumbers) {
-                SyllabusDayRequest syllabusDayRequest = new SyllabusDayRequest();
+                SyllabusDayImportRequest syllabusDayRequest = new SyllabusDayImportRequest();
                 syllabusDayRequest.setDayNo(day);
                 syllabusDayRequest.setStatus(SyllabusDayStatus.AVAILABLE);
-                List<SyllabusUnitRequest> syllabusUnitRequests = new ArrayList<>();
+                List<SyllabusUnitImportRequest> syllabusUnitRequests = new ArrayList<>();
                 //sheet 2
                 XSSFSheet sheet2 = workbook.getSheetAt(1);
-                SyllabusUnitRequest syllabusUnitRequest = new SyllabusUnitRequest();
+                SyllabusUnitImportRequest syllabusUnitRequest = new SyllabusUnitImportRequest();
                 if(day==1){
                     syllabusUnitRequest.setName(getStringAfterUnderscore(dataFormatter.formatCellValue(sheet2.getRow(2).getCell(1))));
                     syllabusUnitRequest.setUnitNo(getUnitNumber(dataFormatter.formatCellValue(sheet2.getRow(3).getCell(1))));
@@ -418,9 +442,9 @@ public class SyllabusServiceImpl implements SyllabusService {
 
         int days = 0;
         int hours = 0;
-        for(SyllabusDayRequest syllabusDayCount: dto.getSyllabusDays()){
+        for(SyllabusDayImportRequest syllabusDayCount: dto.getSyllabusDays()){
             days++;
-            for(SyllabusUnitRequest syllabusUnit: syllabusDayCount.getSyllabusUnits()){
+            for(SyllabusUnitImportRequest syllabusUnit: syllabusDayCount.getSyllabusUnits()){
                 hours += syllabusUnit.getDuration();
             }
         }
@@ -445,7 +469,7 @@ public class SyllabusServiceImpl implements SyllabusService {
 
 
         //save syllabus days
-        for(SyllabusDayRequest syllabusDay: dto.getSyllabusDays()){
+        for(SyllabusDayImportRequest syllabusDay: dto.getSyllabusDays()){
             SyllabusDay syllabusDay1 = new SyllabusDay();
             syllabusDay1.setDayNo(syllabusDay.getDayNo());
             syllabusDay1.setSyllabus(savedSyllabus);
@@ -454,7 +478,7 @@ public class SyllabusServiceImpl implements SyllabusService {
             SyllabusDay savedSyllabusDay = syllabusDayRepository.save(syllabusDay1);
 
             //save syllabus unit
-            for(SyllabusUnitRequest syllabusUnitRequest: syllabusDay.getSyllabusUnits()){
+            for(SyllabusUnitImportRequest syllabusUnitRequest: syllabusDay.getSyllabusUnits()){
                 SyllabusUnit syllabusUnit = new SyllabusUnit();
                 syllabusUnit.setName(syllabusUnitRequest.getName());
                 syllabusUnit.setDuration(syllabusUnitRequest.getDuration());
@@ -833,8 +857,6 @@ public class SyllabusServiceImpl implements SyllabusService {
         syllabus.setAttendeeNumber(dto.getAttendeeNumber());
         syllabus.setTechnicalRequirement(dto.getTechnicalRequirement());
         syllabus.setCourseObjective(dto.getCourseObjective());
-        syllabus.setDays(dto.getDays());
-        syllabus.setHours(dto.getHours());
         syllabus.setStatus(dto.getStatus());
         syllabus.setTemplate(dto.isTemplate());
         syllabus.setCreatedBy(id);
@@ -857,8 +879,6 @@ public class SyllabusServiceImpl implements SyllabusService {
         syllabus.setAttendeeNumber(dto.getAttendeeNumber());
         syllabus.setTechnicalRequirement(dto.getTechnicalRequirement());
         syllabus.setCourseObjective(dto.getCourseObjective());
-        syllabus.setDays(dto.getDays());
-        syllabus.setHours(dto.getHours());
         syllabus.setStatus(dto.getStatus());
         syllabus.setTemplate(dto.isTemplate());
         syllabus.setCreatedBy(id);

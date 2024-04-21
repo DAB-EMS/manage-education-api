@@ -33,6 +33,6 @@ public class SyllabusImportRequest {
     private UUID syllabusLevel;
     private DeliveryPrincipleImportRequest deliveryPrinciple;
 
-    private List<SyllabusDayRequest> syllabusDays;
+    private List<SyllabusDayImportRequest> syllabusDays;
     private List<OutputStandardRequest> standardRequests;
 }
