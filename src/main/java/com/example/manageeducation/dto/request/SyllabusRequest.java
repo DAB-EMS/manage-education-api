@@ -22,8 +22,6 @@ public class SyllabusRequest {
     private int attendeeNumber;
     private String technicalRequirement;
     private String courseObjective;
-    private int days;
-    private int hours;
     @Enumerated(EnumType.STRING)
     private SyllabusStatus status;
     private boolean isTemplate;
