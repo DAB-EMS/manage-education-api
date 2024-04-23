@@ -105,7 +105,10 @@ public class SyllabusServiceImpl implements SyllabusService {
         deliveryPrincipleRepository.save(deliveryPrinciple);
 
         //save syllabus days
+        int totalDay = 0;
+        int totalHours = 0;
         for(SyllabusDayRequest syllabusDay: dto.getSyllabusDays()){
+            totalDay ++;
             SyllabusDay syllabusDay1 = new SyllabusDay();
             syllabusDay1.setDayNo(syllabusDay.getDayNo());
             syllabusDay1.setSyllabus(savedSyllabus);
@@ -122,6 +125,7 @@ public class SyllabusServiceImpl implements SyllabusService {
                 for(SyllabusUnitChapterRequest syllabusUnitChapterRequest: syllabusUnitRequest.getSyllabusUnitChapters()){
                     durations += (int) syllabusUnitChapterRequest.getDuration();
                 }
+                totalHours += durations;
                 syllabusUnit.setDuration(durations);
                 syllabusUnit.setUnitNo(syllabusUnitRequest.getUnitNo());
                 syllabusUnit.setSyllabus(savedSyllabus);
@@ -172,17 +176,9 @@ public class SyllabusServiceImpl implements SyllabusService {
         //update hour and day of syllabus
         Optional<Syllabus> syllabusOptional = syllabusRepository.findById(savedSyllabus.getId());
         if(syllabusOptional.isPresent()){
-            int days = 0;
-            int hours = 0;
             Syllabus syllabus1 = syllabusOptional.get();
-            for(SyllabusDay syllabusDay: syllabus1.getSyllabusDays()){
-                days++;
-                for(SyllabusUnit syllabusUnit: syllabusDay.getSyllabusUnits()){
-                    hours += syllabusUnit.getDuration();
-                }
-            }
-            syllabus1.setHours(hours);
-            syllabus1.setDays(days);
+            syllabus1.setHours(totalHours);
+            syllabus1.setDays(totalDay);
             syllabusRepository.save(syllabus1);
             return "create successful";
         }else{
