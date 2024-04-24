@@ -33,11 +33,11 @@ public class TrainingProgram {
 
     private boolean isTemplate;
 
-    private String createdBy;
+    private UUID createdBy;
 
     private Date createdDate;
 
-    private String updatedBy;
+    private UUID updatedBy;
 
     private Date updatedDate;
     private String version;

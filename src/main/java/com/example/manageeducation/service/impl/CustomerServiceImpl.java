@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -77,7 +78,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 
     @Override
-    public String deActiveCustomer(String customerId) {
+    public String deActiveCustomer(UUID customerId) {
         Optional<Customer> customerOptional = customerRepository.findById(customerId);
         if(customerOptional.isPresent()){
             Customer customer = customerOptional.get();
@@ -90,7 +91,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public String deleteCustomer(String customerId) {
+    public String deleteCustomer(UUID customerId) {
         Optional<Customer> customerOptional = customerRepository.findById(customerId);
         if(customerOptional.isPresent()){
             Customer customer = customerOptional.get();
@@ -103,7 +104,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public String changeRole(String customerId, RoleType role) {
+    public String changeRole(UUID customerId, RoleType role) {
         Optional<Role> roleOptional = roleRepository.findByName(role);
         if(roleOptional.isEmpty()){
             throw new BadRequestException("Role is not exist.");
@@ -120,7 +121,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public String updateCustomer(String customerId, CustomerUpdateRequest dto) {
+    public String updateCustomer(UUID customerId, CustomerUpdateRequest dto) {
         Optional<Customer> customerOptional = customerRepository.findById(customerId);
         if(customerOptional.isPresent()){
             Customer customer = customerOptional.get();
@@ -199,7 +200,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerResponse getUser(String Id) {
+    public CustomerResponse getUser(UUID Id) {
         Optional<Customer> customerOptional = customerRepository.findById(Id);
         if(customerOptional.isPresent()){
             return modelMapper.map(customerOptional.get(),CustomerResponse.class);

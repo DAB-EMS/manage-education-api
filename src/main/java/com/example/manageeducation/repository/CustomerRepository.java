@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface CustomerRepository extends JpaRepository<Customer, String> {
+public interface CustomerRepository extends JpaRepository<Customer, UUID> {
     Optional<Customer> findByEmail(String email);
     Customer findCustomerByEmail(String email);
     List<Customer> findByFullNameContainingIgnoreCase(String name);

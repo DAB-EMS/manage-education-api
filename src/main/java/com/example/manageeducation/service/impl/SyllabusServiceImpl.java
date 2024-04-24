@@ -802,7 +802,7 @@ public class SyllabusServiceImpl implements SyllabusService {
             Optional<Customer> customerOptional = customerRepository.findById(syllabus.getCreatedBy());
             if(customerOptional.isPresent()){
                 Customer customer = customerOptional.get();
-                syllabus.setCreatedBy(customer.getFullName());
+                syllabus.setCreatedBy(customer.getId());
             }else{
                 throw new BadRequestException("Customer id is not found.");
             }
@@ -845,7 +845,7 @@ public class SyllabusServiceImpl implements SyllabusService {
     }
 
 
-    private static Syllabus getSyllabus(SyllabusRequest dto, Optional<SyllabusLevel> syllabusLevelOptional, String id, Date date) {
+    private static Syllabus getSyllabus(SyllabusRequest dto, Optional<SyllabusLevel> syllabusLevelOptional, UUID id, Date date) {
         Syllabus syllabus = new Syllabus();
         syllabus.setName(dto.getName());
         syllabus.setCode(dto.getCode());
@@ -867,7 +867,7 @@ public class SyllabusServiceImpl implements SyllabusService {
         return syllabus;
     }
 
-    private static Syllabus getSyllabusImport(SyllabusRequest dto, String id, Date date) {
+    private static Syllabus getSyllabusImport(SyllabusRequest dto, UUID id, Date date) {
         Syllabus syllabus = new Syllabus();
         syllabus.setName(dto.getName());
         syllabus.setCode(dto.getCode());

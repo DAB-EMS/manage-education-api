@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,8 +28,13 @@ import java.util.*;
 @JsonIgnoreProperties({"hibernateLazyInitializer"})
 public class Customer implements UserDetails {
     @Id
-    private String id;
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "id", updatable = false, nullable = false)
+    @Type(type = "org.hibernate.type.UUIDCharType")
+    private UUID id;
 
+    @Column(length = 50)
     @NonNull
     @Email
     private String email;
@@ -40,6 +47,7 @@ public class Customer implements UserDetails {
     private Instant expiredDate;
     private Instant createdDate;
     private Instant updatedDate;
+    @Column(columnDefinition = "varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL, FULLTEXT KEY fullname(fullname)")
     private String fullName;
 
     private Date birthday;
