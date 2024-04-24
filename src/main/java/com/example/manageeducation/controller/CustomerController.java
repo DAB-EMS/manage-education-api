@@ -6,13 +6,18 @@ import com.example.manageeducation.enums.RoleType;
 import com.example.manageeducation.service.CustomerService;
 import com.example.manageeducation.service.impl.FirebaseService;
 import io.swagger.annotations.ApiOperation;
+import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.UUID;
 
 @RestController
@@ -82,4 +87,18 @@ public class CustomerController {
         }
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("customer/template/download")
+    public @ResponseBody byte[] downloadCsvTemplate(HttpServletResponse servletResponse) throws IOException {
+        servletResponse.setContentType("text/csv");
+        servletResponse.addHeader("Content-Disposition", "attachment; filename=\"UserTemplate.zip\"");
+        InputStream file;
+        try {
+            file = getClass().getResourceAsStream("/templates/UserTemplate.zip");
+        } catch (Exception e) {
+            throw new FileNotFoundException("File template not exist");
+        }
+        return IOUtils.toByteArray(file);
+    }
+
 }
