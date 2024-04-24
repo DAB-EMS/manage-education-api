@@ -4,11 +4,17 @@ import com.example.manageeducation.dto.request.SyllabusRequest;
 import com.example.manageeducation.dto.request.SyllabusUpdateRequest;
 import com.example.manageeducation.service.SyllabusService;
 import io.swagger.annotations.ApiOperation;
+import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.Principal;
 import java.util.Date;
 import java.util.UUID;
@@ -72,5 +78,18 @@ public class SyllabusController {
             //  throw internal error;
         }
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/customer/syllabus/template/download")
+    public @ResponseBody byte[] downloadXlsxTemplate(HttpServletResponse servletResponse) throws IOException {
+        servletResponse.setContentType("text/xlsx");
+        servletResponse.addHeader("Content-Disposition", "attachment; filename=\"SyllabusTemplate.zip\"");
+        InputStream file;
+        try {
+            file = getClass().getResourceAsStream("/templates/SyllabusTemplate.zip");
+        } catch (Exception e) {
+            throw new FileNotFoundException("File template not exist.");
+        }
+        return IOUtils.toByteArray(file);
     }
 }
