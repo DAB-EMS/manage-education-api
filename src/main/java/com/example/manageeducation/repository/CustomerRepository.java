@@ -12,6 +12,7 @@ import java.util.UUID;
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, String> {
     Optional<Customer> findByEmail(String email);
+    Customer findCustomerByEmail(String email);
     List<Customer> findByFullNameContainingIgnoreCase(String name);
     List<Customer> findAllByStatus(CustomerStatus status);
 }
