@@ -56,10 +56,10 @@ public class CustomerServiceImpl implements CustomerService {
             if(customerOptional.isPresent()){
                 return customerOptional.get();
             }else{
-                throw new BadRequestException("Email not exist in system.");
+                return null;
             }
         }catch (Exception e){
-            return null;
+            throw new BadRequestException(e.getMessage());
         }
     }
 

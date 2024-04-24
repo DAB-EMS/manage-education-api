@@ -47,7 +47,6 @@ public class Customer implements UserDetails {
     private Instant expiredDate;
     private Instant createdDate;
     private Instant updatedDate;
-    @Column(columnDefinition = "varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL, FULLTEXT KEY fullname(fullname)")
     private String fullName;
 
     private Date birthday;

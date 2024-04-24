@@ -42,8 +42,13 @@ public class TrainingProgram {
     private Date updatedDate;
     private String version;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private TrainingProgramStatus status;
+
+    @OneToOne
+    @JoinColumn(name = "class_id", unique = true)
+    @JsonIgnore
+    private TrainingClass trainingClass;
 
     @OneToMany(mappedBy = "trainingProgram", cascade = CascadeType.ALL)
     @JsonIgnore

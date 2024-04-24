@@ -351,9 +351,7 @@ public class TrainingClassServiceImpl implements TrainingClassService {
 
 
             for (int i = 1; i < sheet.getPhysicalNumberOfRows(); i++) {
-                // DataExcelForTrainingClass trainingClassDTO = mapToDTO(newTraningClass);
                 Row row = sheet.getRow(i);
-                // dataExcelForTrainingClass=new DataExcelForTrainingClass();
                 DataExcelForTrainingClass dataExcelForTrainingClass = new DataExcelForTrainingClass();
 
                 if (row != null) {
@@ -505,8 +503,6 @@ public class TrainingClassServiceImpl implements TrainingClassService {
                     }
                     if (c22 != null) {
                         String updatedDateValue = formatter.formatCellValue(c22, evaluator).trim();
-//                        Date updatedDate = df.parse(updatedDateValue);
-                        //dataExcelForTrainingClass.setUpdatedDate(updatedDate);
                     }
                     if (c23 != null) {
                         String updatedBy = formatter.formatCellValue(c23, evaluator).trim();
@@ -554,19 +550,14 @@ public class TrainingClassServiceImpl implements TrainingClassService {
                         int plannedAtt = Integer.parseInt(plannedAttendee);
                         dataExcelForTrainingClass.setPlannedAttendee(plannedAtt);
                     }
-                    System.out.println("Tới dòng đây rồi");
                     saveTrainingClass(principal,dataExcelForTrainingClass);
-                    System.out.println("save success");
                     list.add(dataExcelForTrainingClass);
                 }
             }
             return list;
-        } catch (
-
-                Exception ex) {
-
+        } catch (Exception ex) {
+            throw new BadRequestException(ex.getMessage());
         }
-        return null;
     }
 
     public void saveTrainingClass(Principal principal, DataExcelForTrainingClass dataExcelForTrainingClass) {
@@ -577,7 +568,6 @@ public class TrainingClassServiceImpl implements TrainingClassService {
         if (trainingClassRepository.findByCourseCode(dataExcelForTrainingClass.getCourseCode()) == null) {
             if (trainingProgram != null) {
                 if (trainingProgramInTrainingClass == null) {
-                    System.out.println("Bat dau insert");
                     TrainingClass trainingClass = new TrainingClass();
                     Optional<Customer> customerOptional = customerRepository.findById(securityUtil.getLoginUser(principal).getId());
                     if(customerOptional.isPresent()){
@@ -608,31 +598,19 @@ public class TrainingClassServiceImpl implements TrainingClassService {
                     System.out.println(listTrainer.size());
                     Set<Customer> trainers = new HashSet<>();
                     for (String value : listTrainer) {
-                        Optional<Customer> customerOptionalT = customerRepository.findByEmail(value);
-                        if(customerOptionalT.isPresent()){
-                            Customer trainer = customerOptionalT.get();
-                            trainers.add(trainer);
-                            trainingClass.setAccount_trainers(trainers);
-                        }else {
-                            throw new BadRequestException("Customer id is not found.");
-                        }
+                        Customer trainer = customerRepository.findCustomerByEmail(value);
+                        trainers.add(trainer);
+                        trainingClass.setAccount_trainers(trainers);
 
                     }
                     Set<String> listAdmin = dataExcelForTrainingClass.getClassAdmin();
                     Set<Customer> admins = new HashSet<>();
                     for (String value : listAdmin) {
-                        Optional<Customer> customerOptionalA = customerRepository.findByEmail(value);
-                        if(customerOptionalA.isPresent()){
-                            Customer admin = customerOptionalA.get();
-                            admins.add(admin);
-                            trainingClass.setAccount_admins(admins);
-                        }else {
-                            throw new BadRequestException("Customer id is not found.");
-                        }
-
+                        Customer admin = customerRepository.findCustomerByEmail(value);
+                        admins.add(admin);
+                        trainingClass.setAccount_admins(admins);
                     }
                     trainingClassRepository.save(trainingClass);
-                    System.out.println("save rồi");
                 } else {
                     dataExcelForTrainingClass.setMessageError("TrainingProgram is duplicated with another class");
 

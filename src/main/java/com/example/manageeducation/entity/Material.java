@@ -36,7 +36,7 @@ public class Material {
     @Lob
     private byte[] data;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private MaterialStatus materialStatus;
 
     // unit_chapter_id
