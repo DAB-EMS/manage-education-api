@@ -28,15 +28,15 @@ public class Material {
     private String name;
     @Column(length = 65555)
     private String url;
-    private String createdBy;
+    private UUID createdBy;
     private Date createdDate;
-    private String updatedBy;
+    private UUID updatedBy;
     private Date updatedDate;
 
     @Lob
     private byte[] data;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private MaterialStatus materialStatus;
 
     // unit_chapter_id

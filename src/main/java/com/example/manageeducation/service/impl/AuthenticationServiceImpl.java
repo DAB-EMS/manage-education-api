@@ -57,7 +57,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         java.util.Date utilDate = new java.util.Date(sqlDate.getTime());
         java.time.Instant instant = utilDate.toInstant();
         var user = Customer.builder()
-                .id(request.getId())
                 .fullName(request.getName())
                 .avatar(request.getAvatar())
                 .birthday(request.getBirthday())

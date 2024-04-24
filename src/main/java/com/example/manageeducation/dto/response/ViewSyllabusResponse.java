@@ -18,7 +18,7 @@ public class ViewSyllabusResponse {
     private String name;
     private String code;
     private Date createOn;
-    private String createBy;
+    private UUID createBy;
     private int duration;
     List<OutputStandardResponse> outputStandard;
 }

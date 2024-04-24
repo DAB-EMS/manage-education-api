@@ -33,11 +33,11 @@ public class TrainingClassRequest {
 
     private int duration;
 
-    private String reviewedBy;
+    private UUID reviewedBy;
 
     private LocalDateTime reviewedDate;
 
-    private String approvedBy;
+    private UUID approvedBy;
 
     private LocalDateTime approvedDate;
 

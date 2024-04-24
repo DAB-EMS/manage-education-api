@@ -28,7 +28,7 @@ public class SyllabusDay {
 
     private int dayNo;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private SyllabusDayStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)

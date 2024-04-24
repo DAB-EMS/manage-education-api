@@ -33,17 +33,22 @@ public class TrainingProgram {
 
     private boolean isTemplate;
 
-    private String createdBy;
+    private UUID createdBy;
 
     private Date createdDate;
 
-    private String updatedBy;
+    private UUID updatedBy;
 
     private Date updatedDate;
     private String version;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private TrainingProgramStatus status;
+
+    @OneToOne
+    @JoinColumn(name = "class_id", unique = true)
+    @JsonIgnore
+    private TrainingClass trainingClass;
 
     @OneToMany(mappedBy = "trainingProgram", cascade = CascadeType.ALL)
     @JsonIgnore

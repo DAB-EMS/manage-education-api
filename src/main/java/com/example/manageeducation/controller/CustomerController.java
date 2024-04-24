@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -35,27 +36,27 @@ public class CustomerController {
     }
 
     @PutMapping("/customer/{customer-id}/de-active")
-    public ResponseEntity<?> putDeActiveCustomer(@PathVariable("customer-id") String id) {
+    public ResponseEntity<?> putDeActiveCustomer(@PathVariable("customer-id") UUID id) {
         return ResponseEntity.ok(customerService.deActiveCustomer(id));
     }
 
     @PutMapping("/customer/{customer-id}/change-role")
-    public ResponseEntity<?> changeRoleCustomer(@PathVariable("customer-id") String id, RoleType role) {
+    public ResponseEntity<?> changeRoleCustomer(@PathVariable("customer-id") UUID id, RoleType role) {
         return ResponseEntity.ok(customerService.changeRole(id,role));
     }
 
     @PutMapping("/customer/{customer-id}")
-    public ResponseEntity<?> updateCustomer(@PathVariable("customer-id") String id, CustomerUpdateRequest dto) {
+    public ResponseEntity<?> updateCustomer(@PathVariable("customer-id") UUID id, CustomerUpdateRequest dto) {
         return ResponseEntity.ok(customerService.updateCustomer(id,dto));
     }
 
     @DeleteMapping("/customer/{customer-id}")
-    public ResponseEntity<?> deleteCustomer(@PathVariable("customer-id") String id) {
+    public ResponseEntity<?> deleteCustomer(@PathVariable("customer-id") UUID id) {
         return ResponseEntity.ok(customerService.deleteCustomer(id));
     }
 
     @GetMapping("/customer/{customer-id}")
-    public ResponseEntity<?> getCustomerById(@PathVariable("customer-id") String id) {
+    public ResponseEntity<?> getCustomerById(@PathVariable("customer-id") UUID id) {
         return ResponseEntity.ok(customerService.getUser(id));
     }
 

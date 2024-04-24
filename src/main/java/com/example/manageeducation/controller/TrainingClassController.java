@@ -1,12 +1,21 @@
 package com.example.manageeducation.controller;
 
+import com.example.manageeducation.dto.request.DataExcelForTrainingClass;
 import com.example.manageeducation.dto.request.TrainingClassRequest;
 import com.example.manageeducation.service.TrainingClassService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -40,4 +49,11 @@ public class TrainingClassController {
     public ResponseEntity<?> trainingProgramView(@PathVariable("training-class-id") UUID id) {
         return ResponseEntity.ok(trainingClassService.viewTrainingClass(id));
     }
+
+    @PostMapping(value = "customer/training-program/training-class/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> importTrainingClass(Principal principal, @RequestPart(required = true) MultipartFile file) {
+        List<DataExcelForTrainingClass> list = trainingClassService.readDataFromExcel(principal,file);
+        return ResponseEntity.ok(list);
+    }
+
 }
