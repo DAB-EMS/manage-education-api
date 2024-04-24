@@ -5,6 +5,7 @@ import com.example.manageeducation.dto.request.TrainingClassRequest;
 import com.example.manageeducation.service.TrainingClassService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -13,6 +14,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,4 +61,16 @@ public class TrainingClassController {
         return ResponseEntity.ok(list);
     }
 
+    @GetMapping("customer/training-program/training-class/template/download")
+    public @ResponseBody byte[] downloadXlsxTemplate(HttpServletResponse response) throws IOException {
+        response.setContentType("text/xlsx");
+        response.addHeader("Content-Disposition", "attachment; filename=\"ClassTemplate.zip\"");
+        InputStream file;
+        try {
+            file = getClass().getResourceAsStream("/templates/ClassTemplate.zip");
+        }catch (Exception ex) {
+            throw new FileNotFoundException("File template not exist.");
+        }
+        return IOUtils.toByteArray(file);
+    }
 }

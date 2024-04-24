@@ -3,11 +3,16 @@ package com.example.manageeducation.controller;
 import com.example.manageeducation.dto.request.TrainingProgramRequest;
 import com.example.manageeducation.service.TrainingProgramService;
 import io.swagger.annotations.ApiOperation;
+import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.Principal;
 import java.util.UUID;
 
@@ -63,5 +68,18 @@ public class TrainingProgramController {
             //  throw internal error;
         }
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("customer/training-program/template/download")
+    public @ResponseBody byte[] downloadXlsxTemplate(HttpServletResponse response) throws IOException {
+        response.setContentType("text/xlsx");
+        response.addHeader("Content-Disposition", "attachment; filename=\"TrainingProgramTemplate.xlsx\"");
+        InputStream file;
+        try {
+            file = getClass().getResourceAsStream("/templates/TrainingProgramTemplate.xlsx");
+        }catch (Exception ex) {
+            throw new FileNotFoundException("File template not exist.");
+        }
+        return IOUtils.toByteArray(file);
     }
 }
