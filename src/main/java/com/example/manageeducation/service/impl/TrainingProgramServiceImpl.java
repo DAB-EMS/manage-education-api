@@ -326,6 +326,7 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
             TrainingProgramAddClassRequest trainingProgramAddClassRequest = new TrainingProgramAddClassRequest();
             trainingProgramAddClassRequest.setId(trainingProgram.getId());
             trainingProgramAddClassRequest.setName(trainingProgram.getName());
+            trainingProgramAddClassRequest.setVersion(trainingProgram.getVersion());
             Optional<Customer> customerOptional = customerRepository.findById(trainingProgram.getCreatedBy());
             if(customerOptional.isPresent()){
                 Customer customer = customerOptional.get();
@@ -338,18 +339,17 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
             for(ProgramSyllabus programSyllabus: trainingProgram.getProgramSyllabusAssociation()){
                 for(SyllabusDay syllabusDay: programSyllabus.getSyllabus().getSyllabusDays()){
                     day++;
-//                    for(SyllabusUnit syllabusUnit: syllabusDay.getSyllabusUnits()){
-//                        for(SyllabusUnitChapter syllabusUnitChapter: syllabusUnit.getSyllabusUnitChapters()){
-//                            hour += (int) syllabusUnitChapter.getDuration();
-//                        }
-//                    }
+                    for(SyllabusUnit syllabusUnit: syllabusDay.getSyllabusUnits()){
+                        for(SyllabusUnitChapter syllabusUnitChapter: syllabusUnit.getSyllabusUnitChapters()){
+                            hour += (int) syllabusUnitChapter.getDuration();
+                        }
+                    }
                 }
             }
             trainingProgramAddClassRequest.setHours(hour);
             trainingProgramAddClassRequest.setDays(day);
             trainingProgramAdds.add(trainingProgramAddClassRequest);
         }
-        System.out.println("dsadasdasd");
         return trainingProgramAdds;
     }
 

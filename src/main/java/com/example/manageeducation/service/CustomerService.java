@@ -4,6 +4,7 @@ import com.example.manageeducation.dto.request.CustomerImportRequest;
 import com.example.manageeducation.dto.request.CustomerUpdateRequest;
 import com.example.manageeducation.dto.response.CustomerResponse;
 import com.example.manageeducation.entity.Customer;
+import com.example.manageeducation.enums.CustomerStatus;
 import com.example.manageeducation.enums.RoleType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,4 +24,5 @@ public interface CustomerService {
     String createCustomerByExcel(MultipartFile file) throws IOException;
     CustomerResponse getUser(UUID Id);
     String createUser(CustomerImportRequest dto);
+    List<CustomerResponse> customerByStatus(RoleType role);
 }

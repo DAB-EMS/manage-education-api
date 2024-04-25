@@ -2,6 +2,7 @@ package com.example.manageeducation.repository;
 
 import com.example.manageeducation.entity.Customer;
 import com.example.manageeducation.enums.CustomerStatus;
+import com.example.manageeducation.enums.RoleType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -17,4 +18,5 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
     Customer findCustomerByEmail(String email);
     List<Customer> findByFullNameContainingIgnoreCase(String name);
     List<Customer> findAllByStatus(CustomerStatus status);
+    List<Customer> findAllByRole_Name(RoleType role);
 }

@@ -2,6 +2,7 @@ package com.example.manageeducation.controller;
 
 import com.example.manageeducation.dto.request.CustomerImportRequest;
 import com.example.manageeducation.dto.request.CustomerUpdateRequest;
+import com.example.manageeducation.enums.CustomerStatus;
 import com.example.manageeducation.enums.RoleType;
 import com.example.manageeducation.service.CustomerService;
 import com.example.manageeducation.service.impl.FirebaseService;
@@ -33,6 +34,11 @@ public class CustomerController {
     @GetMapping("/customers")
     public ResponseEntity<?> getCustomer(@RequestParam(required = false) String search) {
         return ResponseEntity.ok(customerService.userList(search));
+    }
+
+    @GetMapping("/customers/role")
+    public ResponseEntity<?> getCustomerByStatus(@RequestParam(required = true) RoleType role) {
+        return ResponseEntity.ok(customerService.customerByStatus(role));
     }
 
     @PostMapping("/customer")
