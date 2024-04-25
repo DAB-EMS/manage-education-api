@@ -226,7 +226,6 @@ VALUES ('a12a7297-cc05-4ec8-aa04-1400ff34dbac', 4, 0, '239be19f-72ee-4def-950c-c
        ('acda7eab-d39c-4fe1-80c2-3d3a9fa896ab', 1, 0, '239be19f-72ee-4def-950c-cfb7ff306066'),
        ('b12a7297-cc05-4ec8-aa04-1400ff34dbac', 4, 0, '5d2a9b26-29d0-447d-991f-308a0fa15dd6'),
        ('b4f0ddbb-e579-4ae0-820e-a430744e707a', 2, 0, '5d2a9b26-29d0-447d-991f-308a0fa15dd6'),
-       ('b4f0ddbx-e579-4ae0-820e-a430744e707a', 2, 0, '5d2a9b26-29d0-447d-991f-308a0fa15dd6'),
        ('bafd2469-a707-41ef-a300-aabb2b9929c2', 3, 0, '5d2a9b26-29d0-447d-991f-308a0fa15dd6'),
        ('bcda7eab-d39c-4fe1-80c2-3d3a9fa896ab', 1, 0, '5d2a9b26-29d0-447d-991f-308a0fa15dd6'),
        ('c12a7297-cc05-4ec8-aa04-1400ff34dbac', 4, 0, '954e8ca1-68e6-4c3b-b297-cca5818e433b'),

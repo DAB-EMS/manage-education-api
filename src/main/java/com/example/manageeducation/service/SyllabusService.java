@@ -19,7 +19,7 @@ public interface SyllabusService {
     String createSyllabus(Principal principal, SyllabusRequest dto);
     String importSyllabus(Principal principal, MultipartFile file);
     SyllabusResponse syllabus(UUID id);
-    List<ViewSyllabusResponse> syllabuses(String search, Date date);
+    List<ViewSyllabusResponse> syllabuses();
     String duplicatedSyllabus(UUID id);
     String deleteSyllabus(UUID id);
     Syllabus updateSyllabus(UUID id, SyllabusUpdateRequest dto);

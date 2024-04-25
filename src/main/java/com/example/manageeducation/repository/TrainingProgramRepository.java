@@ -15,4 +15,6 @@ public interface TrainingProgramRepository extends JpaRepository<TrainingProgram
     List<TrainingProgram> findAllByStatus(TrainingProgramStatus status);
     @Query("SELECT t from TrainingProgram t where t.name=?1 and t.version=?2")
     TrainingProgram findByName(String name, String version);
+    @Query("SELECT tp FROM TrainingProgram tp WHERE tp.trainingClass IS NULL")
+    List<TrainingProgram> findAllWithoutTrainingClass();
 }

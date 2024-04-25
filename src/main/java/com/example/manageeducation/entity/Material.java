@@ -28,8 +28,10 @@ public class Material {
     private String name;
     @Column(length = 65555)
     private String url;
+    @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID createdBy;
     private Date createdDate;
+    @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID updatedBy;
     private Date updatedDate;
 

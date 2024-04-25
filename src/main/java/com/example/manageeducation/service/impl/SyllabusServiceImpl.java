@@ -619,18 +619,53 @@ public class SyllabusServiceImpl implements SyllabusService {
     }
 
     @Override
-    public List<ViewSyllabusResponse> syllabuses(String search, Date date) {
-        List<Syllabus> syllabusList;
-        if (search == null && date == null) {
-            syllabusList = syllabusRepository.findAllByStatus(SyllabusStatus.ACTIVE);
-        } else {
-            syllabusList = syllabusRepository.findAllByNameAndCodeAndCreatedByAndCreatedDateAndStatus(search, search, search, date,SyllabusStatus.ACTIVE);
+    public List<ViewSyllabusResponse> syllabuses() {
+        List<Syllabus> syllabusList = syllabusRepository.findAllByStatus(SyllabusStatus.ACTIVE);
+        List<ViewSyllabusResponse> viewSyllabusResponses = new ArrayList<>();
+
+        for (Syllabus suSyllabus : syllabusList) {
+            ViewSyllabusResponse viewSyllabusResponse = new ViewSyllabusResponse();
+            viewSyllabusResponse.setId(suSyllabus.getId());
+            viewSyllabusResponse.setName(suSyllabus.getName());
+            viewSyllabusResponse.setCode(suSyllabus.getCode());
+            viewSyllabusResponse.setCreateOn(suSyllabus.getCreatedDate());
+            Optional<Customer> customerOptional = customerRepository.findById(suSyllabus.getCreatedBy());
+            if(customerOptional.isPresent()){
+                Customer customer = customerOptional.get();
+                viewSyllabusResponse.setCreateBy(customer.getFullName());
+            }else{
+                viewSyllabusResponse.setCreateBy(null);
+            }
+
+            viewSyllabusResponse.setDuration(suSyllabus.getSyllabusDays().size());
+
+            Set<String> outputStandardCodes = new HashSet<>();
+            List<OutputStandardResponse> outputStandardResponses = new ArrayList<>();
+
+            for (SyllabusDay syllabusDay : suSyllabus.getSyllabusDays()) {
+                for (SyllabusUnit syllabusUnit : syllabusDay.getSyllabusUnits()) {
+                    for (SyllabusUnitChapter syllabusUnitChapter : syllabusUnit.getSyllabusUnitChapters()) {
+                        OutputStandard outputStandard = syllabusUnitChapter.getOutputStandard();
+                        if (outputStandard != null) {
+                            String code = outputStandard.getCode();
+                            if (!outputStandardCodes.contains(code)) {
+                                outputStandardCodes.add(code);
+                                OutputStandardResponse outputStandardResponse = new OutputStandardResponse();
+                                outputStandardResponse.setCode(code);
+                                outputStandardResponses.add(outputStandardResponse);
+                            }
+                        }
+                    }
+                }
+            }
+
+            viewSyllabusResponse.setOutputStandard(outputStandardResponses);
+            viewSyllabusResponses.add(viewSyllabusResponse);
         }
 
-        return syllabusList.stream()
-                .map(this::mapToViewSyllabusResponse)
-                .collect(Collectors.toList());
+        return viewSyllabusResponses;
     }
+
 
     @Override
     public String duplicatedSyllabus(UUID id) {
@@ -797,52 +832,55 @@ public class SyllabusServiceImpl implements SyllabusService {
 
     @Override
     public List<SyllabusViewProgramResponse> viewSyllabusProgram() {
+        List<SyllabusViewProgramResponse> syllabusViewProgramResponses = new ArrayList<>();
         List<Syllabus> syllabusList = syllabusRepository.findAllByStatus(SyllabusStatus.ACTIVE);
         for(Syllabus syllabus: syllabusList){
+            SyllabusViewProgramResponse syllabusViewProgramResponse = new SyllabusViewProgramResponse();
             Optional<Customer> customerOptional = customerRepository.findById(syllabus.getCreatedBy());
             if(customerOptional.isPresent()){
                 Customer customer = customerOptional.get();
-                syllabus.setCreatedBy(customer.getId());
+                syllabusViewProgramResponse.setCreatedByName(customer.getFullName());
+                modelMapper.map(syllabus, syllabusViewProgramResponse);
+                syllabusViewProgramResponses.add(syllabusViewProgramResponse);
             }else{
                 throw new BadRequestException("Customer id is not found.");
             }
         }
-        return syllabusList
-                .stream()
-                .map(syllabus -> modelMapper.map(syllabus, SyllabusViewProgramResponse.class))
-                .collect(Collectors.toList());
+
+        return syllabusViewProgramResponses;
     }
 
-    private ViewSyllabusResponse mapToViewSyllabusResponse(Syllabus suSyllabus) {
-        ViewSyllabusResponse viewSyllabusResponse = new ViewSyllabusResponse();
-        viewSyllabusResponse.setId(suSyllabus.getId());
-        viewSyllabusResponse.setName(suSyllabus.getName());
-        viewSyllabusResponse.setCode(suSyllabus.getCode());
-        viewSyllabusResponse.setCreateOn(suSyllabus.getCreatedDate());
-        viewSyllabusResponse.setCreateBy(suSyllabus.getCreatedBy());
-        viewSyllabusResponse.setDuration(suSyllabus.getSyllabusDays().size());
-
-        Set<String> outputStandardCodes = new HashSet<>();
-        List<OutputStandardResponse> outputStandardResponses = suSyllabus.getSyllabusDays().stream()
-                .flatMap(syllabusDay -> syllabusDay.getSyllabusUnits().stream())
-                .flatMap(syllabusUnit -> syllabusUnit.getSyllabusUnitChapters().stream())
-                .filter(syllabusUnitChapter -> syllabusUnitChapter.getOutputStandard() != null)
-                .map(syllabusUnitChapter -> {
-                    String code = syllabusUnitChapter.getOutputStandard().getCode();
-                    if (!outputStandardCodes.contains(code)) {
-                        outputStandardCodes.add(code);
-                        OutputStandardResponse outputStandardResponse = new OutputStandardResponse();
-                        outputStandardResponse.setCode(code);
-                        return outputStandardResponse;
-                    }
-                    return null;
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-
-        viewSyllabusResponse.setOutputStandard(outputStandardResponses);
-        return viewSyllabusResponse;
-    }
+//    private ViewSyllabusResponse mapToViewSyllabusResponse(Syllabus suSyllabus) {
+//        ViewSyllabusResponse viewSyllabusResponse = new ViewSyllabusResponse();
+//        viewSyllabusResponse.setId(suSyllabus.getId());
+//        viewSyllabusResponse.setName(suSyllabus.getName());
+//        viewSyllabusResponse.setCode(suSyllabus.getCode());
+//        viewSyllabusResponse.setCreateOn(suSyllabus.getCreatedDate());
+//        viewSyllabusResponse.setCreateBy(suSyllabus.getCreatedBy());
+//        viewSyllabusResponse.setDuration(suSyllabus.getSyllabusDays().size());
+//
+//        Set<String> outputStandardCodes = new HashSet<>();
+//        List<OutputStandardResponse> outputStandardResponses = suSyllabus.getSyllabusDays().stream()
+//                .flatMap(syllabusDay -> syllabusDay.getSyllabusUnits().stream())
+//                .flatMap(syllabusUnit -> syllabusUnit.getSyllabusUnitChapters().stream())
+//                .filter(syllabusUnitChapter -> syllabusUnitChapter.getOutputStandard() != null)
+//                .map(syllabusUnitChapter -> {
+//                    String code = syllabusUnitChapter.getOutputStandard().getCode();
+//                    if (code != null && !code.isEmpty() && !outputStandardCodes.contains(code)) {
+//                        outputStandardCodes.add(code);
+//                        OutputStandardResponse outputStandardResponse = new OutputStandardResponse();
+//                        outputStandardResponse.setCode(code);
+//                        return outputStandardResponse;
+//                    }
+//                    return null;
+//                })
+//                .filter(Objects::nonNull)
+//                .collect(Collectors.toList());
+//
+//
+//        viewSyllabusResponse.setOutputStandard(outputStandardResponses);
+//        return viewSyllabusResponse;
+//    }
 
 
     private static Syllabus getSyllabus(SyllabusRequest dto, Optional<SyllabusLevel> syllabusLevelOptional, UUID id, Date date) {

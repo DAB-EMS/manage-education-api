@@ -22,6 +22,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
+@ToString
 public class Syllabus {
     @Id
     @GeneratedValue(generator = "UUID")
@@ -44,12 +45,14 @@ public class Syllabus {
     //	private int deliveryPrincipleId;// fk
     private int days;
     private int hours;
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private SyllabusStatus status;
     private boolean isTemplate;
+    @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID createdBy;
     @CreationTimestamp
     private Date createdDate;
+    @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID updatedBy;
     @CreationTimestamp
     private Date updatedDate;
@@ -81,6 +84,7 @@ public class Syllabus {
 
     //Training Syllabus
     @OneToMany(mappedBy = "syllabus")
+    @ToString.Exclude
     @JsonManagedReference
     @JsonIgnore
     private List<ProgramSyllabus> programSyllabusAssociation; // relationship association

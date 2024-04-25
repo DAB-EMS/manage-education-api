@@ -2,6 +2,7 @@ package com.example.manageeducation.service;
 
 import com.example.manageeducation.dto.request.TrainingProgramImportRequest;
 import com.example.manageeducation.dto.request.TrainingProgramRequest;
+import com.example.manageeducation.dto.response.TrainingProgramAddClassRequest;
 import com.example.manageeducation.dto.response.TrainingProgramResponse;
 import com.example.manageeducation.dto.response.TrainingProgramsResponse;
 import com.example.manageeducation.entity.TrainingProgram;
@@ -22,4 +23,5 @@ public interface TrainingProgramService {
     TrainingProgram duplicatedTrainingProgram(Principal principal, UUID id);
     List<TrainingProgramsResponse> trainingPrograms();
     String importTrainingProgram(MultipartFile file, Principal principal);
+    List<TrainingProgramAddClassRequest> trainingProgramAddClass();
 }

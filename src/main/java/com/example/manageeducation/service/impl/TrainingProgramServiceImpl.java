@@ -3,6 +3,7 @@ package com.example.manageeducation.service.impl;
 import com.example.manageeducation.Utils.SecurityUtil;
 import com.example.manageeducation.dto.request.*;
 import com.example.manageeducation.dto.response.SyllabusResponse;
+import com.example.manageeducation.dto.response.TrainingProgramAddClassRequest;
 import com.example.manageeducation.dto.response.TrainingProgramResponse;
 import com.example.manageeducation.dto.response.TrainingProgramsResponse;
 import com.example.manageeducation.entity.*;
@@ -313,6 +314,43 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
         } catch (IOException e) {
             throw new BadRequestException("Please fill in all information and use the correct excel file downloaded from the system.");
         }
+    }
+
+    @Override
+    public List<TrainingProgramAddClassRequest> trainingProgramAddClass() {
+        List<TrainingProgramAddClassRequest> trainingProgramAdds = new ArrayList<>();
+        List<TrainingProgram> trainingPrograms = trainingProgramRepository.findAllWithoutTrainingClass();
+        for(TrainingProgram trainingProgram: trainingPrograms){
+            int hour = 0;
+            int day = 0;
+            TrainingProgramAddClassRequest trainingProgramAddClassRequest = new TrainingProgramAddClassRequest();
+            trainingProgramAddClassRequest.setId(trainingProgram.getId());
+            trainingProgramAddClassRequest.setName(trainingProgram.getName());
+            Optional<Customer> customerOptional = customerRepository.findById(trainingProgram.getCreatedBy());
+            if(customerOptional.isPresent()){
+                Customer customer = customerOptional.get();
+                trainingProgramAddClassRequest.setCreatedBy(customer.getFullName());
+            }else{
+                trainingProgramAddClassRequest.setCreatedBy(null);
+            }
+
+            trainingProgramAddClassRequest.setCreatedDate(trainingProgram.getCreatedDate());
+            for(ProgramSyllabus programSyllabus: trainingProgram.getProgramSyllabusAssociation()){
+                for(SyllabusDay syllabusDay: programSyllabus.getSyllabus().getSyllabusDays()){
+                    day++;
+//                    for(SyllabusUnit syllabusUnit: syllabusDay.getSyllabusUnits()){
+//                        for(SyllabusUnitChapter syllabusUnitChapter: syllabusUnit.getSyllabusUnitChapters()){
+//                            hour += (int) syllabusUnitChapter.getDuration();
+//                        }
+//                    }
+                }
+            }
+            trainingProgramAddClassRequest.setHours(hour);
+            trainingProgramAddClassRequest.setDays(day);
+            trainingProgramAdds.add(trainingProgramAddClassRequest);
+        }
+        System.out.println("dsadasdasd");
+        return trainingProgramAdds;
     }
 
     private String checkValidationDataTrainingProgram(Principal principal, TrainingProgramImportRequest dto){

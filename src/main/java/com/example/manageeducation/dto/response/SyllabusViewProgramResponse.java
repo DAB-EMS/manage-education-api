@@ -20,7 +20,7 @@ public class SyllabusViewProgramResponse {
     private String version;
     private int days;
     private int hours;
-    private String createdBy;
+    private String createdByName;
     private Date createdDate;
     private SyllabusStatus status;
 }

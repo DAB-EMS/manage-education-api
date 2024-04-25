@@ -21,6 +21,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
+@ToString
 public class TrainingProgram {
     @Id
     @GeneratedValue(generator = "UUID")
@@ -33,10 +34,12 @@ public class TrainingProgram {
 
     private boolean isTemplate;
 
+    @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID createdBy;
 
     private Date createdDate;
 
+    @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID updatedBy;
 
     private Date updatedDate;

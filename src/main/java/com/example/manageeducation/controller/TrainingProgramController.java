@@ -34,6 +34,11 @@ public class TrainingProgramController {
         return ResponseEntity.ok(trainingProgramService.viewTrainingProgram(id));
     }
 
+    @GetMapping("customer/training-programs/classes")
+    public ResponseEntity<?> listTrainingProgramClass() {
+        return ResponseEntity.ok(trainingProgramService.trainingProgramAddClass());
+    }
+
     @GetMapping("customer/training-program")
     public ResponseEntity<?> TrainingPrograms() {
         return ResponseEntity.ok(trainingProgramService.trainingPrograms());

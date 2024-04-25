@@ -4,21 +4,21 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
-public class ViewSyllabusResponse {
+public class TrainingProgramAddClassRequest {
+    @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID id;
     private String name;
-    private String code;
-    private Date createOn;
-    private String createBy;
-    private int duration;
-    List<OutputStandardResponse> outputStandard;
+    private String createdBy;
+    private Date createdDate;
+    private int hours;
+    private int days;
 }
