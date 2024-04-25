@@ -42,10 +42,8 @@ public class SyllabusController {
     }
 
     @GetMapping("/syllabus")
-    public ResponseEntity<?> getSyllabuses(
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) Date date) {
-        return ResponseEntity.ok(syllabusService.syllabuses(search, date));
+    public ResponseEntity<?> getSyllabuses() {
+        return ResponseEntity.ok(syllabusService.syllabuses());
     }
 
     @GetMapping("/syllabuses/program-syllabus")

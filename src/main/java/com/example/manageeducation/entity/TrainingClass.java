@@ -100,7 +100,7 @@ public class TrainingClass implements Serializable {
     private int acceptedAttendee;
     private int actualAttendee;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private TrainingClassStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
