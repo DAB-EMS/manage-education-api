@@ -17,6 +17,7 @@ public class TrainingProgramAddClassRequest {
     @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID id;
     private String name;
+    private String version;
     private String createdBy;
     private Date createdDate;
     private int hours;

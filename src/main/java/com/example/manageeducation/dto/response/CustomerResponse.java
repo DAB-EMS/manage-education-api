@@ -5,13 +5,14 @@ import com.example.manageeducation.enums.CustomerStatus;
 import com.example.manageeducation.enums.Gender;
 import lombok.*;
 import java.util.Date;
+import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 public class CustomerResponse {
-    private String id;
+    private UUID id;
 
     @NonNull
     private String email;

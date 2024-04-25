@@ -225,6 +225,15 @@ public class CustomerServiceImpl implements CustomerService {
         return "Create successful.";
     }
 
+    @Override
+    public List<CustomerResponse> customerByStatus(RoleType role) {
+        List<Customer> customers = customerRepository.findAllByRole_Name(role);
+        return customers
+                .stream()
+                .map(customer -> modelMapper.map(customer, CustomerResponse.class))
+                .collect(Collectors.toList());
+    }
+
     private boolean createCustomerWithSystem(List<CustomerImportRequest> customers){
         try{
             for(CustomerImportRequest customer: customers){
