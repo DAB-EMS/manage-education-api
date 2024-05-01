@@ -7,9 +7,7 @@ import com.example.manageeducation.dto.request.ClassCalendarRequest;
 import com.example.manageeducation.dto.request.CustomerRequest;
 import com.example.manageeducation.dto.request.DataExcelForTrainingClass;
 import com.example.manageeducation.dto.request.TrainingClassRequest;
-import com.example.manageeducation.dto.response.TrainingClassViewResponse;
-import com.example.manageeducation.dto.response.TrainingClassesResponse;
-import com.example.manageeducation.dto.response.TrainingProgramResponse;
+import com.example.manageeducation.dto.response.*;
 import com.example.manageeducation.entity.*;
 import com.example.manageeducation.enums.TrainingClassStatus;
 import com.example.manageeducation.exception.BadRequestException;
@@ -265,7 +263,8 @@ public class TrainingClassServiceImpl implements TrainingClassService {
             trainingClassesResponse.setDuration(trainingClass.getDuration());
             trainingClassesResponse.setFsu(trainingClass.getFsu().getName());
             trainingClassesResponse.setLocation(trainingClass.getClassLocation().getName());
-            trainingClassesResponse.setAttend(trainingClass.getAttendeeLevel().getName());
+            trainingClassesResponse.setAttend(modelMapper.map(trainingClass.getAttendeeLevel(), AttendLevelResponse.class));
+            trainingClassesResponse.setStatus(modelMapper.map(trainingClass.getClassStatus(), ClassStatusResponse.class));
             trainingClassesResponse.setCreatedBy(trainingClass.getCreatedBy().getFullName());
             trainingClassesResponses.add(trainingClassesResponse);
 
