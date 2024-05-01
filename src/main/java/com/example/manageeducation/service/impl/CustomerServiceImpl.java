@@ -29,10 +29,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -232,6 +229,18 @@ public class CustomerServiceImpl implements CustomerService {
                 .stream()
                 .map(customer -> modelMapper.map(customer, CustomerResponse.class))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public HashSet<String> customerLevel() {
+        HashSet<String> levels = new HashSet<>();
+        List<Customer> customers = customerRepository.findAll();
+        for (Customer customer : customers) {
+            if(customer.getLevel()!=null){
+                levels.add(customer.getLevel());
+            }
+        }
+        return levels;
     }
 
     private boolean createCustomerWithSystem(List<CustomerImportRequest> customers){
