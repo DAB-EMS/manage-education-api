@@ -21,5 +21,6 @@ public class TrainingClassesResponse {
     private int duration;
     private String location;
     private String fsu;
-    private String attend;
+    private AttendLevelResponse attend;
+    private ClassStatusResponse status;
 }
