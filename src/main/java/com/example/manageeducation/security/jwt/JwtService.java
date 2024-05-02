@@ -1,4 +1,4 @@
-package com.example.manageeducation.security;
+package com.example.manageeducation.security.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

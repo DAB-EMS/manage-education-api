@@ -1,6 +1,6 @@
 package com.example.manageeducation.config;
 
-import com.example.manageeducation.security.JwtAuthenticationFilter;
+import com.example.manageeducation.security.jwt.JwtAuthenticationFilter;
 import com.example.manageeducation.service.impl.LogoutService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

@@ -1,4 +1,4 @@
-package com.example.manageeducation.security;
+package com.example.manageeducation.security.jwt;
 
 import com.example.manageeducation.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
