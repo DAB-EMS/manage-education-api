@@ -22,7 +22,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Role GetRoleByName() {
         try{
-            Optional<Role> roleOptional = roleRepository.findByName(RoleType.SUPER_ADMIN);
+            Optional<Role> roleOptional = roleRepository.findByName(RoleType.STUDENT);
             if(roleOptional.isPresent()){
                 return roleOptional.get();
             }else{
