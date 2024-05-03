@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 import java.util.List;
 import java.util.Set;
@@ -20,7 +21,8 @@ import java.util.UUID;
 @JsonIgnoreProperties({"hibernateLazyInitializer"})
 public class Role {
     @Id
-    private String id;
+    @Type(type = "org.hibernate.type.UUIDCharType")
+    private UUID id;
 
     @Column(length = 30)
     @Enumerated(EnumType.STRING)
