@@ -15,8 +15,12 @@ public class RoleController {
     RoleService roleService;
 
     @GetMapping("/all-role")
-    public ResponseEntity<?> attendLevels() {
+    public ResponseEntity<?> getRoles() {
         return ResponseEntity.ok(roleService.roles());
+    }
+    @GetMapping("/roles/permissions")
+    public ResponseEntity<?> getRolePermission() {
+        return ResponseEntity.ok(roleService.rolePermissions());
     }
 
     @PutMapping("/roles/permissions")

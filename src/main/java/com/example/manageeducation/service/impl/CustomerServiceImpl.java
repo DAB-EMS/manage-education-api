@@ -177,13 +177,13 @@ public class CustomerServiceImpl implements CustomerService {
 
                 //check validation role
                 if(getStringCellValue(row.getCell(6), formulaEvaluator).equalsIgnoreCase("STUDENT")){
-                    importRequest.setRole(RoleType.USER);
+                    importRequest.setRole(RoleType.STUDENT);
                 }else if(getStringCellValue(row.getCell(6), formulaEvaluator).equalsIgnoreCase("CLASS_ADMIN")){
-                    importRequest.setRole(RoleType.ADMIN);
+                    importRequest.setRole(RoleType.CLASS_ADMIN);
                 }else if(getStringCellValue(row.getCell(6), formulaEvaluator).equalsIgnoreCase("TRAINER")){
                     importRequest.setRole(RoleType.TRAINER);
                 }else{
-                    importRequest.setRole(RoleType.USER);
+                    importRequest.setRole(RoleType.STUDENT);
                 }
                 importRequest.setLevel(getStringCellValue(row.getCell(7), formulaEvaluator));
 
