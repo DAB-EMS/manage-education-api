@@ -35,4 +35,9 @@ public class MaterialController {
     public ResponseEntity<?> deliveryTypes(@PathVariable("unit-chapter-id") UUID id) {
         return ResponseEntity.ok(materialService.materials(id));
     }
+
+    @GetMapping("/syllabus/syllabus-day/syllabus-unit/unit-chapter/materials")
+    public ResponseEntity<?> materialFull() {
+        return ResponseEntity.ok(materialService.materialFull());
+    }
 }

@@ -1,5 +1,6 @@
 package com.example.manageeducation.service;
 
+import com.example.manageeducation.dto.MaterialDTO;
 import com.example.manageeducation.dto.request.MaterialRequest;
 import com.example.manageeducation.dto.response.MaterialResponse;
 import com.example.manageeducation.entity.Material;
@@ -15,5 +16,6 @@ public interface MaterialService {
     Material updateMaterial(Principal principal, UUID materialId, MaterialRequest dto);
     String deleteMaterial(UUID materialId);
     List<MaterialResponse> materials(UUID chapterId);
+    List<MaterialDTO> materialFull();
 
 }

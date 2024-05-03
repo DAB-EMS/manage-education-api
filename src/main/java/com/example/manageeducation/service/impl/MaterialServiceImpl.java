@@ -1,6 +1,7 @@
 package com.example.manageeducation.service.impl;
 
 import com.example.manageeducation.Utils.SecurityUtil;
+import com.example.manageeducation.dto.MaterialDTO;
 import com.example.manageeducation.dto.request.MaterialRequest;
 import com.example.manageeducation.dto.response.MaterialResponse;
 import com.example.manageeducation.entity.Customer;
@@ -13,12 +14,14 @@ import com.example.manageeducation.repository.MaterialRepository;
 import com.example.manageeducation.repository.SyllabusUnitChapterRepository;
 import com.example.manageeducation.repository.SyllabusUnitRepository;
 import com.example.manageeducation.service.MaterialService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class MaterialServiceImpl implements MaterialService {
@@ -34,6 +37,9 @@ public class MaterialServiceImpl implements MaterialService {
 
     @Autowired
     SecurityUtil securityUtil;
+
+    @Autowired
+    ModelMapper modelMapper;
 
     @Override
     public Material createMaterial(Principal principal, UUID chapterId, MaterialRequest dto) {
@@ -136,5 +142,22 @@ public class MaterialServiceImpl implements MaterialService {
             ex.printStackTrace();
             throw new BadRequestException("An internal server error occurred.");
         }
+    }
+
+    @Override
+    public List<MaterialDTO> materialFull() {
+        List<MaterialDTO> materialDTOS = new ArrayList<>();
+        List<Material> materials = materialRepository.findAll();
+        for(Material material: materials){
+            MaterialDTO materialDTO = new MaterialDTO();
+            modelMapper.map(material, materialDTO);
+            Optional<Customer> customerOptional = customerRepository.findById(material.getCreatedBy());
+            if(customerOptional.isPresent()){
+                Customer customer = customerOptional.get();
+                materialDTO.setCreatedBy(customer.getFullName());
+            }
+            materialDTOS.add(materialDTO);
+        }
+        return materialDTOS;
     }
 }
