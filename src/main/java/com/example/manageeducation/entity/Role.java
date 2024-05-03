@@ -26,7 +26,11 @@ public class Role {
     @Enumerated(EnumType.STRING)
     private RoleType name;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "role")
+    @ManyToMany(fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<Customer> customers;
+    @JoinTable(name = "role_authority",
+            joinColumns = @JoinColumn(name = "role_id"),
+            inverseJoinColumns = @JoinColumn(name = "authority_id")
+    )
+    Set<Authority> authorities;
 }

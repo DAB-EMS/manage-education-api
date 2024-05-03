@@ -7,7 +7,9 @@ import com.example.manageeducation.repository.RoleRepository;
 import com.example.manageeducation.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.stylesheets.LinkStyle;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,5 +31,11 @@ public class RoleServiceImpl implements RoleService {
         }catch (Exception e){
             throw new BadRequestException("Error with get role by id");
         }
+    }
+
+    @Override
+    public List<Role> roles() {
+        List<Role> roleList = roleRepository.findAll();
+        return roleList;
     }
 }

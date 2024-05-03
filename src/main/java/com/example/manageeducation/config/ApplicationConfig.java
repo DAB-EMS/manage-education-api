@@ -1,7 +1,9 @@
 package com.example.manageeducation.config;
 
 import com.example.manageeducation.repository.CustomerRepository;
+import com.example.manageeducation.security.principle.CustomerPrinciple;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,11 +23,21 @@ public class ApplicationConfig {
     @Autowired
     CustomerRepository repository;
 
+    @Autowired
+    ModelMapper modelMapper;
+
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> repository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return username -> {
+            CustomerPrinciple customerPrinciple = modelMapper.map(repository.findByEmail(username), CustomerPrinciple.class);
+            if (customerPrinciple != null) {
+                return customerPrinciple;
+            } else {
+                throw new UsernameNotFoundException("User not found");
+            }
+        };
     }
+
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
