@@ -96,6 +96,24 @@ public class RoleServiceImpl implements RoleService {
         }
     }
 
+    @Override
+    @Transactional
+    public HashSet<RolePermissionsRequest> rolePermissions() {
+        HashSet<RolePermissionsRequest> rolePermissionsRequests = new HashSet<>();
+        List<Role> roles = roleRepository.findAll();
+        for(Role role:roles){
+            RolePermissionsRequest rolePermissionsRequest = new RolePermissionsRequest();
+            rolePermissionsRequest.setRoleId(role.getId());
+            List<UUID> authorities = new ArrayList<>();
+            for(Authority authority:role.getAuthorities()){
+                authorities.add(authority.getId());
+            }
+            rolePermissionsRequest.setAuthoritiesId(authorities);
+            rolePermissionsRequests.add(rolePermissionsRequest);
+        }
+        return rolePermissionsRequests;
+    }
+
     private boolean validateUpdateRolePermissions(List<RolePermissionsRequest> updateRolePermissionsForms, UUID superAdminId) {
         if (updateRolePermissionsForms.size() == 1
                 && updateRolePermissionsForms
