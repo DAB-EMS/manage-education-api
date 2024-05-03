@@ -8,10 +8,11 @@ import com.example.manageeducation.entity.RefreshToken;
 import com.example.manageeducation.enums.CustomerStatus;
 import com.example.manageeducation.enums.Gender;
 import com.example.manageeducation.enums.TokenType;
+import com.example.manageeducation.exception.BadRequestException;
 import com.example.manageeducation.repository.CustomerRepository;
 import com.example.manageeducation.repository.RefreshTokenRepository;
 import com.example.manageeducation.security.jwt.JwtService;
-import com.example.manageeducation.security.priciple.CustomerPrinciple;
+import com.example.manageeducation.security.principle.CustomerPrinciple;
 import com.example.manageeducation.service.AuthenticationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -87,22 +88,26 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
-        var user = customerRepository.findByEmail(request.getEmail())
-                .orElseThrow();
-        var jwtToken = jwtService.generateToken(user);
-        var refreshToken = jwtService.generateRefreshToken(user);
-        revokeAllUserTokens(user);
-        saveUserToken(user, jwtToken);
-        return AuthenticationResponse.builder()
-                .accessToken(jwtToken)
-                .refreshToken(refreshToken)
-                .build();
+        try{
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
+            var user = customerRepository.findByEmail(request.getEmail())
+                    .orElseThrow();
+            var jwtToken = jwtService.generateToken(modelMapper.map(user,CustomerPrinciple.class));
+            var refreshToken = jwtService.generateRefreshToken(modelMapper.map(user,CustomerPrinciple.class));
+            revokeAllUserTokens(user);
+            saveUserToken(user, jwtToken);
+            return AuthenticationResponse.builder()
+                    .accessToken(jwtToken)
+                    .refreshToken(refreshToken)
+                    .build();
+        }catch (Exception ex){
+            throw new BadRequestException(ex.getMessage());
+        }
     }
 
     @Override
@@ -146,8 +151,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (userEmail != null) {
             var user = this.customerRepository.findByEmail(userEmail)
                     .orElseThrow();
-            if (jwtService.isTokenValid(refreshToken, user)) {
-                var accessToken = jwtService.generateToken(user);
+            if (jwtService.isTokenValid(refreshToken, modelMapper.map(user,CustomerPrinciple.class))) {
+                var accessToken = jwtService.generateToken(modelMapper.map(user,CustomerPrinciple.class));
                 revokeAllUserTokens(user);
                 saveUserToken(user, accessToken);
                 var authResponse = AuthenticationResponse.builder()

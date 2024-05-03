@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/api/v1/con")
+@RequestMapping("/api/v1/auth")
 public class testController {
 
     @GetMapping("/information/config")
@@ -27,6 +27,31 @@ public class testController {
     @GetMapping("/user")
     public ResponseEntity<?> getUser(Principal principal) {
         return ResponseEntity.ok(securityUtil.getLoginUser(principal));
+    }
+
+
+    @GetMapping("/userd")
+    @PreAuthorize("hasAuthority('FULL_ACCESS_CLASS')")
+    public ResponseEntity<?> getUdsedasr() {
+        return ResponseEntity.ok("oh nha");
+    }
+
+    @GetMapping("/userdsd")
+    @PreAuthorize("hasAuthority('VIEW_CLASS')")
+    public ResponseEntity<?> getUsedasr() {
+        return ResponseEntity.ok("oh nha");
+    }
+
+    @GetMapping("/usedasdrdsd")
+    @PreAuthorize("hasAuthority('VIEW_SYLLABUS')")
+    public ResponseEntity<?> getUssedasr() {
+        return ResponseEntity.ok("oh nha");
+    }
+
+    @GetMapping("/usedasdasrdsd")
+    @PreAuthorize("hasAuthority('MODIFY_SYLLABUS')")
+    public ResponseEntity<?> getUseddasr() {
+        return ResponseEntity.ok("oh nha");
     }
 
 }
