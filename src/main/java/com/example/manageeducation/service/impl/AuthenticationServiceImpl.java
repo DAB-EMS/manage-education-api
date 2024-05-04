@@ -83,6 +83,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
+                .role(String.valueOf(savedUser.getRole().getName()))
                 .build();
     }
 
@@ -104,6 +105,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return AuthenticationResponse.builder()
                     .accessToken(jwtToken)
                     .refreshToken(refreshToken)
+                    .role(String.valueOf(user.getRole().getName()))
                     .build();
         }catch (Exception ex){
             throw new BadRequestException(ex.getMessage());
