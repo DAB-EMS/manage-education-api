@@ -1,6 +1,7 @@
 package com.example.manageeducation.controller;
 
 import com.example.manageeducation.enums.Resource;
+import com.example.manageeducation.enums.RoleType;
 import com.example.manageeducation.service.AuthorityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,5 +19,10 @@ public class AuthorityController {
     @GetMapping("/authorities")
     public ResponseEntity<?> authority(@RequestParam(required = true) Resource resource) {
         return ResponseEntity.ok(authorityService.syllabusAuthorities(String.valueOf(resource)));
+    }
+
+    @GetMapping("/authority")
+    public ResponseEntity<?> authority(@RequestParam RoleType role, @RequestParam Resource resource) {
+        return ResponseEntity.ok(authorityService.getAuthorities(role, String.valueOf(resource)));
     }
 }
