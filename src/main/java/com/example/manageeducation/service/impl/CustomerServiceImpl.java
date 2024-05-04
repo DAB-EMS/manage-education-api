@@ -1,5 +1,6 @@
 package com.example.manageeducation.service.impl;
 
+import com.example.manageeducation.Utils.SecurityUtil;
 import com.example.manageeducation.dto.request.CustomerImportRequest;
 import com.example.manageeducation.dto.request.CustomerUpdateRequest;
 import com.example.manageeducation.dto.request.RegisterRequest;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.io.IOException;
@@ -46,6 +48,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
     AuthenticationService authenticationService;
+
+    @Autowired
+    SecurityUtil securityUtil;
     @Override
     public Customer GetCustomerByEmail(String email) {
         try{
@@ -241,6 +246,16 @@ public class CustomerServiceImpl implements CustomerService {
             }
         }
         return levels;
+    }
+
+    @Override
+    public CustomerResponse getProfile(Principal principal) {
+        Optional<Customer> customerOptional = customerRepository.findById(securityUtil.getLoginUser(principal).getId());
+        if(customerOptional.isPresent()){
+            Customer customer = customerOptional.get();
+            return modelMapper.map(customer,CustomerResponse.class);
+        }
+        return null;
     }
 
     private boolean createCustomerWithSystem(List<CustomerImportRequest> customers){

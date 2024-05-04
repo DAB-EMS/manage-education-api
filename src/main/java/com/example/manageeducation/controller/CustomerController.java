@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -71,6 +72,11 @@ public class CustomerController {
     @GetMapping("/customers/role")
     public ResponseEntity<?> getCustomerByStatus(@RequestParam(required = true) RoleType role) {
         return ResponseEntity.ok(customerService.customerByStatus(role));
+    }
+
+    @GetMapping("/customer/profile")
+    public ResponseEntity<?> getProfile(Principal principal) {
+        return ResponseEntity.ok(customerService.getProfile(principal));
     }
 
     @PostMapping("/customer")

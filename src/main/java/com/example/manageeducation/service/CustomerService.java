@@ -4,12 +4,12 @@ import com.example.manageeducation.dto.request.CustomerImportRequest;
 import com.example.manageeducation.dto.request.CustomerUpdateRequest;
 import com.example.manageeducation.dto.response.CustomerResponse;
 import com.example.manageeducation.entity.Customer;
-import com.example.manageeducation.enums.CustomerStatus;
 import com.example.manageeducation.enums.RoleType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
@@ -27,4 +27,6 @@ public interface CustomerService {
     String createUser(CustomerImportRequest dto);
     List<CustomerResponse> customerByStatus(RoleType role);
     HashSet<String> customerLevel();
+    CustomerResponse getProfile(Principal principal);
+
 }

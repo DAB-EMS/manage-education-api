@@ -17,6 +17,7 @@ public class CustomerResponse {
     @NonNull
     private String email;
     private String fullName;
+    private String avatar;
 
     private Date birthday;
     private Gender gender;
