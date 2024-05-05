@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,36 +25,43 @@ public class TrainingProgramController {
     @Autowired
     TrainingProgramService trainingProgramService;
 
+    @PreAuthorize("hasAuthority('CREATE_TRAINING_PROGRAM')")
     @PostMapping("customer/training-program")
     public ResponseEntity<?> createTrainingProgram(Principal principal, @RequestBody TrainingProgramRequest dto) {
         return ResponseEntity.ok(trainingProgramService.createTrainingProgram(principal,dto));
     }
 
+    @PreAuthorize("hasAuthority('VIEW_TRAINING_PROGRAM')")
     @GetMapping("customer/training-program/{training-program-id}")
     public ResponseEntity<?> createTrainingProgram(@PathVariable("training-program-id") UUID id) {
         return ResponseEntity.ok(trainingProgramService.viewTrainingProgram(id));
     }
 
+    @PreAuthorize("hasAuthority('VIEW_TRAINING_PROGRAM')")
     @GetMapping("customer/training-programs/classes")
     public ResponseEntity<?> listTrainingProgramClass() {
         return ResponseEntity.ok(trainingProgramService.trainingProgramAddClass());
     }
 
+    @PreAuthorize("hasAuthority('VIEW_TRAINING_PROGRAM')")
     @GetMapping("customer/training-program")
     public ResponseEntity<?> TrainingPrograms() {
         return ResponseEntity.ok(trainingProgramService.trainingPrograms());
     }
 
+    @PreAuthorize("hasAuthority('MODIFY_TRAINING_PROGRAM')")
     @PutMapping("customer/training-program/{training-program-id}/de-active")
     public ResponseEntity<?> inActiveTrainingProgram(@PathVariable("training-program-id") UUID id) {
         return ResponseEntity.ok(trainingProgramService.deActiveTrainingProgram(id));
     }
 
+    @PreAuthorize("hasAuthority('MODIFY_TRAINING_PROGRAM')")
     @DeleteMapping("customer/training-program/{training-program-id}")
     public ResponseEntity<?> deleteTrainingProgram(@PathVariable("training-program-id") UUID id) {
         return ResponseEntity.ok(trainingProgramService.deleteTrainingProgram(id));
     }
 
+    @PreAuthorize("hasAuthority('CREATE_TRAINING_PROGRAM')")
     @PostMapping("customer/training-program/{training-program-id}/duplicated")
     public ResponseEntity<?> duplicatedTrainingProgram(Principal principal, @PathVariable("training-program-id") UUID id) {
         if(trainingProgramService.duplicatedTrainingProgram(principal,id)!=null){
@@ -63,6 +71,7 @@ public class TrainingProgramController {
         }
     }
 
+    @PreAuthorize("hasAuthority('CREATE_TRAINING_PROGRAM')")
     @ApiOperation(value = "Upload a file", response = ResponseEntity.class)
     @PostMapping(value = "customer/training-program/import", consumes = "multipart/form-data")
     public ResponseEntity<?> uploadFile(
@@ -75,6 +84,7 @@ public class TrainingProgramController {
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("hasAuthority('CREATE_TRAINING_PROGRAM')")
     @GetMapping("customer/training-program/template/download")
     public @ResponseBody byte[] downloadXlsxTemplate(HttpServletResponse response) throws IOException {
         response.setContentType("text/xlsx");

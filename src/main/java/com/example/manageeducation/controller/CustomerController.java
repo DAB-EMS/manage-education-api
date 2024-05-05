@@ -12,6 +12,7 @@ import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,11 +36,13 @@ public class CustomerController {
     @Autowired
     FirebaseService firebaseService;
 
+    @PreAuthorize("hasAuthority('VIEW_USER')")
     @GetMapping("/customers")
     public ResponseEntity<?> getCustomer(@RequestParam(required = false) String search) {
         return ResponseEntity.ok(customerService.userList(search));
     }
 
+    @PreAuthorize("hasAuthority('VIEW_USER')")
     @GetMapping("/customers/status")
     public ResponseEntity<?> getCustomerStatus() {
         List<String> customerStatusList = Arrays.stream(CustomerStatus.values())
@@ -48,6 +51,7 @@ public class CustomerController {
         return ResponseEntity.ok(customerStatusList);
     }
 
+    @PreAuthorize("hasAuthority('VIEW_USER')")
     @GetMapping("/customers/genders")
     public ResponseEntity<?> getCustomerGenders() {
         List<String> customerGenderList = Arrays.stream(Gender.values())
@@ -56,6 +60,7 @@ public class CustomerController {
         return ResponseEntity.ok(customerGenderList);
     }
 
+    @PreAuthorize("hasAuthority('VIEW_USER')")
     @GetMapping("/customers/roles")
     public ResponseEntity<?> getCustomerRoles() {
         List<String> customerRoleList = Arrays.stream(RoleType.values())
@@ -64,11 +69,13 @@ public class CustomerController {
         return ResponseEntity.ok(customerRoleList);
     }
 
+    @PreAuthorize("hasAuthority('VIEW_USER')")
     @GetMapping("/customers/levels")
     public ResponseEntity<?> getCustomerOthers() {
         return ResponseEntity.ok(customerService.customerLevel());
     }
 
+    @PreAuthorize("hasAuthority('VIEW_USER')")
     @GetMapping("/customers/role")
     public ResponseEntity<?> getCustomerByStatus(@RequestParam(required = true) RoleType role) {
         return ResponseEntity.ok(customerService.customerByStatus(role));
@@ -79,36 +86,43 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.getProfile(principal));
     }
 
+    @PreAuthorize("hasAuthority('FULL_ACCESS_USER')")
     @PostMapping("/customer")
     public ResponseEntity<?> postCustomer(@RequestBody CustomerImportRequest dto) {
         return ResponseEntity.ok(customerService.createUser(dto));
     }
 
+    @PreAuthorize("hasAuthority('FULL_ACCESS_USER')")
     @PutMapping("/customer/{customer-id}/de-active")
     public ResponseEntity<?> putDeActiveCustomer(@PathVariable("customer-id") UUID id) {
         return ResponseEntity.ok(customerService.deActiveCustomer(id));
     }
 
+    @PreAuthorize("hasAuthority('FULL_ACCESS_USER')")
     @PutMapping("/customer/{customer-id}/change-role")
     public ResponseEntity<?> changeRoleCustomer(@PathVariable("customer-id") UUID id, RoleType role) {
         return ResponseEntity.ok(customerService.changeRole(id,role));
     }
 
+    @PreAuthorize("hasAuthority('FULL_ACCESS_USER')")
     @PutMapping("/customer/{customer-id}")
     public ResponseEntity<?> updateCustomer(@PathVariable("customer-id") UUID id, CustomerUpdateRequest dto) {
         return ResponseEntity.ok(customerService.updateCustomer(id,dto));
     }
 
+    @PreAuthorize("hasAuthority('FULL_ACCESS_USER')")
     @DeleteMapping("/customer/{customer-id}")
     public ResponseEntity<?> deleteCustomer(@PathVariable("customer-id") UUID id) {
         return ResponseEntity.ok(customerService.deleteCustomer(id));
     }
 
+    @PreAuthorize("hasAuthority('VIEW_USER')")
     @GetMapping("/customer/{customer-id}")
     public ResponseEntity<?> getCustomerById(@PathVariable("customer-id") UUID id) {
         return ResponseEntity.ok(customerService.getUser(id));
     }
 
+    @PreAuthorize("hasAuthority('FULL_ACCESS_USER')")
     @ApiOperation(value = "Upload a file", response = ResponseEntity.class)
     @PostMapping(value = "/customer/import", consumes = "multipart/form-data")
     public ResponseEntity<?> updateCustomer(@RequestPart MultipartFile file) throws IOException {
@@ -119,6 +133,7 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.createCustomerByExcel(file));
     }
 
+    @PreAuthorize("hasAuthority('FULL_ACCESS_USER')")
     @ApiOperation(value = "Upload a file", response = ResponseEntity.class)
     @PostMapping(value = "/upload/image", consumes = "multipart/form-data")
     public ResponseEntity<String> uploadFile(
@@ -132,6 +147,7 @@ public class CustomerController {
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("hasAuthority('FULL_ACCESS_USER')")
     @GetMapping("customer/template/download")
     public @ResponseBody byte[] downloadCsvTemplate(HttpServletResponse servletResponse) throws IOException {
         servletResponse.setContentType("text/csv");
