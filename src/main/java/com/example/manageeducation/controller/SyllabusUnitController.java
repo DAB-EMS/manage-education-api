@@ -18,11 +18,13 @@ public class SyllabusUnitController {
     @Autowired
     SyllabusUnitService syllabusUnitService;
 
+    @PreAuthorize("hasAuthority('CREATE_SYLLABUS')")
     @PostMapping("/{syllabus-id}/syllabus-day/{syllabus-day-id}/syllabus-unit")
     public ResponseEntity<?> createSyllabusUnit(@PathVariable("syllabus-id") UUID syllabusId, @PathVariable("syllabus-day-id") UUID dayId, @RequestBody SyllabusUnitAddRequest dto) {
         return ResponseEntity.ok(syllabusUnitService.createSyllabusUnit(syllabusId,dayId,dto));
     }
 
+    @PreAuthorize("hasAuthority('MODIFY_SYLLABUS')")
     @PutMapping("/syllabus-day/syllabus-unit/{syllabus-unit-id}")
     public ResponseEntity<?> createSyllabusUnit(@PathVariable("syllabus-unit-id") UUID unitId, @RequestBody SyllabusUnitAddRequest dto) {
         return ResponseEntity.ok(syllabusUnitService.updateSyllabusUnit(unitId,dto));

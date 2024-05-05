@@ -15,7 +15,7 @@ public class SyllabusUnitChapterController {
     SyllabusUnitChapterService syllabusUnitChapterService;
 
     @PostMapping("/syllabus-unit-chapter")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAuthority('CREATE_SYLLABUS')")
     public ResponseEntity<?> createSyllabusUnitChapter(@RequestBody SyllabusUnitChapter dto) {
         return ResponseEntity.ok(syllabusUnitChapterService.createSyllabusUnitChapter(dto));
     }
