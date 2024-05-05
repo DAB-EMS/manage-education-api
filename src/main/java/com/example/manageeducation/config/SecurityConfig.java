@@ -54,7 +54,7 @@ public class SecurityConfig {
         http
                 .cors().configurationSource(request -> {
                     CorsConfiguration cors = new CorsConfiguration();
-                    cors.setAllowedOrigins(Arrays.asList("http://localhost:3001","http://localhost:3000"));
+                    cors.setAllowedOrigins(Arrays.asList("http://localhost:3001","http://localhost:3000","https://manage-education-6wsgppv0y-anhbang369s-projects.vercel.app"));
                     cors.setAllowedMethods(Arrays.asList("*"));
                     cors.setAllowedHeaders(Arrays.asList("*"));
                     cors.setAllowCredentials(true);
