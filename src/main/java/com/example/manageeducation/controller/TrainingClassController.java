@@ -30,37 +30,44 @@ public class TrainingClassController {
     @Autowired
     TrainingClassService trainingClassService;
 
+    @PreAuthorize("hasAuthority('CREATE_CLASS')")
     @PostMapping("customer/training-program/{training-program-id}/training-class")
     public ResponseEntity<?> createTrainingProgram(Principal principal, @PathVariable("training-program-id") UUID id, @RequestBody TrainingClassRequest dto) {
         return ResponseEntity.ok(trainingClassService.createTrainingClass(principal,id,dto));
     }
 
+    @PreAuthorize("hasAuthority('CREATE_CLASS')")
     @PostMapping("customer/training-program/training-class/{training-class-id}/duplicated")
     public ResponseEntity<?> createTrainingProgram(Principal principal, @PathVariable("training-class-id") UUID id) {
         return ResponseEntity.ok(trainingClassService.duplicated(principal,id));
     }
 
+    @PreAuthorize("hasAuthority('MODIFY_CLASS')")
     @DeleteMapping("customer/training-program/training-class/{training-class-id}")
     public ResponseEntity<?> deleteTrainingProgram(@PathVariable("training-class-id") UUID id) {
         return ResponseEntity.ok(trainingClassService.deleteTrainingClass(id));
     }
 
+    @PreAuthorize("hasAuthority('VIEW_CLASS')")
     @GetMapping("customer/training-program/training-classes")
     public ResponseEntity<?> trainingProgramList() {
         return ResponseEntity.ok(trainingClassService.TrainingClassesResponses());
     }
 
+    @PreAuthorize("hasAuthority('VIEW_CLASS')")
     @GetMapping("customer/training-program/training-classes/{training-class-id}")
     public ResponseEntity<?> trainingProgramView(@PathVariable("training-class-id") UUID id) {
         return ResponseEntity.ok(trainingClassService.viewTrainingClass(id));
     }
 
+    @PreAuthorize("hasAuthority('CREATE_CLASS')")
     @PostMapping(value = "customer/training-program/training-class/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> importTrainingClass(Principal principal, @RequestPart(required = true) MultipartFile file) {
         List<DataExcelForTrainingClass> list = trainingClassService.readDataFromExcel(principal,file);
         return ResponseEntity.ok(list);
     }
 
+    @PreAuthorize("hasAuthority('CREATE_CLASS')")
     @GetMapping("customer/training-program/training-class/template/download")
     public @ResponseBody byte[] downloadXlsxTemplate(HttpServletResponse response) throws IOException {
         response.setContentType("text/xlsx");
