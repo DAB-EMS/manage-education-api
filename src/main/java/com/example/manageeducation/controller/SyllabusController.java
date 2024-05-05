@@ -26,46 +26,56 @@ public class SyllabusController {
     @Autowired
     SyllabusService syllabusService;
 
+    @PreAuthorize("hasAuthority('CREATE_SYLLABUS')")
     @PostMapping("/customer/syllabus")
     public ResponseEntity<?> createSyllabus(Principal principal, @RequestBody SyllabusRequest dto) {
         return ResponseEntity.ok(syllabusService.createSyllabus(principal,dto));
     }
 
+    @PreAuthorize("hasAuthority('CREATE_SYLLABUS')")
     @PostMapping("/customer/syllabus/{syllabus-id}/duplicated")
     public ResponseEntity<?> duplicatedSyllabus(@PathVariable("syllabus-id") UUID id) {
         return ResponseEntity.ok(syllabusService.duplicatedSyllabus(id));
     }
 
+    @PreAuthorize("hasAuthority('VIEW_SYLLABUS')")
     @GetMapping("/syllabus/{syllabus-id}")
     public ResponseEntity<?> getSyllabus(@PathVariable("syllabus-id") UUID id) {
         return ResponseEntity.ok(syllabusService.syllabus(id));
     }
 
+    @PreAuthorize("hasAuthority('VIEW_SYLLABUS')")
     @GetMapping("/syllabus")
     public ResponseEntity<?> getSyllabuses() {
         return ResponseEntity.ok(syllabusService.syllabuses());
     }
 
+    @PreAuthorize("hasAuthority('VIEW_SYLLABUS')")
     @GetMapping("/syllabuses/program-syllabus")
     public ResponseEntity<?> getSyllabusesProgram() {
         return ResponseEntity.ok(syllabusService.viewSyllabusProgram());
     }
 
+    @PreAuthorize("hasAuthority('MODIFY_SYLLABUS')")
     @DeleteMapping("/customer/syllabus/{syllabus-id}")
     public ResponseEntity<?> deleteSyllabus(@PathVariable("syllabus-id") UUID id) {
         return ResponseEntity.ok(syllabusService.deleteSyllabus(id));
     }
 
+    @PreAuthorize("hasAuthority('MODIFY_SYLLABUS')")
     @PutMapping("/customer/syllabus/{syllabus-id}")
     public ResponseEntity<?> putSyllabus(@PathVariable("syllabus-id") UUID id, @RequestBody SyllabusUpdateRequest dto) {
         return ResponseEntity.ok(syllabusService.updateSyllabus(id,dto));
     }
 
+    @PreAuthorize("hasAuthority('MODIFY_SYLLABUS')")
     @PutMapping("/customer/syllabus/{syllabus-id}/de-active")
     public ResponseEntity<?> deActiveSyllabus(@PathVariable("syllabus-id") UUID id) {
         return ResponseEntity.ok(syllabusService.deActive(id));
     }
 
+
+    @PreAuthorize("hasAuthority('CREATE_SYLLABUS')")
     @ApiOperation(value = "Upload a file", response = ResponseEntity.class)
     @PostMapping(value = "customer/syllabus/import", consumes = "multipart/form-data")
     public ResponseEntity<?> uploadFile(
@@ -78,6 +88,7 @@ public class SyllabusController {
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("hasAuthority('CREATE_SYLLABUS')")
     @GetMapping("/customer/syllabus/template/download")
     public @ResponseBody byte[] downloadXlsxTemplate(HttpServletResponse servletResponse) throws IOException {
         servletResponse.setContentType("text/xlsx");

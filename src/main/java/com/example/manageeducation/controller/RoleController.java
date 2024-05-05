@@ -4,6 +4,7 @@ import com.example.manageeducation.dto.request.RolePermissionsRequest;
 import com.example.manageeducation.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,15 +15,19 @@ public class RoleController {
     @Autowired
     RoleService roleService;
 
+    @PreAuthorize("hasAuthority('VIEW_USER')")
     @GetMapping("/all-role")
     public ResponseEntity<?> getRoles() {
         return ResponseEntity.ok(roleService.roles());
     }
+
+    @PreAuthorize("hasAuthority('VIEW_USER')")
     @GetMapping("/roles/permissions")
     public ResponseEntity<?> getRolePermission() {
         return ResponseEntity.ok(roleService.rolePermissions());
     }
 
+    @PreAuthorize("hasAuthority('MODIFY_USER')")
     @PutMapping("/roles/permissions")
     public ResponseEntity<?> updateRolePermission(@RequestBody List<RolePermissionsRequest> rolePermissionsRequests) {
         return ResponseEntity.ok(roleService.updateRolePermissions(rolePermissionsRequests));
