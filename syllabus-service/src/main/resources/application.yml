@@ -13,7 +13,7 @@ spring:
     import: optional:configserver:http://localhost:8888
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/education
+    url: jdbc:mysql://localhost:3306/syllabus
     username: root
     password: Clp12345
   jpa:
