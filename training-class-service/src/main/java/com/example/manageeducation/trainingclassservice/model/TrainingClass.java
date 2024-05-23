@@ -60,7 +60,6 @@ public class TrainingClass implements Serializable {
 
     private int duration; // month
 
-    @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "created_by_id")
     @Type(type = "org.hibernate.type.UUIDCharType")
@@ -71,7 +70,6 @@ public class TrainingClass implements Serializable {
     @CreatedDate
     private LocalDateTime createdDate;
 
-    @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "updated_by_id")
     @Type(type = "org.hibernate.type.UUIDCharType")
@@ -82,7 +80,6 @@ public class TrainingClass implements Serializable {
     @LastModifiedDate
     private LocalDateTime updatedDate;
 
-    @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "reviewed_by_id")
     @Type(type = "org.hibernate.type.UUIDCharType")
@@ -90,7 +87,6 @@ public class TrainingClass implements Serializable {
 
     private LocalDateTime reviewedDate;
 
-    @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "approved_by_id")
     @Type(type = "org.hibernate.type.UUIDCharType")
@@ -142,26 +138,25 @@ public class TrainingClass implements Serializable {
     @JoinColumn(name = "fsu_id", nullable = true)
     private Fsu fsu;
 
-    @OneToOne
     @JsonIgnore
     @JoinColumn(name = "training_program_id", unique = true)
     @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID trainingProgram;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JsonIgnore
-    @JoinTable(name = "class_trainers", joinColumns = @JoinColumn(name = "class_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "trainer_id", referencedColumnName = "id"))
-    private Set<Customer> account_trainers;
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JsonIgnore
-    @JoinTable(name = "class_admins", joinColumns = @JoinColumn(name = "class_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "admin_id", referencedColumnName = "id"))
-    private Set<Customer> account_admins;
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JsonIgnore
-    @JoinTable(name = "class_trainee", joinColumns = @JoinColumn(name = "class_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "trainee_id", referencedColumnName = "id"))
-    private List<Customer> account_trainee;
+//    @ManyToMany(fetch = FetchType.EAGER)
+//    @JsonIgnore
+//    @JoinTable(name = "class_trainers", joinColumns = @JoinColumn(name = "class_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "trainer_id", referencedColumnName = "id"))
+//    private Set<Customer> account_trainers;
+//
+//    @ManyToMany(fetch = FetchType.EAGER)
+//    @JsonIgnore
+//    @JoinTable(name = "class_admins", joinColumns = @JoinColumn(name = "class_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "admin_id", referencedColumnName = "id"))
+//    private Set<Customer> account_admins;
+//
+//    @ManyToMany(fetch = FetchType.EAGER)
+//    @JsonIgnore
+//    @JoinTable(name = "class_trainee", joinColumns = @JoinColumn(name = "class_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "trainee_id", referencedColumnName = "id"))
+//    private List<Customer> account_trainee;
 
     @OneToMany(mappedBy = "trainingClass")
     @JsonIgnore
