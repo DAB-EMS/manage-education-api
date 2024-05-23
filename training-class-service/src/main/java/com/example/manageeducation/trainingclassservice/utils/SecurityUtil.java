@@ -1,9 +1,9 @@
 package com.example.manageeducation.trainingclassservice.utils;
 
-import com.example.manageeducation.syllabusservice.client.CustomerClient;
-import com.example.manageeducation.syllabusservice.dto.Customer;
-import com.example.manageeducation.syllabusservice.dto.request.CustomerRequest;
-import com.example.manageeducation.syllabusservice.exception.BadRequestException;
+import com.example.manageeducation.trainingclassservice.client.CustomerClient;
+import com.example.manageeducation.trainingclassservice.dto.Customer;
+import com.example.manageeducation.trainingclassservice.dto.request.CustomerRequest;
+import com.example.manageeducation.trainingclassservice.exception.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
