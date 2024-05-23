@@ -5,6 +5,7 @@ import com.example.manageeducation.syllabusservice.dto.request.SyllabusUpdateReq
 import com.example.manageeducation.syllabusservice.dto.response.SyllabusResponse;
 import com.example.manageeducation.syllabusservice.dto.response.SyllabusViewProgramResponse;
 import com.example.manageeducation.syllabusservice.dto.response.ViewSyllabusResponse;
+import com.example.manageeducation.syllabusservice.enums.SyllabusStatus;
 import com.example.manageeducation.syllabusservice.model.Syllabus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,4 +25,5 @@ public interface SyllabusService {
     Syllabus updateSyllabus(UUID id, SyllabusUpdateRequest dto);
     String deActive(UUID id);
     List<SyllabusViewProgramResponse> viewSyllabusProgram();
+    List<Syllabus> checkCondition(String name, String code, String version, SyllabusStatus status);
 }

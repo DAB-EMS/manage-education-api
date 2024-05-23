@@ -2,6 +2,8 @@ package com.example.manageeducation.syllabusservice.controller;
 
 import com.example.manageeducation.syllabusservice.dto.request.SyllabusRequest;
 import com.example.manageeducation.syllabusservice.dto.request.SyllabusUpdateRequest;
+import com.example.manageeducation.syllabusservice.enums.SyllabusStatus;
+import com.example.manageeducation.syllabusservice.model.Syllabus;
 import com.example.manageeducation.syllabusservice.service.SyllabusService;
 import io.swagger.annotations.ApiOperation;
 import org.apache.poi.util.IOUtils;
@@ -16,6 +18,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.Principal;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -37,10 +40,20 @@ public class SyllabusController {
         return ResponseEntity.ok(syllabusService.duplicatedSyllabus(id));
     }
 
-    @PreAuthorize("hasAuthority('VIEW_SYLLABUS')")
+//    @PreAuthorize("hasAuthority('VIEW_SYLLABUS')")
     @GetMapping("/syllabus/{syllabus-id}")
     public ResponseEntity<?> getSyllabus(@PathVariable("syllabus-id") UUID id) {
         return ResponseEntity.ok(syllabusService.syllabus(id));
+    }
+
+    @GetMapping("/syllabus/check")
+    public ResponseEntity<List<Syllabus>> checkCondition(
+            @RequestParam String name,
+            @RequestParam String code,
+            @RequestParam String version,
+            @RequestParam SyllabusStatus status) {
+        List<Syllabus> syllabusList = syllabusService.checkCondition(name, code, version, status);
+        return ResponseEntity.ok(syllabusList);
     }
 
     @PreAuthorize("hasAuthority('VIEW_SYLLABUS')")

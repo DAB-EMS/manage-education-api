@@ -30,6 +30,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 public class SyllabusServiceImpl implements SyllabusService {
@@ -790,6 +791,12 @@ public class SyllabusServiceImpl implements SyllabusService {
         }
 
         return syllabusViewProgramResponses;
+    }
+
+    @Override
+    public List<Syllabus> checkCondition(String name, String code, String version, SyllabusStatus status) {
+        List<Syllabus> syllabusList = syllabusRepository.findByNameIgnoreCaseAndCodeIgnoreCaseAndVersionIgnoreCaseAndStatus(name,code,version,status);
+        return syllabusList;
     }
 
     private static Syllabus getSyllabus(SyllabusRequest dto, Optional<SyllabusLevel> syllabusLevelOptional, UUID id, Date date) {

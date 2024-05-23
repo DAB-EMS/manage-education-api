@@ -1,6 +1,5 @@
 package com.example.manageeducation.trainingprogramservice.dto;
 
-import com.example.manageeducation.dto.request.SyllabusTNImportRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

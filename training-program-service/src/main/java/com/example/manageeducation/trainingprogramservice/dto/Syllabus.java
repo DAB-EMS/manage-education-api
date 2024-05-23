@@ -41,4 +41,5 @@ public class Syllabus {
     @CreationTimestamp
     private Date updatedDate;
     private List<SyllabusUnit> syllabusUnits;
+    private List<SyllabusDay> syllabusDays;
 }

@@ -2,7 +2,9 @@ package com.example.manageeducation.trainingprogramservice.service.impl;
 
 
 import com.example.manageeducation.trainingprogramservice.client.CustomerClient;
+import com.example.manageeducation.trainingprogramservice.client.SyllabusClient;
 import com.example.manageeducation.trainingprogramservice.dto.*;
+import com.example.manageeducation.trainingprogramservice.enums.SyllabusStatus;
 import com.example.manageeducation.trainingprogramservice.enums.TrainingProgramStatus;
 import com.example.manageeducation.trainingprogramservice.exception.BadRequestException;
 import com.example.manageeducation.trainingprogramservice.model.ProgramSyllabus;
@@ -34,7 +36,7 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
     CustomerClient customerRepository;
 
     @Autowired
-    SyllabusRepository syllabusRepository;
+    SyllabusClient syllabusRepository;
 
     @Autowired
     TrainingProgramRepository trainingProgramRepository;
@@ -71,9 +73,9 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
                 programSyllabus.setTrainingProgram(saved);
 
                 //check validation Syllabus
-                Optional<Syllabus> syllabusOptional = syllabusRepository.findById(trainingProgramRequest.getSyllabusId());
+                Optional<Syllabus> syllabusOptional = syllabusRepository.getSyllabus(trainingProgramRequest.getSyllabusId());
                 if(syllabusOptional.isPresent()){
-                    programSyllabus.setSyllabus(syllabusOptional.get());
+                    programSyllabus.setSyllabus(syllabusOptional.get().getId());
                 }else{
                     throw new BadRequestException("Syllabus id is not found.");
                 }
@@ -121,14 +123,19 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
             List<SyllabusResponse> responses = new ArrayList<>();
             for(ProgramSyllabus trainingProgram1: trainingProgramOptional.get().getProgramSyllabusAssociation()){
                 responses.add(modelMapper.map(trainingProgram1.getSyllabus(), SyllabusResponse.class));
-                for(SyllabusDay syllabusDay:trainingProgram1.getSyllabus().getSyllabusDays()){
-                    days++;
-                    for (SyllabusUnit syllabusUnit: syllabusDay.getSyllabusUnits()){
-                        for(SyllabusUnitChapter syllabusUnitChapter: syllabusUnit.getSyllabusUnitChapters()){
-                            hours += (int) syllabusUnitChapter.getDuration();
+                Optional<Syllabus> syllabusOptional = syllabusRepository.getSyllabus(trainingProgram1.getSyllabus());
+                if(syllabusOptional.isPresent()){
+                    Syllabus syllabus = syllabusOptional.get();
+                    for(SyllabusDay syllabusDay:syllabus.getSyllabusDays()){
+                        days++;
+                        for (SyllabusUnit syllabusUnit: syllabusDay.getSyllabusUnits()){
+                            for(SyllabusUnitChapter syllabusUnitChapter: syllabusUnit.getSyllabusUnitChapters()){
+                                hours += (int) syllabusUnitChapter.getDuration();
+                            }
                         }
                     }
                 }
+
             }
 
             trainingProgramResponse.setDay(days);
@@ -201,7 +208,7 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
 
                 ProgramSyllabusId programSyllabusId = new ProgramSyllabusId();
                 programSyllabusId.setTrainingProgramId(saved.getId());
-                programSyllabusId.setSyllabusId(programSyllabus.getSyllabus().getId());
+                programSyllabusId.setSyllabusId(programSyllabus.getSyllabus());
                 programSyllabus1.setId(programSyllabusId);
                 programSyllabus1.setTrainingProgram(saved);
                 programSyllabus1.setSyllabus(programSyllabus.getSyllabus());
@@ -237,8 +244,11 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
 
             //get duration
             for (ProgramSyllabus syllabus : trainingProgram.getProgramSyllabusAssociation()) {
-                Syllabus programSyllabus = syllabus.getSyllabus();
-                days = programSyllabus.getSyllabusDays().size();
+                Optional<Syllabus> syllabusOptional = syllabusRepository.getSyllabus(syllabus.getSyllabus());
+                if(syllabusOptional.isPresent()){
+                    Syllabus programSyllabus = syllabusOptional.get();
+                    days = programSyllabus.getSyllabusDays().size();
+                }
             }
             trainingProgramsResponse.setDay(days);
             trainingProgramsResponses.add(trainingProgramsResponse);
@@ -328,11 +338,15 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
 
             trainingProgramAddClassRequest.setCreatedDate(trainingProgram.getCreatedDate());
             for(ProgramSyllabus programSyllabus: trainingProgram.getProgramSyllabusAssociation()){
-                for(SyllabusDay syllabusDay: programSyllabus.getSyllabus().getSyllabusDays()){
-                    day++;
-                    for(SyllabusUnit syllabusUnit: syllabusDay.getSyllabusUnits()){
-                        for(SyllabusUnitChapter syllabusUnitChapter: syllabusUnit.getSyllabusUnitChapters()){
-                            hour += (int) syllabusUnitChapter.getDuration();
+                Optional<Syllabus> syllabusOptional = syllabusRepository.getSyllabus(programSyllabus.getSyllabus());
+                if(syllabusOptional.isPresent()){
+                    Syllabus syllabus = syllabusOptional.get();
+                    for(SyllabusDay syllabusDay: syllabus.getSyllabusDays()){
+                        day++;
+                        for(SyllabusUnit syllabusUnit: syllabusDay.getSyllabusUnits()){
+                            for(SyllabusUnitChapter syllabusUnitChapter: syllabusUnit.getSyllabusUnitChapters()){
+                                hour += (int) syllabusUnitChapter.getDuration();
+                            }
                         }
                     }
                 }
@@ -353,7 +367,7 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
             request.setStatus(TrainingProgramStatus.ACTIVE);
             List<ProgramSyllabusRequest> programSyllabuses = new ArrayList<>();
             for(SyllabusTNImportRequest importRequest: dto.getSyllabuses()){
-                List<Syllabus> syllabuses = syllabusRepository.findByNameIgnoreCaseAndCodeIgnoreCaseAndVersionIgnoreCaseAndStatus(importRequest.getName(),importRequest.getCode(), importRequest.getVersion(), SyllabusStatus.ACTIVE);
+                List<Syllabus> syllabuses = syllabusRepository.checkCondition(importRequest.getName(),importRequest.getCode(), importRequest.getVersion(), SyllabusStatus.ACTIVE);
                 if(syllabuses!=null){
                     ProgramSyllabusRequest programSyllabusRequest = new ProgramSyllabusRequest();
                     for(Syllabus syllabus:syllabuses){
