@@ -1,12 +1,12 @@
 package com.example.manageeducation.userservice.service.impl;
 
-import com.example.manageeducation.dto.response.AuthorityResponse;
-import com.example.manageeducation.entity.Authority;
-import com.example.manageeducation.entity.Role;
-import com.example.manageeducation.enums.RoleType;
-import com.example.manageeducation.repository.AuthorityRepository;
-import com.example.manageeducation.repository.RoleRepository;
-import com.example.manageeducation.service.AuthorityService;
+import com.example.manageeducation.userservice.dto.AuthorityResponse;
+import com.example.manageeducation.userservice.enums.RoleType;
+import com.example.manageeducation.userservice.model.Authority;
+import com.example.manageeducation.userservice.model.Role;
+import com.example.manageeducation.userservice.repository.AuthorityRepository;
+import com.example.manageeducation.userservice.repository.RoleRepository;
+import com.example.manageeducation.userservice.service.AuthorityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

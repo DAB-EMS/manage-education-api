@@ -13,6 +13,7 @@ import com.example.manageeducation.userservice.model.Customer;
 import com.example.manageeducation.userservice.model.Role;
 import com.example.manageeducation.userservice.repository.CustomerRepository;
 import com.example.manageeducation.userservice.repository.RoleRepository;
+import com.example.manageeducation.userservice.service.AuthenticationService;
 import com.example.manageeducation.userservice.service.CustomerService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
