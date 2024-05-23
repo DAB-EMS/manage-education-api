@@ -1,10 +1,10 @@
-package com.example.manageeducation.securityservice.security.principle;
+package com.example.manageeducation.userservice.security.principle;
 
-import com.example.manageeducation.entity.Authority;
-import com.example.manageeducation.entity.Customer;
-import com.example.manageeducation.entity.Role;
-import com.example.manageeducation.enums.CustomerStatus;
-import com.example.manageeducation.enums.Gender;
+import com.example.manageeducation.userservice.enums.CustomerStatus;
+import com.example.manageeducation.userservice.enums.Gender;
+import com.example.manageeducation.userservice.model.Authority;
+import com.example.manageeducation.userservice.model.Customer;
+import com.example.manageeducation.userservice.model.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;

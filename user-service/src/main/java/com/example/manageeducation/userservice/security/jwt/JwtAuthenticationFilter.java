@@ -1,7 +1,7 @@
-package com.example.manageeducation.securityservice.security.jwt;
+package com.example.manageeducation.userservice.security.jwt;
 
-import com.example.manageeducation.repository.RefreshTokenRepository;
-import com.example.manageeducation.security.principle.CustomUserDetailService;
+import com.example.manageeducation.userservice.repository.RefreshTokenRepository;
+import com.example.manageeducation.userservice.security.principle.CustomUserDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;

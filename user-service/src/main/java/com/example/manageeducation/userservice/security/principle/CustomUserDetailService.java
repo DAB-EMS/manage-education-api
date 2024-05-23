@@ -1,8 +1,8 @@
-package com.example.manageeducation.securityservice.security.principle;
+package com.example.manageeducation.userservice.security.principle;
 
-import com.example.manageeducation.entity.Customer;
-import com.example.manageeducation.exception.BadRequestException;
-import com.example.manageeducation.repository.CustomerRepository;
+import com.example.manageeducation.userservice.exception.BadRequestException;
+import com.example.manageeducation.userservice.model.Customer;
+import com.example.manageeducation.userservice.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;

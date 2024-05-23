@@ -1,13 +1,11 @@
-package com.example.manageeducation.securityservice.model;
+package com.example.manageeducation.userservice.model;
 
-import com.example.manageeducation.securityservice.enums.TokenType;
+import com.example.manageeducation.userservice.enums.TokenType;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,10 +23,10 @@ public class RefreshToken {
     @Column(name = "id", nullable = false)
     private String id;
 
+    @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @NotNull
-    @Type(type = "org.hibernate.type.UUIDCharType")
-    private UUID customer;
+    private Customer customer;
 
     @Column(nullable = false, unique = true)
     private String token;
