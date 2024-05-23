@@ -1,11 +1,23 @@
 package com.example.manageeducation.userservice.service.impl;
 
+import com.example.manageeducation.userservice.Utils.SecurityUtil;
+import com.example.manageeducation.userservice.dto.CustomerImportRequest;
+import com.example.manageeducation.userservice.dto.CustomerResponse;
+import com.example.manageeducation.userservice.dto.CustomerUpdateRequest;
+import com.example.manageeducation.userservice.dto.RegisterRequest;
+import com.example.manageeducation.userservice.enums.CustomerStatus;
+import com.example.manageeducation.userservice.enums.Gender;
+import com.example.manageeducation.userservice.enums.RoleType;
+import com.example.manageeducation.userservice.exception.BadRequestException;
+import com.example.manageeducation.userservice.model.Customer;
+import com.example.manageeducation.userservice.model.Role;
 import com.example.manageeducation.userservice.repository.CustomerRepository;
 import com.example.manageeducation.userservice.repository.RoleRepository;
 import com.example.manageeducation.userservice.service.CustomerService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
