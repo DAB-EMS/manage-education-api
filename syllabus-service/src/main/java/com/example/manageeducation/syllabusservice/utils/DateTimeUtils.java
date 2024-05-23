@@ -1,4 +1,4 @@
-package com.example.manageeducation.syllabusservice.Utils;
+package com.example.manageeducation.syllabusservice.utils;
 
 import lombok.experimental.UtilityClass;
 

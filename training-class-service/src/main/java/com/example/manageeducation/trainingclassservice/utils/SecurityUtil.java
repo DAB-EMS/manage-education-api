@@ -1,4 +1,4 @@
-package com.example.manageeducation.syllabusservice.Utils;
+package com.example.manageeducation.trainingclassservice.utils;
 
 import com.example.manageeducation.syllabusservice.client.CustomerClient;
 import com.example.manageeducation.syllabusservice.dto.Customer;

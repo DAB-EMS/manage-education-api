@@ -1,4 +1,4 @@
-package com.example.manageeducation.syllabusservice.Utils;
+package com.example.manageeducation.syllabusservice.utils;
 
 import java.util.Calendar;
 import java.util.Date;

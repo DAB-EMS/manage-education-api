@@ -1,7 +1,7 @@
 package com.example.manageeducation.syllabusservice.service.impl;
 
 
-import com.example.manageeducation.syllabusservice.Utils.SecurityUtil;
+import com.example.manageeducation.syllabusservice.utils.SecurityUtil;
 import com.example.manageeducation.syllabusservice.client.CustomerClient;
 import com.example.manageeducation.syllabusservice.dto.Customer;
 import com.example.manageeducation.syllabusservice.dto.request.*;
@@ -30,7 +30,6 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Service
 public class SyllabusServiceImpl implements SyllabusService {

@@ -1,6 +1,6 @@
 package com.example.manageeducation.syllabusservice.service.impl;
 
-import com.example.manageeducation.syllabusservice.Utils.SecurityUtil;
+import com.example.manageeducation.syllabusservice.utils.SecurityUtil;
 import com.example.manageeducation.syllabusservice.client.CustomerClient;
 import com.example.manageeducation.syllabusservice.dto.Customer;
 import com.example.manageeducation.syllabusservice.dto.MaterialDTO;

@@ -1,6 +1,6 @@
 package com.example.manageeducation.trainingclassservice.model;
 
-import com.example.manageeducation.trainingclassservice.nums.TrainingClassStatus;
+import com.example.manageeducation.trainingclassservice.enums.TrainingClassStatus;
 import com.example.manageeducation.trainingclassservice.utils.DateTimeUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -18,7 +18,6 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
