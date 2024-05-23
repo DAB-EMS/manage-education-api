@@ -48,10 +48,9 @@ public class TrainingProgram {
     @Enumerated(EnumType.ORDINAL)
     private TrainingProgramStatus status;
 
-    @OneToOne
     @JoinColumn(name = "class_id", unique = true)
-    @Type(type = "org.hibernate.type.UUIDCharType")
     @JsonIgnore
+    @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID trainingClass;
 
     @OneToMany(mappedBy = "trainingProgram", cascade = CascadeType.ALL)

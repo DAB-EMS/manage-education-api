@@ -19,17 +19,20 @@ import java.util.UUID;
 @Setter
 @ToString
 public class ProgramSyllabus implements Serializable {
+
     @EmbeddedId
     private ProgramSyllabusId id;
 
-    @Type(type = "org.hibernate.type.UUIDCharType")
+    @ManyToOne
+    @MapsId("trainingProgramId")
     @JoinColumn(name = "training_program_id")
     @JsonBackReference
-    private UUID trainingProgram;
+    private TrainingProgram trainingProgram;
 
-    @Type(type = "org.hibernate.type.UUIDCharType")
+    @MapsId("syllabusId")
     @JoinColumn(name = "syllabus_id")
     @JsonBackReference
+    @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID syllabus;
     private int position;
 
