@@ -1,9 +1,9 @@
 package com.example.manageeducation.userservice.service.impl;
 
-import com.example.manageeducation.exception.InternalServerException;
-import com.example.manageeducation.exception.ResourceNotFoundException;
-import com.example.manageeducation.mapper.AbstractMapper;
-import com.example.manageeducation.service.BaseService;
+import com.example.manageeducation.userservice.exception.InternalServerException;
+import com.example.manageeducation.userservice.exception.ResourceNotFoundException;
+import com.example.manageeducation.userservice.mapper.AbstractMapper;
+import com.example.manageeducation.userservice.service.BaseService;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
