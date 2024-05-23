@@ -1,8 +1,8 @@
 package com.example.manageeducation.syllabusservice.service.impl;
 
-import com.example.manageeducation.entity.SyllabusUnitChapter;
-import com.example.manageeducation.repository.SyllabusUnitChapterRepository;
-import com.example.manageeducation.service.SyllabusUnitChapterService;
+import com.example.manageeducation.syllabusservice.model.SyllabusUnitChapter;
+import com.example.manageeducation.syllabusservice.repository.SyllabusUnitChapterRepository;
+import com.example.manageeducation.syllabusservice.service.SyllabusUnitChapterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

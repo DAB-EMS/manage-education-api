@@ -1,14 +1,15 @@
 package com.example.manageeducation.syllabusservice.service.impl;
 
-import com.example.manageeducation.dto.response.SyllabusUnitResponse;
-import com.example.manageeducation.entity.Syllabus;
-import com.example.manageeducation.entity.SyllabusDay;
-import com.example.manageeducation.entity.SyllabusUnit;
-import com.example.manageeducation.exception.BadRequestException;
-import com.example.manageeducation.repository.SyllabusDayRepository;
-import com.example.manageeducation.repository.SyllabusRepository;
-import com.example.manageeducation.repository.SyllabusUnitRepository;
-import com.example.manageeducation.service.SyllabusUnitService;
+import com.example.manageeducation.syllabusservice.dto.request.SyllabusUnitAddRequest;
+import com.example.manageeducation.syllabusservice.dto.response.SyllabusUnitResponse;
+import com.example.manageeducation.syllabusservice.exception.BadRequestException;
+import com.example.manageeducation.syllabusservice.model.Syllabus;
+import com.example.manageeducation.syllabusservice.model.SyllabusDay;
+import com.example.manageeducation.syllabusservice.model.SyllabusUnit;
+import com.example.manageeducation.syllabusservice.repository.SyllabusDayRepository;
+import com.example.manageeducation.syllabusservice.repository.SyllabusRepository;
+import com.example.manageeducation.syllabusservice.repository.SyllabusUnitRepository;
+import com.example.manageeducation.syllabusservice.service.SyllabusUnitService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -116,10 +116,15 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.deleteCustomer(id));
     }
 
-    @PreAuthorize("hasAuthority('VIEW_USER')")
+//    @PreAuthorize("hasAuthority('VIEW_USER')")
     @GetMapping("/customer/{customer-id}")
     public ResponseEntity<?> getCustomerById(@PathVariable("customer-id") UUID id) {
         return ResponseEntity.ok(customerService.getUser(id));
+    }
+
+    @GetMapping("/customer/{email}")
+    public ResponseEntity<?> getCustomerByEmail(@PathVariable("email") String email) {
+        return ResponseEntity.ok(customerService.GetCustomerByEmail(email));
     }
 
     @PreAuthorize("hasAuthority('FULL_ACCESS_USER')")

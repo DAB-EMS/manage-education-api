@@ -1,15 +1,18 @@
 package com.example.manageeducation.syllabusservice.service.impl;
 
+import com.example.manageeducation.syllabusservice.Utils.SecurityUtil;
+import com.example.manageeducation.syllabusservice.client.CustomerClient;
+import com.example.manageeducation.syllabusservice.dto.Customer;
 import com.example.manageeducation.syllabusservice.dto.MaterialDTO;
 import com.example.manageeducation.syllabusservice.dto.request.MaterialRequest;
 import com.example.manageeducation.syllabusservice.dto.response.MaterialResponse;
 import com.example.manageeducation.syllabusservice.enums.MaterialStatus;
 import com.example.manageeducation.syllabusservice.exception.BadRequestException;
 import com.example.manageeducation.syllabusservice.model.Material;
+import com.example.manageeducation.syllabusservice.model.SyllabusUnitChapter;
 import com.example.manageeducation.syllabusservice.repository.MaterialRepository;
 import com.example.manageeducation.syllabusservice.repository.SyllabusUnitChapterRepository;
 import com.example.manageeducation.syllabusservice.service.MaterialService;
-import org.apache.catalina.security.SecurityUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +28,7 @@ public class MaterialServiceImpl implements MaterialService {
     MaterialRepository materialRepository;
 
     @Autowired
-    CustomerRepository customerRepository;
+    CustomerClient customerRepository;
 
     @Autowired
     SyllabusUnitChapterRepository syllabusUnitChapterRepository;
@@ -42,7 +45,7 @@ public class MaterialServiceImpl implements MaterialService {
         Date date = java.sql.Date.valueOf(currentDate);
 
         //check validation customer
-        Optional<Customer> customerOptional = customerRepository.findById(securityUtil.getLoginUser(principal).getId());
+        Optional<Customer> customerOptional = customerRepository.getCustomerById(securityUtil.getLoginUser(principal).getId());
         if(customerOptional.isEmpty()){
             throw new BadRequestException("Customer id not found.");
         }
@@ -70,7 +73,7 @@ public class MaterialServiceImpl implements MaterialService {
         LocalDate currentDate = LocalDate.now();
         Date date = java.sql.Date.valueOf(currentDate);
         //check validation customer
-        Optional<Customer> customerOptional = customerRepository.findById(securityUtil.getLoginUser(principal).getId());
+        Optional<Customer> customerOptional = customerRepository.getCustomerById(securityUtil.getLoginUser(principal).getId());
         if(customerOptional.isEmpty()){
             throw new BadRequestException("Customer id not found.");
         }
@@ -114,14 +117,14 @@ public class MaterialServiceImpl implements MaterialService {
                 materialResponse.setName(material.getName());
                 materialResponse.setUrl(material.getUrl());
                 //get name customer
-                Optional<Customer> customerOptional = customerRepository.findById(material.getCreatedBy());
+                Optional<Customer> customerOptional = customerRepository.getCustomerById(material.getCreatedBy());
                 if(customerOptional.isPresent()){
                     materialResponse.setCreatedBy(customerOptional.get().getFullName());
                 }else {
                     throw new BadRequestException("Customer id not found.");
                 }
 
-                Optional<Customer> customerOptional1 = customerRepository.findById(material.getCreatedBy());
+                Optional<Customer> customerOptional1 = customerRepository.getCustomerById(material.getCreatedBy());
                 if(customerOptional1.isPresent()){
                     materialResponse.setUpdatedBy(customerOptional1.get().getFullName());
                 }else {
@@ -146,7 +149,7 @@ public class MaterialServiceImpl implements MaterialService {
         for(Material material: materials){
             MaterialDTO materialDTO = new MaterialDTO();
             modelMapper.map(material, materialDTO);
-            Optional<Customer> customerOptional = customerRepository.findById(material.getCreatedBy());
+            Optional<Customer> customerOptional = customerRepository.getCustomerById(material.getCreatedBy());
             if(customerOptional.isPresent()){
                 Customer customer = customerOptional.get();
                 materialDTO.setCreatedBy(customer.getFullName());

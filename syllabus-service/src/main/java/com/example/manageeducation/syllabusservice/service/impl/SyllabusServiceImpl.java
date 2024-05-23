@@ -1,6 +1,9 @@
 package com.example.manageeducation.syllabusservice.service.impl;
 
 
+import com.example.manageeducation.syllabusservice.Utils.SecurityUtil;
+import com.example.manageeducation.syllabusservice.client.CustomerClient;
+import com.example.manageeducation.syllabusservice.dto.Customer;
 import com.example.manageeducation.syllabusservice.dto.request.*;
 import com.example.manageeducation.syllabusservice.dto.response.*;
 import com.example.manageeducation.syllabusservice.enums.MaterialStatus;
@@ -59,7 +62,7 @@ public class SyllabusServiceImpl implements SyllabusService {
     OutputStandardRepository outputStandardRepository;
 
     @Autowired
-    CustomerRepository customerRepository;
+    CustomerClient customerRepository;
 
     @Autowired
     DeliveryTypeRepository deliveryTypeRepository;
@@ -85,7 +88,7 @@ public class SyllabusServiceImpl implements SyllabusService {
         }
 
         //check validation customer
-        Optional<Customer> customerOptional = customerRepository.findById(securityUtil.getLoginUser(principal).getId());
+        Optional<Customer> customerOptional = customerRepository.getCustomerById(securityUtil.getLoginUser(principal).getId());
         if(customerOptional.isEmpty()){
             throw new BadRequestException("Create by id not found.");
         }
@@ -429,7 +432,7 @@ public class SyllabusServiceImpl implements SyllabusService {
 
 
         //check validation customer
-        Optional<Customer> customerOptional = customerRepository.findById(securityUtil.getLoginUser(principal).getId());
+        Optional<Customer> customerOptional = customerRepository.getCustomerById(securityUtil.getLoginUser(principal).getId());
         if(customerOptional.isEmpty()){
             throw new BadRequestException("Create by id not found.");
         }
@@ -568,7 +571,7 @@ public class SyllabusServiceImpl implements SyllabusService {
             viewSyllabusResponse.setName(suSyllabus.getName());
             viewSyllabusResponse.setCode(suSyllabus.getCode());
             viewSyllabusResponse.setCreateOn(suSyllabus.getCreatedDate());
-            Optional<Customer> customerOptional = customerRepository.findById(suSyllabus.getCreatedBy());
+            Optional<Customer> customerOptional = customerRepository.getCustomerById(suSyllabus.getCreatedBy());
             if(customerOptional.isPresent()){
                 Customer customer = customerOptional.get();
                 viewSyllabusResponse.setCreateBy(customer.getFullName());
@@ -626,7 +629,7 @@ public class SyllabusServiceImpl implements SyllabusService {
 
 
             //check validation customer
-            Optional<Customer> customerOptional = customerRepository.findById(syllabusFirst.getCreatedBy());
+            Optional<Customer> customerOptional = customerRepository.getCustomerById(syllabusFirst.getCreatedBy());
             if(customerOptional.isEmpty()){
                 throw new BadRequestException("Create by id not found.");
             }
@@ -775,7 +778,7 @@ public class SyllabusServiceImpl implements SyllabusService {
         List<Syllabus> syllabusList = syllabusRepository.findAllByStatus(SyllabusStatus.ACTIVE);
         for(Syllabus syllabus: syllabusList){
             SyllabusViewProgramResponse syllabusViewProgramResponse = new SyllabusViewProgramResponse();
-            Optional<Customer> customerOptional = customerRepository.findById(syllabus.getCreatedBy());
+            Optional<Customer> customerOptional = customerRepository.getCustomerById(syllabus.getCreatedBy());
             if(customerOptional.isPresent()){
                 Customer customer = customerOptional.get();
                 syllabusViewProgramResponse.setCreatedByName(customer.getFullName());
