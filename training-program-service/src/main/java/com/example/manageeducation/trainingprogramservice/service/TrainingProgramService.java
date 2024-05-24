@@ -23,4 +23,5 @@ public interface TrainingProgramService {
     String importTrainingProgram(MultipartFile file, Principal principal);
     List<TrainingProgramAddClassRequest> trainingProgramAddClass();
     TrainingProgram trainingProgramName(String name,String version);
+    TrainingProgram trainingProgramId(UUID id);
 }

@@ -7,10 +7,7 @@ import com.example.manageeducation.trainingclassservice.dto.TrainingProgram;
 import com.example.manageeducation.trainingclassservice.dto.request.ClassCalendarRequest;
 import com.example.manageeducation.trainingclassservice.dto.request.CustomerRequest;
 import com.example.manageeducation.trainingclassservice.dto.request.TrainingClassRequest;
-import com.example.manageeducation.trainingclassservice.dto.response.DataExcelForTrainingClass;
-import com.example.manageeducation.trainingclassservice.dto.response.TrainingClassViewResponse;
-import com.example.manageeducation.trainingclassservice.dto.response.TrainingClassesResponse;
-import com.example.manageeducation.trainingclassservice.dto.response.TrainingProgramResponse;
+import com.example.manageeducation.trainingclassservice.dto.response.*;
 import com.example.manageeducation.trainingclassservice.enums.TrainingClassStatus;
 import com.example.manageeducation.trainingclassservice.exception.BadRequestException;
 import com.example.manageeducation.trainingclassservice.model.*;
@@ -82,9 +79,6 @@ public class TrainingClassServiceImpl implements TrainingClassService {
 
     @Autowired
     SecurityUtil securityUtil;
-
-    @Autowired
-    TrainingProgramService trainingProgramService;
 
     @Override
     public String createTrainingClass(Principal principal, UUID trainingProgramId, TrainingClassRequest dto) {

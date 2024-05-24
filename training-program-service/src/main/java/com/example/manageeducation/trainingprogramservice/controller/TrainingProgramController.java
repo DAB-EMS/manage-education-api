@@ -38,6 +38,11 @@ public class TrainingProgramController {
         return ResponseEntity.ok(trainingProgramService.viewTrainingProgram(id));
     }
 
+    @GetMapping("customer/training-program/{training-program-id}/id")
+    public ResponseEntity<?> findById(@PathVariable("training-program-id") UUID id) {
+        return ResponseEntity.ok(trainingProgramService.trainingProgramId(id));
+    }
+
     @GetMapping("customer/training-program/name")
     public ResponseEntity<?> getTrainingProgram(
             @RequestParam String name,

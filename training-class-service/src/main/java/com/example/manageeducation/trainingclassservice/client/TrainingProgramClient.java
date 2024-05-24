@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -27,4 +28,7 @@ public interface TrainingProgramClient {
     TrainingProgram getTrainingProgram(
             @RequestParam String name,
             @RequestParam String version);
+
+    @GetMapping("customer/training-program/{training-program-id}/id")
+    Optional<TrainingProgram> findById(@PathVariable("training-program-id") UUID id);
 }
