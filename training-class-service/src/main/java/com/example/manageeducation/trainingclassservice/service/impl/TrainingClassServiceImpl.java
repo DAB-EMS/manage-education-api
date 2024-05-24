@@ -1,7 +1,9 @@
 package com.example.manageeducation.trainingclassservice.service.impl;
 
 import com.example.manageeducation.trainingclassservice.client.CustomerClient;
+import com.example.manageeducation.trainingclassservice.client.TrainingProgramClient;
 import com.example.manageeducation.trainingclassservice.dto.Customer;
+import com.example.manageeducation.trainingclassservice.dto.TrainingProgram;
 import com.example.manageeducation.trainingclassservice.dto.request.ClassCalendarRequest;
 import com.example.manageeducation.trainingclassservice.dto.request.CustomerRequest;
 import com.example.manageeducation.trainingclassservice.dto.request.TrainingClassRequest;
@@ -67,7 +69,7 @@ public class TrainingClassServiceImpl implements TrainingClassService {
     CustomerClient customerRepository;
 
     @Autowired
-    TrainingProgramRepository trainingProgramRepository;
+    TrainingProgramClient trainingProgramRepository;
 
     @Autowired
     FsuRepository fsuRepository;
@@ -316,7 +318,7 @@ public class TrainingClassServiceImpl implements TrainingClassService {
 
             //init new
             TrainingClassViewResponse trainingClassViewResponse = new TrainingClassViewResponse();
-            TrainingProgramResponse trainingProgramResponse = trainingProgramService.viewTrainingProgram(trainingClass.getTrainingProgram().getId());
+            TrainingProgramResponse trainingProgramResponse = trainingProgramRepository.createTrainingProgram(trainingClass.getTrainingProgram());
             trainingClassViewResponse.setTrainingProgram(trainingProgramResponse);
             modelMapper.map(trainingClass,trainingClassViewResponse);
             return trainingClassViewResponse;
@@ -594,7 +596,7 @@ public class TrainingClassServiceImpl implements TrainingClassService {
                     trainingClass.setTechnicalGroup(technicalGroupRepository.findByName(dataExcelForTrainingClass.getTechnicalGroup()));
                     trainingClass.setProgramContent(programContentRepository.findByName(dataExcelForTrainingClass.getProgramContentId()));
                     trainingClass.setFsu(fsuRepository.findByName(dataExcelForTrainingClass.getFsu()));
-                    trainingClass.setTrainingProgram(trainingProgram);
+                    trainingClass.setTrainingProgram(trainingProgram.getId());
                     trainingClass.setPlannedAttendee(dataExcelForTrainingClass.getPlannedAttendee());
                     Set<String> listTrainer = dataExcelForTrainingClass.getTrainer();
                     System.out.println(listTrainer.size());
@@ -629,7 +631,7 @@ public class TrainingClassServiceImpl implements TrainingClassService {
     }
 
     private TrainingProgram findTrainingProgramByNameAndVersion(String name, String version) {
-        return trainingProgramRepository.findByName(name,version);
+        return trainingProgramRepository.getTrainingProgram(name,version);
     }
 
     private TrainingClass findClassByTrainingProgramId(TrainingProgram trainingProgramId) {

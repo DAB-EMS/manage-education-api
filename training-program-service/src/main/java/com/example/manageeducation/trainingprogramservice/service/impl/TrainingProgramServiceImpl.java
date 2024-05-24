@@ -358,6 +358,11 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
         return trainingProgramAdds;
     }
 
+    @Override
+    public TrainingProgram trainingProgramName(String name, String version) {
+        return trainingProgramRepository.findByName(name,version);
+    }
+
     private String checkValidationDataTrainingProgram(Principal principal, TrainingProgramImportRequest dto){
         try{
             TrainingProgramRequest request = new TrainingProgramRequest();
