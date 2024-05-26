@@ -1,14 +1,13 @@
 package com.example.manageeducation.trainingclassservice.service.impl;
 
 import com.example.manageeducation.trainingclassservice.client.CustomerClient;
+import com.example.manageeducation.trainingclassservice.client.TrainingProgramClient;
 import com.example.manageeducation.trainingclassservice.dto.Customer;
+import com.example.manageeducation.trainingclassservice.dto.TrainingProgram;
 import com.example.manageeducation.trainingclassservice.dto.request.ClassCalendarRequest;
 import com.example.manageeducation.trainingclassservice.dto.request.CustomerRequest;
 import com.example.manageeducation.trainingclassservice.dto.request.TrainingClassRequest;
-import com.example.manageeducation.trainingclassservice.dto.response.DataExcelForTrainingClass;
-import com.example.manageeducation.trainingclassservice.dto.response.TrainingClassViewResponse;
-import com.example.manageeducation.trainingclassservice.dto.response.TrainingClassesResponse;
-import com.example.manageeducation.trainingclassservice.dto.response.TrainingProgramResponse;
+import com.example.manageeducation.trainingclassservice.dto.response.*;
 import com.example.manageeducation.trainingclassservice.enums.TrainingClassStatus;
 import com.example.manageeducation.trainingclassservice.exception.BadRequestException;
 import com.example.manageeducation.trainingclassservice.model.*;
@@ -67,7 +66,7 @@ public class TrainingClassServiceImpl implements TrainingClassService {
     CustomerClient customerRepository;
 
     @Autowired
-    TrainingProgramRepository trainingProgramRepository;
+    TrainingProgramClient trainingProgramRepository;
 
     @Autowired
     FsuRepository fsuRepository;
@@ -80,9 +79,6 @@ public class TrainingClassServiceImpl implements TrainingClassService {
 
     @Autowired
     SecurityUtil securityUtil;
-
-    @Autowired
-    TrainingProgramService trainingProgramService;
 
     @Override
     public String createTrainingClass(Principal principal, UUID trainingProgramId, TrainingClassRequest dto) {
@@ -103,12 +99,12 @@ public class TrainingClassServiceImpl implements TrainingClassService {
         Customer customer = customerOptional.get();
 
         TrainingClass trainingClass = new TrainingClass();
-        trainingClass.setTrainingProgram(trainingProgram);
-        trainingClass.setCreatedBy(customer);
-        trainingClass.setUpdatedBy(customer);
+        trainingClass.setTrainingProgram(trainingProgram.getId());
+        trainingClass.setCreatedBy(customer.getId());
+        trainingClass.setUpdatedBy(customer.getId());
         trainingClass.setCreatedDate(currentDate);
         trainingClass.setUpdatedDate(currentDate);
-        trainingClass.setTrainingProgram(trainingProgram);
+        trainingClass.setTrainingProgram(trainingProgram.getId());
         trainingClass.setName(dto.getName());
         trainingClass.setCourseCode(dto.getCourseCode());
         trainingClass.setStartDate(dto.getStartDate());
@@ -129,50 +125,50 @@ public class TrainingClassServiceImpl implements TrainingClassService {
         if(customerApOptional.isEmpty()){
             throw new BadRequestException("Customer id is not found.");
         }
-        trainingClass.setApprovedBy(customerApOptional.get());
+        trainingClass.setApprovedBy(customerApOptional.get().getId());
 
         //check accept validation
         Optional<Customer> customerReOptional = customerRepository.getCustomerById(dto.getReviewedBy());
         if(customerReOptional.isEmpty()){
             throw new BadRequestException("Customer id is not found.");
         }
-        trainingClass.setReviewedBy(customerReOptional.get());
+        trainingClass.setReviewedBy(customerReOptional.get().getId());
 
         //set Admin
-        Set<Customer> admins = new HashSet<>();
+        Set<UUID> admins = new HashSet<>();
         for(CustomerRequest customer1: dto.getAccount_admins()){
             Optional<Customer> AdminOptional = customerRepository.getCustomerById(customer1.getId());
             if(AdminOptional.isPresent()){
-                admins.add(AdminOptional.get());
+                admins.add(AdminOptional.get().getId());
             }else {
                 throw new BadRequestException("Admin id is not found.");
             }
         }
-        trainingClass.setAccount_admins(admins);
+        trainingClass.setAccountAdmins(admins);
 
         //set trainee
-        List<Customer> trainee = new ArrayList<>();
+        List<UUID> trainee = new ArrayList<>();
         for(CustomerRequest customer1: dto.getAccount_trainee()){
             Optional<Customer> TraineeOptional = customerRepository.getCustomerById(customer1.getId());
             if(TraineeOptional.isPresent()){
-                trainee.add(TraineeOptional.get());
+                trainee.add(TraineeOptional.get().getId());
             }else {
                 throw new BadRequestException("Admin id is not found.");
             }
         }
-        trainingClass.setAccount_trainee(trainee);
+        trainingClass.setAccountTrainee(trainee);
 
         //set trainer
-        Set<Customer> trainer = new HashSet<>();
+        Set<UUID> trainer = new HashSet<>();
         for(CustomerRequest customer1: dto.getAccount_trainers()){
             Optional<Customer> TrainerOptional = customerRepository.getCustomerById(customer1.getId());
             if(TrainerOptional.isPresent()){
-                trainer.add(TrainerOptional.get());
+                trainer.add(TrainerOptional.get().getId());
             }else {
                 throw new BadRequestException("Admin id is not found.");
             }
         }
-        trainingClass.setAccount_trainers(trainer);
+        trainingClass.setAccountTrainers(trainer);
 
         //set class location
         Optional<ClassLocation> classLocationOptional = classLocationRepository.findById(dto.getClassLocation().getId());
@@ -268,7 +264,7 @@ public class TrainingClassServiceImpl implements TrainingClassService {
             trainingClassesResponse.setLocation(trainingClass.getClassLocation().getName());
             trainingClassesResponse.setAttend(modelMapper.map(trainingClass.getAttendeeLevel(), AttendLevelResponse.class));
             trainingClassesResponse.setStatus(modelMapper.map(trainingClass.getClassStatus(), ClassStatusResponse.class));
-            trainingClassesResponse.setCreatedBy(trainingClass.getCreatedBy().getFullName());
+            trainingClassesResponse.setCreatedBy(String.valueOf(trainingClass.getCreatedBy()));
             trainingClassesResponses.add(trainingClassesResponse);
 
         }
@@ -293,12 +289,12 @@ public class TrainingClassServiceImpl implements TrainingClassService {
         Optional<TrainingClass> trainingClassOptional = trainingClassRepository.findById(id);
         if(trainingClassOptional.isPresent()){
             TrainingClass trainingClass = trainingClassOptional.get();
-            TrainingProgram trainingProgram = trainingProgramService.duplicatedTrainingProgram(principal,trainingClass.getTrainingProgram().getId());
+            TrainingProgram trainingProgram = trainingProgramRepository.duplicatedTrainingProgram(principal,trainingClass.getTrainingProgram());
 
             TrainingClass newTrainingClass = new TrainingClass();
             modelMapper.map(trainingClass,newTrainingClass);
             newTrainingClass.setId(null);
-            newTrainingClass.setTrainingProgram(trainingProgram);
+            newTrainingClass.setTrainingProgram(trainingProgram.getId());
             UUID uuid = UUID.randomUUID();
             newTrainingClass.setCourseCode(trainingClass.getCourseCode() + uuid);
             trainingClassRepository.save(newTrainingClass);
@@ -316,7 +312,7 @@ public class TrainingClassServiceImpl implements TrainingClassService {
 
             //init new
             TrainingClassViewResponse trainingClassViewResponse = new TrainingClassViewResponse();
-            TrainingProgramResponse trainingProgramResponse = trainingProgramService.viewTrainingProgram(trainingClass.getTrainingProgram().getId());
+            TrainingProgramResponse trainingProgramResponse = trainingProgramRepository.createTrainingProgram(trainingClass.getTrainingProgram());
             trainingClassViewResponse.setTrainingProgram(trainingProgramResponse);
             modelMapper.map(trainingClass,trainingClassViewResponse);
             return trainingClassViewResponse;
@@ -565,11 +561,58 @@ public class TrainingClassServiceImpl implements TrainingClassService {
     public void saveTrainingClass(Principal principal, DataExcelForTrainingClass dataExcelForTrainingClass) {
 
         TrainingProgram trainingProgram = findTrainingProgramByNameAndVersion(dataExcelForTrainingClass.getTrainingProgram(),dataExcelForTrainingClass.getTrainingProgramVersion());
-        TrainingClass trainingProgramInTrainingClass = findClassByTrainingProgramId(trainingProgram);
+//        TrainingClass trainingProgramInTrainingClass = findClassByTrainingProgramId(trainingProgram);
 
         if (trainingClassRepository.findByCourseCode(dataExcelForTrainingClass.getCourseCode()) == null) {
             if (trainingProgram != null) {
-                if (trainingProgramInTrainingClass == null) {
+//                if (trainingProgramInTrainingClass == null) {
+//                    TrainingClass trainingClass = new TrainingClass();
+//                    Optional<Customer> customerOptional = customerRepository.getCustomerById(securityUtil.getLoginUser(principal).getId());
+//                    if(customerOptional.isPresent()){
+//                        trainingClass.setCreatedBy(customerRepository.getCustomerByEmail(customerOptional.get().getEmail()).get().getId());
+//                    }else{
+//                        throw new BadRequestException("Customer id is not found.");
+//                    }
+//                    trainingClass.setId(dataExcelForTrainingClass.getId());
+//                    trainingClass.setCourseCode(dataExcelForTrainingClass.getCourseCode());
+//                    trainingClass.setStartTime(dataExcelForTrainingClass.getStartTime());
+//                    trainingClass.setEndTime(dataExcelForTrainingClass.getEndTime());
+//                    trainingClass.setStartDate(dataExcelForTrainingClass.getStartDate());
+//                    trainingClass.setEndDate(dataExcelForTrainingClass.getEndDate());
+//                    trainingClass.setDuration(dataExcelForTrainingClass.getDuration());
+//                    trainingClass.setUpdatedBy(customerRepository.getCustomerByEmail(dataExcelForTrainingClass.getUpdatedBy()).get().getId());
+//                    trainingClass.setUpdatedDate(dataExcelForTrainingClass.getUpdatedDate());
+//                    trainingClass.setUniversityCode(dataExcelForTrainingClass.getUniversityCode());
+//                    trainingClass.setClassLocation(classLocationRepository.findByName(dataExcelForTrainingClass.getLocationId()));
+//                    trainingClass.setAttendeeLevel(attendLevelRepository.findByName(dataExcelForTrainingClass.getAttendeeType()));
+//                    trainingClass.setFormatType(formatTypeRepository.findByName(dataExcelForTrainingClass.getFormatType()));
+//                    trainingClass.setClassStatus(classStatusRepository.findByName(dataExcelForTrainingClass.getStatus().trim()));
+//                    trainingClass.setTechnicalGroup(technicalGroupRepository.findByName(dataExcelForTrainingClass.getTechnicalGroup()));
+//                    trainingClass.setProgramContent(programContentRepository.findByName(dataExcelForTrainingClass.getProgramContentId()));
+//                    trainingClass.setFsu(fsuRepository.findByName(dataExcelForTrainingClass.getFsu()));
+//                    trainingClass.setTrainingProgram(trainingProgram.getId());
+//                    trainingClass.setPlannedAttendee(dataExcelForTrainingClass.getPlannedAttendee());
+//                    Set<String> listTrainer = dataExcelForTrainingClass.getTrainer();
+//                    System.out.println(listTrainer.size());
+//                    Set<UUID> trainers = new HashSet<>();
+//                    for (String value : listTrainer) {
+//                        Customer trainer = customerRepository.getCustomerByEmail(value).get();
+//                        trainers.add(trainer.getId());
+//                        trainingClass.setAccountTrainers(trainers);
+//
+//                    }
+//                    Set<String> listAdmin = dataExcelForTrainingClass.getClassAdmin();
+//                    Set<UUID> admins = new HashSet<>();
+//                    for (String value : listAdmin) {
+//                        Customer admin = customerRepository.getCustomerByEmail(value).get();
+//                        admins.add(admin.getId());
+//                        trainingClass.setAccountAdmins(admins);
+//                    }
+//                    trainingClassRepository.save(trainingClass);
+//                } else {
+//                    dataExcelForTrainingClass.setMessageError("TrainingProgram is duplicated with another class");
+//
+//                }
                     TrainingClass trainingClass = new TrainingClass();
                     Optional<Customer> customerOptional = customerRepository.getCustomerById(securityUtil.getLoginUser(principal).getId());
                     if(customerOptional.isPresent()){
@@ -594,29 +637,26 @@ public class TrainingClassServiceImpl implements TrainingClassService {
                     trainingClass.setTechnicalGroup(technicalGroupRepository.findByName(dataExcelForTrainingClass.getTechnicalGroup()));
                     trainingClass.setProgramContent(programContentRepository.findByName(dataExcelForTrainingClass.getProgramContentId()));
                     trainingClass.setFsu(fsuRepository.findByName(dataExcelForTrainingClass.getFsu()));
-                    trainingClass.setTrainingProgram(trainingProgram);
+                    trainingClass.setTrainingProgram(trainingProgram.getId());
                     trainingClass.setPlannedAttendee(dataExcelForTrainingClass.getPlannedAttendee());
                     Set<String> listTrainer = dataExcelForTrainingClass.getTrainer();
                     System.out.println(listTrainer.size());
-                    Set<Customer> trainers = new HashSet<>();
+                    Set<UUID> trainers = new HashSet<>();
                     for (String value : listTrainer) {
                         Customer trainer = customerRepository.getCustomerByEmail(value).get();
-                        trainers.add(trainer);
-                        trainingClass.setAccount_trainers(trainers);
+                        trainers.add(trainer.getId());
+                        trainingClass.setAccountTrainers(trainers);
 
                     }
                     Set<String> listAdmin = dataExcelForTrainingClass.getClassAdmin();
-                    Set<Customer> admins = new HashSet<>();
+                    Set<UUID> admins = new HashSet<>();
                     for (String value : listAdmin) {
                         Customer admin = customerRepository.getCustomerByEmail(value).get();
-                        admins.add(admin);
-                        trainingClass.setAccount_admins(admins);
+                        admins.add(admin.getId());
+                        trainingClass.setAccountAdmins(admins);
                     }
                     trainingClassRepository.save(trainingClass);
-                } else {
-                    dataExcelForTrainingClass.setMessageError("TrainingProgram is duplicated with another class");
 
-                }
             } else {
                 dataExcelForTrainingClass.setMessageError("TrainingProgram does not exist");
             }
@@ -629,10 +669,10 @@ public class TrainingClassServiceImpl implements TrainingClassService {
     }
 
     private TrainingProgram findTrainingProgramByNameAndVersion(String name, String version) {
-        return trainingProgramRepository.findByName(name,version);
+        return trainingProgramRepository.getTrainingProgram(name,version);
     }
 
-    private TrainingClass findClassByTrainingProgramId(TrainingProgram trainingProgramId) {
-        return trainingClassRepository.findClassByTrainingProgramId(trainingProgramId);
-    }
+//    private TrainingClass findClassByTrainingProgramId(TrainingProgram trainingProgramId) {
+//        return trainingClassRepository.findClassByTrainingProgramId(trainingProgramId);
+//    }
 }

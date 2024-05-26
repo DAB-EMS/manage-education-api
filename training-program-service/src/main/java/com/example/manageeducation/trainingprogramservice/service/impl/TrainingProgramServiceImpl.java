@@ -358,6 +358,21 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
         return trainingProgramAdds;
     }
 
+    @Override
+    public TrainingProgram trainingProgramName(String name, String version) {
+        return trainingProgramRepository.findByName(name,version);
+    }
+
+    @Override
+    public TrainingProgram trainingProgramId(UUID id) {
+        Optional<TrainingProgram> trainingProgramOptional = trainingProgramRepository.findById(id);
+        if(trainingProgramOptional.isPresent()){
+            return trainingProgramOptional.get();
+        }else {
+            throw new BadRequestException("training program id not found.");
+        }
+    }
+
     private String checkValidationDataTrainingProgram(Principal principal, TrainingProgramImportRequest dto){
         try{
             TrainingProgramRequest request = new TrainingProgramRequest();
