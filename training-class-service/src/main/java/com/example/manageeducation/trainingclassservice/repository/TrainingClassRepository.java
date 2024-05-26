@@ -1,5 +1,6 @@
 package com.example.manageeducation.trainingclassservice.repository;
 
+import com.example.manageeducation.trainingclassservice.dto.TrainingProgram;
 import com.example.manageeducation.trainingclassservice.model.TrainingClass;
 import com.example.manageeducation.trainingclassservice.enums.TrainingClassStatus;
 import org.springframework.data.jpa.repository.JpaRepository;

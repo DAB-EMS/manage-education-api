@@ -27,7 +27,7 @@ public class ClassCalendarServiceImpl implements ClassCalendarService {
             calendarClassResponse.setDateTime(classCalendar.getDateTime());
             calendarClassResponse.setBeginTime(classCalendar.getBeginTime());
             calendarClassResponse.setEndTime(classCalendar.getEndTime());
-            calendarClassResponse.setCreateBy(classCalendar.getTrainingClass().getCreatedBy().getFullName());
+            calendarClassResponse.setCreateBy(String.valueOf(classCalendar.getTrainingClass().getCreatedBy()));
             calendarClassResponses.add(calendarClassResponse);
         }
         return calendarClassResponses;

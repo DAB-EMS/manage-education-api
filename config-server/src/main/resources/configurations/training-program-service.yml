@@ -22,4 +22,4 @@ spring:
 application:
   config:
     customer-url: http://localhost:8222/api/v1/auth
-    program-url: http://localhost:8222/api/v1/auth
+    syllabus-url: http://localhost:8222/api/v1/auth
