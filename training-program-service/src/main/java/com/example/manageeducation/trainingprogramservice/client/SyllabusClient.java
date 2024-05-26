@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
-@FeignClient(name = "user-service", url = "${application.config.program-url}")
+@FeignClient(name = "syllabus-service", url = "${application.config.syllabus-url}")
 public interface SyllabusClient {
     @GetMapping("/syllabus/{syllabus-id}")
     Optional<Syllabus> getSyllabus(@PathVariable("syllabus-id") UUID id);

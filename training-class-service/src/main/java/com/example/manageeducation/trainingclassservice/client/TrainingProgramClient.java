@@ -15,7 +15,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
-@FeignClient(name = "user-service", url = "${application.config.program-url}")
+@FeignClient(name = "training-program-service", url = "${application.config.program-url}")
 public interface TrainingProgramClient {
 
     @PostMapping("customer/training-program/{training-program-id}/duplicated")

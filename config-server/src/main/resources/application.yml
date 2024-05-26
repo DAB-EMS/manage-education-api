@@ -9,4 +9,4 @@ spring:
     config:
       server:
         native:
-          search-locations: classpath:/configurations
+          search-locations: config-server\src\main\resources\configurations
