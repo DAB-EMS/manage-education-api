@@ -19,7 +19,7 @@ import java.util.UUID;
 public interface TrainingProgramClient {
 
     @PostMapping("customer/training-program/{training-program-id}/duplicated")
-    String duplicatedTrainingProgram(Principal principal, @PathVariable("training-program-id") UUID id);
+    TrainingProgram duplicatedTrainingProgram(Principal principal, @PathVariable("training-program-id") UUID id);
 
     @GetMapping("customer/training-program/{training-program-id}")
     TrainingProgramResponse createTrainingProgram(@PathVariable("training-program-id") UUID id);

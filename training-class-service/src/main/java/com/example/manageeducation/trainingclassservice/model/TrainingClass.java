@@ -18,6 +18,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -156,6 +157,15 @@ public class TrainingClass implements Serializable {
 //    @JsonIgnore
 //    @JoinTable(name = "class_trainee", joinColumns = @JoinColumn(name = "class_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "trainee_id", referencedColumnName = "id"))
 //    private List<Customer> account_trainee;
+
+    @ElementCollection
+    private Set<UUID> accountTrainers;
+
+    @ElementCollection
+    private Set<UUID> accountAdmins;
+
+    @ElementCollection
+    private List<UUID> accountTrainee;
 
     @OneToMany(mappedBy = "trainingClass")
     @JsonIgnore

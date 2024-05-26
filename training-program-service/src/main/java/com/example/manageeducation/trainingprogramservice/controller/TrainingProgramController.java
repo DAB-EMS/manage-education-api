@@ -82,11 +82,12 @@ public class TrainingProgramController {
 //    @PreAuthorize("hasAuthority('CREATE_TRAINING_PROGRAM')")
     @PostMapping("customer/training-program/{training-program-id}/duplicated")
     public ResponseEntity<?> duplicatedTrainingProgram(Principal principal, @PathVariable("training-program-id") UUID id) {
-        if(trainingProgramService.duplicatedTrainingProgram(principal,id)!=null){
-            return ResponseEntity.ok("duplicated successful.");
-        }else{
-            return ResponseEntity.ok("duplicated fail.");
-        }
+//        if(trainingProgramService.duplicatedTrainingProgram(principal,id)!=null){
+//            return ResponseEntity.ok(trainingProgramService.duplicatedTrainingProgram(principal,id));
+//        }else{
+//            return ResponseEntity.ok("duplicated fail.");
+//        }
+        return ResponseEntity.ok(trainingProgramService.duplicatedTrainingProgram(principal,id));
     }
 
     @PreAuthorize("hasAuthority('CREATE_TRAINING_PROGRAM')")
