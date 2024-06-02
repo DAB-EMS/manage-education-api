@@ -1,0 +1,30 @@
+services:
+  postgres:
+    container_name: postgres-sq
+    image: postgres
+    environment:
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: education
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/var/lib/postgres/data
+    networks:
+      - spring-boot-network
+  spring-boot-app:
+    container_name: spring-manage-education
+    image: spring/manage-education
+    ports:
+      - "8088:8080"
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/config/serviceAccountKey.json
+    networks:
+      - spring-boot-network
+
+volumes:
+  postgres:
+
+networks:
+  spring-boot-network:
+    driver: bridge
