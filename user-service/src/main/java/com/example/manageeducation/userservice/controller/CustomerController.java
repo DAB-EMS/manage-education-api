@@ -2,13 +2,19 @@ package com.example.manageeducation.userservice.controller;
 
 import com.example.manageeducation.userservice.dto.CustomerImportRequest;
 import com.example.manageeducation.userservice.dto.CustomerUpdateRequest;
+import com.example.manageeducation.userservice.dto.RequestForListOfCustomer;
 import com.example.manageeducation.userservice.enums.CustomerStatus;
 import com.example.manageeducation.userservice.enums.Gender;
 import com.example.manageeducation.userservice.enums.RoleType;
+import com.example.manageeducation.userservice.model.ResponseObject;
 import com.example.manageeducation.userservice.service.CustomerService;
 import com.example.manageeducation.userservice.service.impl.FirebaseService;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.apache.poi.util.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +35,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/auth")
 public class CustomerController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CustomerController.class);
 
     @Autowired
     CustomerService customerService;
@@ -164,6 +172,21 @@ public class CustomerController {
             throw new FileNotFoundException("File template not exist");
         }
         return IOUtils.toByteArray(file);
+    }
+
+    @GetMapping("/customers/keywords")
+    @Operation(summary = "get all customers ")
+    public ResponseEntity<ResponseObject> searchCustomers(
+            @RequestParam(name = "keyword", defaultValue = "") String keywords,
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(value = "sortBy", required = false)
+            @Parameter(name = "sortBy", description = "name or age or address") String sortBy,
+            @RequestParam(value = "sortType", required = false)
+            @Parameter(name = "sortType", description = "ASC or DESC") String sortType) {
+        RequestForListOfCustomer request = new RequestForListOfCustomer(keywords,page, size, sortBy, sortType);
+        LOGGER.info("Start method List of Customers in SpringDataController");
+        return customerService.getAllCustomers(request);
     }
 
 }

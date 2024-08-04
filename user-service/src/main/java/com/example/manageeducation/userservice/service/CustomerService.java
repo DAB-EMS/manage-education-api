@@ -3,8 +3,11 @@ package com.example.manageeducation.userservice.service;
 import com.example.manageeducation.userservice.dto.CustomerImportRequest;
 import com.example.manageeducation.userservice.dto.CustomerResponse;
 import com.example.manageeducation.userservice.dto.CustomerUpdateRequest;
+import com.example.manageeducation.userservice.dto.RequestForListOfCustomer;
 import com.example.manageeducation.userservice.enums.RoleType;
 import com.example.manageeducation.userservice.model.Customer;
+import com.example.manageeducation.userservice.model.ResponseObject;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,5 +31,6 @@ public interface CustomerService {
     List<CustomerResponse> customerByStatus(RoleType role);
     HashSet<String> customerLevel();
     CustomerResponse getProfile(Principal principal);
+    ResponseEntity<ResponseObject> getAllCustomers(RequestForListOfCustomer request);
 
 }
