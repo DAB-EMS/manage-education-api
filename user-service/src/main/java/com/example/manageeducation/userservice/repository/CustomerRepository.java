@@ -16,6 +16,8 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
     Optional<Customer> findByEmail(String email);
     @Query("SELECT u from Customer u where u.email=?1")
     Customer findCustomerByEmail(String email);
+    @Query("SELECT COUNT(s) FROM Customer s WHERE NOT s.status = 2 AND NOT s.status = 3 AND NOT s.status = 4")
+    int getTotalRows();
     List<Customer> findByFullNameContainingIgnoreCase(String name);
     List<Customer> findAllByStatus(CustomerStatus status);
     List<Customer> findAllByRole_Name(RoleType role);

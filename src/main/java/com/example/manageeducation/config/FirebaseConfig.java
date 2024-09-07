@@ -13,9 +13,13 @@ import java.io.IOException;
 public class FirebaseConfig {
     @PostConstruct
     public void initialize() throws IOException {
+        String serviceAccountPath = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
 
-        FileInputStream serviceAccount =
-                new FileInputStream("src/main/resources/serviceAccountKey.json");
+        if (serviceAccountPath == null || serviceAccountPath.isEmpty()) {
+            throw new IOException("GOOGLE_APPLICATION_CREDENTIALS environment variable not set or empty");
+        }
+
+        FileInputStream serviceAccount = new FileInputStream(serviceAccountPath);
 
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))

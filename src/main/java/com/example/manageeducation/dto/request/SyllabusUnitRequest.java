@@ -3,10 +3,7 @@ package com.example.manageeducation.dto.request;
 import com.example.manageeducation.entity.Syllabus;
 import com.example.manageeducation.entity.SyllabusDay;
 import com.example.manageeducation.entity.SyllabusUnitChapter;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
@@ -15,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class SyllabusUnitRequest {
     private String name;
     private int unitNo;

@@ -15,6 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class SyllabusRequest {
     private String name;
     private String code;

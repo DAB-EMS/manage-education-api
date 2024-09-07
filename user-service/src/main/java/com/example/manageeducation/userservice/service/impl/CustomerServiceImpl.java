@@ -1,15 +1,17 @@
 package com.example.manageeducation.userservice.service.impl;
 
+import com.example.manageeducation.userservice.Utils.CustomerServiceUtils;
 import com.example.manageeducation.userservice.Utils.SecurityUtil;
-import com.example.manageeducation.userservice.dto.CustomerImportRequest;
-import com.example.manageeducation.userservice.dto.CustomerResponse;
-import com.example.manageeducation.userservice.dto.CustomerUpdateRequest;
-import com.example.manageeducation.userservice.dto.RegisterRequest;
+import com.example.manageeducation.userservice.controller.CustomerController;
+import com.example.manageeducation.userservice.dto.*;
 import com.example.manageeducation.userservice.enums.CustomerStatus;
 import com.example.manageeducation.userservice.enums.Gender;
 import com.example.manageeducation.userservice.enums.RoleType;
 import com.example.manageeducation.userservice.exception.BadRequestException;
+import com.example.manageeducation.userservice.jdbc.CustomerJdbc;
 import com.example.manageeducation.userservice.model.Customer;
+import com.example.manageeducation.userservice.model.Pagination;
+import com.example.manageeducation.userservice.model.ResponseObject;
 import com.example.manageeducation.userservice.model.Role;
 import com.example.manageeducation.userservice.repository.CustomerRepository;
 import com.example.manageeducation.userservice.repository.RoleRepository;
@@ -22,7 +24,14 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,8 +46,16 @@ import java.util.stream.Collectors;
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CustomerController.class);
+
     @Autowired
     CustomerRepository customerRepository;
+
+    @Autowired
+    CustomerJdbc customerJdbc;
+
+    @Autowired
+    CustomerServiceUtils customerServiceUtils;
 
     @Autowired
     RoleRepository roleRepository;
@@ -256,6 +273,61 @@ public class CustomerServiceImpl implements CustomerService {
             return modelMapper.map(customer,CustomerResponse.class);
         }
         return null;
+    }
+
+    @Override
+    public ResponseEntity<ResponseObject> getAllCustomers(RequestForListOfCustomer request) {
+        LOGGER.info("Start method getAllCustomers in CustomerServiceImpl");
+        List<CustomerResponse> responseData = new ArrayList<>();
+        List<Customer> results = new ArrayList<>();
+        int totalPage = 0;
+        int totalRows = 0;
+        String message = "";
+        if("".equalsIgnoreCase(request.getKeyword())){
+            if (request.getSortBy() == null && request.getSortType() == null) {
+                LOGGER.info("Start View All Customers");
+                Pageable pageable = PageRequest.of(request.getPage() - 1, request.getSize());
+                Page<Customer> syllabusPage = customerRepository.findAll(pageable);
+                totalPage = syllabusPage.getTotalPages();
+                results = syllabusPage.getContent();
+            }else {
+                LOGGER.info("View All Customers With Sort Options");
+                results = customerJdbc.getCustomers(customerServiceUtils
+                        .getSQLForSortingAllCustomers(request.getPage() - 1, request.getSize(),
+                                request.getSortBy(), request.getSortType()));
+                totalRows = customerRepository.getTotalRows();
+            }
+        }else{
+            if (request.getSortBy() != null && request.getSortType() != null) {
+                LOGGER.info("View All Customers With Keywords and Sort Options");
+                results = customerJdbc.getCustomers(customerServiceUtils
+                        .getSQLForSearchingByKeywordsForSuggestions(request.getPage() - 1, request.getSize(),
+                                request.getKeyword()));
+                totalRows = customerRepository.getTotalRows();
+            }else {
+                LOGGER.info("View All Customers With Keywords");
+                results = customerJdbc.getCustomers(customerServiceUtils
+                        .getSQLForSearchingByKeywordsForSuggestionsAndSorting(request.getPage() - 1, request.getSize(),
+                                request.getSortBy(), request.getSortType(), request.getKeyword()));
+                totalRows = customerRepository.getTotalRows();
+            }
+        }
+
+        if (results.size() > 0) {
+            if(totalPage == 0) {
+                totalPage = (int)(totalRows % request.getSize() == 0 ? (totalRows / request.getSize()) : (totalRows / request.getSize()) + 1);
+            }
+            message += "Total " + results.size() + " element(s) in page " + request.getPage();
+            responseData = results.stream()
+                    .map(customer -> modelMapper.map(customer, CustomerResponse.class))
+                    .collect(Collectors.toList());
+        } else {
+            LOGGER.info("Null result");
+            message += "Empty list";
+        }
+        LOGGER.info("End method getAllCustomers in SpringDataServiceImpl");
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(HttpStatus.OK.toString(), message,
+                new Pagination(request.getPage(), request.getSize(), totalPage), responseData));
     }
 
     private boolean createCustomerWithSystem(List<CustomerImportRequest> customers){
