@@ -1,12 +1,15 @@
 package com.example.manageeducation.syllabusservice.service;
 
+import com.example.manageeducation.syllabusservice.dto.RequestForListOfSyllabus;
 import com.example.manageeducation.syllabusservice.dto.request.SyllabusRequest;
 import com.example.manageeducation.syllabusservice.dto.request.SyllabusUpdateRequest;
 import com.example.manageeducation.syllabusservice.dto.response.SyllabusResponse;
 import com.example.manageeducation.syllabusservice.dto.response.SyllabusViewProgramResponse;
 import com.example.manageeducation.syllabusservice.dto.response.ViewSyllabusResponse;
 import com.example.manageeducation.syllabusservice.enums.SyllabusStatus;
+import com.example.manageeducation.syllabusservice.model.ResponseObject;
 import com.example.manageeducation.syllabusservice.model.Syllabus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,4 +29,5 @@ public interface SyllabusService {
     String deActive(UUID id);
     List<SyllabusViewProgramResponse> viewSyllabusProgram();
     List<Syllabus> checkCondition(String name, String code, String version, SyllabusStatus status);
+    ResponseEntity<ResponseObject> getAllSyllabus(RequestForListOfSyllabus request);
 }

@@ -3,10 +3,7 @@ package com.example.manageeducation.syllabusservice.model;
 import com.example.manageeducation.syllabusservice.enums.SyllabusStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
@@ -18,7 +15,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Getter
 @Setter

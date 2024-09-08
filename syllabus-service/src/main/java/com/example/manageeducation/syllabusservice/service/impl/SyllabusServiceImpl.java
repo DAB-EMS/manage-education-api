@@ -1,6 +1,9 @@
 package com.example.manageeducation.syllabusservice.service.impl;
 
 
+import com.example.manageeducation.syllabusservice.controller.SyllabusController;
+import com.example.manageeducation.syllabusservice.dto.RequestForListOfSyllabus;
+import com.example.manageeducation.syllabusservice.jdbc.SyllabusJdbc;
 import com.example.manageeducation.syllabusservice.utils.SecurityUtil;
 import com.example.manageeducation.syllabusservice.client.CustomerClient;
 import com.example.manageeducation.syllabusservice.dto.Customer;
@@ -14,12 +17,20 @@ import com.example.manageeducation.syllabusservice.model.*;
 import com.example.manageeducation.syllabusservice.repository.*;
 import com.example.manageeducation.syllabusservice.service.OutputStandardService;
 import com.example.manageeducation.syllabusservice.service.SyllabusService;
+import com.example.manageeducation.syllabusservice.utils.SyllabusServiceUtils;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,9 +41,12 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 public class SyllabusServiceImpl implements SyllabusService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SyllabusServiceImpl.class);
 
     @Autowired
     SyllabusRepository syllabusRepository;
@@ -72,6 +86,12 @@ public class SyllabusServiceImpl implements SyllabusService {
 
     @Autowired
     SecurityUtil securityUtil;
+
+    @Autowired
+    SyllabusServiceUtils syllabusServiceUtils;
+
+    @Autowired
+    SyllabusJdbc syllabusJdbc;
 
     @Autowired
     OutputStandardService outputStandardService;
@@ -796,6 +816,61 @@ public class SyllabusServiceImpl implements SyllabusService {
     public List<Syllabus> checkCondition(String name, String code, String version, SyllabusStatus status) {
         List<Syllabus> syllabusList = syllabusRepository.findByNameIgnoreCaseAndCodeIgnoreCaseAndVersionIgnoreCaseAndStatus(name,code,version,status);
         return syllabusList;
+    }
+
+    @Override
+    public ResponseEntity<ResponseObject> getAllSyllabus(RequestForListOfSyllabus request) {
+        LOGGER.info("Start method getAllCustomers in CustomerServiceImpl");
+        List<ViewSyllabusResponse> responseData = new ArrayList<>();
+        List<Syllabus> results = new ArrayList<>();
+        int totalPage = 0;
+        int totalRows = 0;
+        String message = "";
+        if("".equalsIgnoreCase(request.getKeyword())){
+            if (request.getSortBy() == null && request.getSortType() == null) {
+                LOGGER.info("Start View All Syllabus");
+                Pageable pageable = PageRequest.of(request.getPage() - 1, request.getSize());
+                Page<Syllabus> syllabusPage = syllabusRepository.findAll(pageable);
+                totalPage = syllabusPage.getTotalPages();
+                results = syllabusPage.getContent();
+            }else {
+                LOGGER.info("View All Syllabus With Sort Options");
+                results = syllabusJdbc.getSyllabus(syllabusServiceUtils
+                        .getSQLForSortingAllSyllabus(request.getPage() - 1, request.getSize(),
+                                request.getSortBy(), request.getSortType()));
+                totalRows = syllabusRepository.getTotalRows();
+            }
+        }else{
+            if (request.getSortBy() != null && request.getSortType() != null) {
+                LOGGER.info("View All Syllabus With Keywords and Sort Options");
+                results = syllabusJdbc.getSyllabus(syllabusServiceUtils
+                        .getSQLForSearchingByKeywordsForSuggestions(request.getPage() - 1, request.getSize(),
+                                request.getKeyword()));
+                totalRows = syllabusRepository.getTotalRows();
+            }else {
+                LOGGER.info("View All Syllabus With Keywords");
+                results = syllabusJdbc.getSyllabus(syllabusServiceUtils
+                        .getSQLForSearchingByKeywordsForSuggestionsAndSorting(request.getPage() - 1, request.getSize(),
+                                request.getSortBy(), request.getSortType(), request.getKeyword()));
+                totalRows = syllabusRepository.getTotalRows();
+            }
+        }
+
+        if (results.size() > 0) {
+            if(totalPage == 0) {
+                totalPage = (int)(totalRows % request.getSize() == 0 ? (totalRows / request.getSize()) : (totalRows / request.getSize()) + 1);
+            }
+            message += "Total " + results.size() + " element(s) in page " + request.getPage();
+            responseData = results.stream()
+                    .map(customer -> modelMapper.map(customer, ViewSyllabusResponse.class))
+                    .toList();
+        } else {
+            LOGGER.info("Null result");
+            message += "Empty list";
+        }
+        LOGGER.info("End method getAllSyllabus in SpringDataServiceImpl");
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(HttpStatus.OK.toString(), message,
+                new Pagination(request.getPage(), request.getSize(), totalPage), responseData));
     }
 
     private static Syllabus getSyllabus(SyllabusRequest dto, Optional<SyllabusLevel> syllabusLevelOptional, UUID id, Date date) {
