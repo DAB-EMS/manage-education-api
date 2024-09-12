@@ -18,7 +18,7 @@ public class RoleController {
     @PreAuthorize("hasAuthority('VIEW_USER')")
     @GetMapping("/all-role")
     public ResponseEntity<?> getRoles() {
-        return ResponseEntity.ok(roleService.roles());
+        return ResponseEntity.ok(roleService.getRoles());
     }
 
     @PreAuthorize("hasAuthority('VIEW_USER')")
