@@ -11,29 +11,32 @@ public class CustomerServiceUtils {
     JdbcTemplate jdbcTemplate;
 
     public String getSQLForSortingAllCustomers(int page, int size, String sortBy, String sortType) {
-        return "SELECT * FROM customer s LEFT JOIN role r ON s.role_id = r.id"
+        return "SELECT s.email, s.fullName, s.avatar, s.birthday, s.gender, s.level, r.name , s.status FROM customer s LEFT JOIN role r ON s.role_id = r.id"
                 + " ORDER BY s." + sortBy.toLowerCase() + " " + sortType
                 + getLimitAndOffsetValues(page, size);
     }
 
     public String getSQLForSearchingByKeywords(int page, int size, String keyword) {
         return "SELECT * FROM customer_spring_data s WHERE "
-                + "(s.status = 2 OR s.status = 3 OR s.status = 4) AND "
-                + "(s.name = '" + keyword + "' OR s.age = " + keyword + " OR s.address = '"
+                + "s.status = 1 AND "
+                + "(s.email = '" + keyword + "' OR s.fullName = " + keyword + " OR s.gender = '"
                 + keyword + "')" + getLimitAndOffsetValues(page, size);
     }
 
     public String getSQLForSearchingByKeywordsForSuggestions(int page, int size, String keyword) {
         return "SELECT * FROM customer s WHERE "
-                + "(s.name LIKE '%" + keyword + "%' OR s.age LIKE '%" + keyword + "%' OR s.address LIKE '%"
+                + "s.status = 1 AND "
+                + "(s.email LIKE '%" + keyword + "%' OR s.fullName LIKE '%" + keyword + "%' OR s.gender LIKE '%" + keyword + "%' OR s.role LIKE '%" + keyword + "%' OR s.status LIKE '%" + keyword + "%'  OR s.level LIKE '%" + keyword + "%' OR s.gender LIKE '%"
                 + keyword + "%')" + getLimitAndOffsetValues(page, size);
     }
 
     public String getSQLForSearchingByKeywordsForSuggestionsAndSorting(int page, int size, String sortBy, String sortType, String keyword) {
-        return "SELECT * FROM customer s WHERE "
-                + "(s.name LIKE '%" + keyword + "%' OR s.age LIKE '%" + keyword + "%' OR s.address LIKE '%"
+        return "SELECT s.email, s.fullName, s.avatar, s.birthday, s.gender, s.level, r.name , s.status FROM customer s LEFT JOIN role r ON s.role_id = r.id "
+                + "WHERE s.status = 1 AND "
+                + "(s.email LIKE '%" + keyword + "%' OR s.fullName LIKE '%" + keyword + "%' OR s.gender LIKE '%" + keyword + "%' OR s.role LIKE '%" + keyword + "%' OR s.status LIKE '%" + keyword + "%'  OR s.level LIKE '%" + keyword + "%' OR s.gender LIKE '%"
+                + keyword + "%')"
                 + " ORDER BY s." + sortBy.toLowerCase() + " " + sortType
-                + keyword + "%')" + getLimitAndOffsetValues(page, size);
+                + getLimitAndOffsetValues(page, size);
     }
 
     public String getLimitAndOffsetValues(int page, int size) {

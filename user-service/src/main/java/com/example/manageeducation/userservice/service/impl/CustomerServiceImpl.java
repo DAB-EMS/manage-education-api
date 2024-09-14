@@ -288,8 +288,9 @@ public class CustomerServiceImpl implements CustomerService {
                 LOGGER.info("Start View All Customers");
                 Pageable pageable = PageRequest.of(request.getPage() - 1, request.getSize());
                 Page<Customer> syllabusPage = customerRepository.findAll(pageable);
-                totalPage = syllabusPage.getTotalPages();
                 results = syllabusPage.getContent();
+                totalPage = syllabusPage.getTotalPages();
+
             }else {
                 LOGGER.info("View All Customers With Sort Options");
                 results = customerJdbc.getCustomers(customerServiceUtils

@@ -60,7 +60,7 @@ public class AuthController {
                 request.setAvatar(picture);
                 request.setEmail(email);
                 request.setPassword("");
-                request.setRole(roleService.GetRoleByName());
+                request.setRole(roleService.getRoleByName());
 
                 return ResponseEntity.ok(authenticationService.register(request));
             }

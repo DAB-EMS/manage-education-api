@@ -1,8 +1,6 @@
 package com.example.manageeducation.userservice.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
@@ -13,10 +11,12 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 import java.util.UUID;
 
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Getter
 @Setter
+@Builder
 public class Authority {
     @Id
     @GeneratedValue(generator = "UUID")
