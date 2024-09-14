@@ -29,7 +29,7 @@ public class RoleServiceImpl implements RoleService {
     ModelMapper modelMapper;
 
     @Override
-    public Role GetRoleByName() {
+    public Role getRoleByName() {
         try{
             Optional<Role> roleOptional = roleRepository.findByName(RoleType.STUDENT);
             if(roleOptional.isPresent()){
@@ -43,7 +43,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public List<Role> roles() {
+    public List<Role> getRoles() {
         List<Role> roleList = roleRepository.findAll();
         return roleList;
     }

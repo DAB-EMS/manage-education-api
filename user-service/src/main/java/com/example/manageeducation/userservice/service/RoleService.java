@@ -10,8 +10,8 @@ import java.util.List;
 
 @Service
 public interface RoleService {
-    Role GetRoleByName();
-    List<Role> roles();
+    Role getRoleByName();
+    List<Role> getRoles();
     String updateRolePermissions(List<RolePermissionsRequest> rolePermissionsRequests);
     HashSet<RolePermissionsRequest> rolePermissions();
 }

@@ -10,15 +10,15 @@ spring:
   application:
     name: trainingprogram
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/trainingprogram
-    username: root
-    password: Clp12345
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/trainingprogram
+    username: postgres
+    password: 12345
   jpa:
     hibernate:
-      ddl-auto: update
-    database: mysql
-    database-platform: org.hibernate.dialect.MySQL8Dialect
+      ddl-auto: create
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
 application:
   config:
     customer-url: http://localhost:8222/api/v1/auth

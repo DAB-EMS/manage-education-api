@@ -13,7 +13,6 @@ import java.util.UUID;
 
 @Repository
 public interface SyllabusRepository extends JpaRepository<Syllabus, UUID> {
-    List<Syllabus> findAllByNameAndCodeAndCreatedByAndCreatedDateAndStatus(String name, String code, String by, Date createdDate, SyllabusStatus status);
     List<Syllabus> findAllByStatus(SyllabusStatus status);
     Optional<Syllabus> findByIdAndStatus(UUID id, SyllabusStatus status);
     List<Syllabus> findByNameIgnoreCaseAndCodeIgnoreCaseAndVersionIgnoreCaseAndStatus(String name, String code, String version, SyllabusStatus status);
@@ -22,4 +21,7 @@ public interface SyllabusRepository extends JpaRepository<Syllabus, UUID> {
             "INNER JOIN suc.syllabusUnit su " +
             "WHERE su.syllabus.id = :syllabusId AND suc.deliveryType.id = :deliveryId")
     Double sumDurationBySyllabusIdAndDeliveryId(UUID syllabusId, UUID deliveryId);
+
+    @Query("SELECT COUNT(s) FROM Syllabus s WHERE s.status = 0")
+    int getTotalRows();
 }
