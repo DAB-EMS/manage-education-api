@@ -1,7 +1,9 @@
 package com.example.manageeducation.userservice.customer.service;
 
 import com.example.manageeducation.userservice.Utils.CustomerServiceUtils;
+import com.example.manageeducation.userservice.dto.CustomerImportRequest;
 import com.example.manageeducation.userservice.dto.CustomerResponse;
+import com.example.manageeducation.userservice.dto.CustomerUpdateRequest;
 import com.example.manageeducation.userservice.dto.RequestForListOfCustomer;
 import com.example.manageeducation.userservice.enums.CustomerStatus;
 import com.example.manageeducation.userservice.enums.Gender;
@@ -15,7 +17,6 @@ import com.example.manageeducation.userservice.service.CustomerService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,13 +24,18 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import static org.aspectj.bridge.MessageUtil.fail;
 import static org.mockito.ArgumentMatchers.any;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -926,6 +932,119 @@ public class CustomerServiceTest {
         Assertions.assertThat(actualList)
                 .usingRecursiveComparison()
                 .isEqualTo(expectedList);
+    }
+
+    @Test
+    @DisplayName("De-active customer information")
+    public void deactiveCustomer(){
+        try{
+            String update = customerService.deActiveCustomer(customerId10);
+            Assertions.assertThat(update).isEqualTo("De-active customer successful.");
+        }catch (Exception e){
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("Delete customer information")
+    public void deleteCustomer(){
+        try{
+            String update = customerService.deleteCustomer(customerId10);
+            Assertions.assertThat(update).isEqualTo("Delete customer successful.");
+        }catch (Exception e){
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("Update customer information")
+    public void updateCustomerInformation(){
+        try{
+            CustomerUpdateRequest customerUpdate = CustomerUpdateRequest.builder()
+                    .email("customer100@example.com")
+                    .fullName("Anh Bang")
+                    .birthday(new Date(90, 1, 5))
+                    .gender(Gender.MALE)
+                    .level("Gold")
+                    .build();
+            String update = customerService.updateCustomer(customerId10,customerUpdate);
+            Assertions.assertThat(update).isEqualTo("Update customer successful.");
+        }catch (Exception e){
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("Create customer with condition password is large than or equal 6")
+    public void createCustomerWithPasswordSmallThanSix(){
+        try{
+            CustomerImportRequest customer = CustomerImportRequest.builder()
+                    .email("customer109@example.com")
+                    .password("1234p")
+                    .fullName("Thanh Thang")
+                    .birthday(new Date(90, 1, 5))
+                    .gender(Gender.FEMALE)
+                    .role(RoleType.STUDENT)
+                    .level("Silver")
+                    .build();
+            String update = customerService.createUser(customer);
+            Assertions.assertThat(update).isEqualTo("Password is large than or equal 6.");
+        }catch (Exception e){
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("Create customer with condition email is existed.")
+    public void createCustomerWithConditionEmailExisted(){
+        try{
+            CustomerImportRequest customer = CustomerImportRequest.builder()
+                    .email("customer10@example.com")
+                    .password("1234p")
+                    .fullName("Thanh Thang")
+                    .birthday(new Date(90, 1, 5))
+                    .gender(Gender.FEMALE)
+                    .role(RoleType.STUDENT)
+                    .level("Silver")
+                    .build();
+            String update = customerService.createUser(customer);
+            Assertions.assertThat(update).isEqualTo("Email is existed.");
+        }catch (Exception e){
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("Create customer successfully")
+    public void createCustomerInformation(){
+        try{
+            CustomerImportRequest customer = CustomerImportRequest.builder()
+                    .email("customer180@example.com")
+                    .password("1234p90")
+                    .fullName("Tan Khang")
+                    .birthday(new Date(90, 1, 5))
+                    .gender(Gender.FEMALE)
+                    .role(RoleType.STUDENT)
+                    .level("Silver")
+                    .build();
+            String update = customerService.createUser(customer);
+            Assertions.assertThat(update).isEqualTo("Create successful.");
+        }catch (Exception e){
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("Create customer successfully with file excel")
+    public void createCustomerWithFileExcel(){
+        try{
+            Path filePath = Paths.get("user-service/src/main/resources/ImportTemplate.xlsx");
+            File file = filePath.toFile();
+            String update = customerService.createCustomerByExcel((MultipartFile) file);
+            Assertions.assertThat(update).isEqualTo("Create customer successful.");
+        }catch (Exception e){
+            fail(e.getMessage());
+        }
     }
 
 }

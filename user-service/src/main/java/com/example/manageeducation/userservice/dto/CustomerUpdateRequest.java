@@ -10,6 +10,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class CustomerUpdateRequest {
     @NonNull
     private String email;
