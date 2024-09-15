@@ -2,10 +2,7 @@ package com.example.manageeducation.userservice.dto;
 
 import com.example.manageeducation.userservice.enums.Gender;
 import com.example.manageeducation.userservice.enums.RoleType;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 
@@ -13,6 +10,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class CustomerImportRequest {
     private String fullName;
     private Date birthday;

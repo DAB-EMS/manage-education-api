@@ -1,0 +1,5 @@
+- Birthday: dd-mm-yyyy or yyyy-mm-dd
+- Gender: male or female
+- Password: more than 6 character
+- Role: class_admin, trainer, student
+- Please upload the file with the extension .csv
