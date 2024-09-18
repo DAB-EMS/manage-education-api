@@ -11,9 +11,9 @@ spring:
     name: trainingclass
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/trainingclass
+    url: jdbc:postgresql://postgres-sql:5432/trainingclass
     username: postgres
-    password: 12345
+    password: password
   jpa:
     hibernate:
       ddl-auto: create

@@ -24,4 +24,6 @@ public interface SyllabusRepository extends JpaRepository<Syllabus, UUID> {
 
     @Query("SELECT COUNT(s) FROM Syllabus s WHERE s.status = 0")
     int getTotalRows();
+
+    Syllabus findSyllabusById(UUID id);
 }
