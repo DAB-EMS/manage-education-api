@@ -11,14 +11,18 @@ spring:
     name: customer
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/customer
+    url: jdbc:postgresql://postgres-sql:5432/customer
     username: postgres
-    password: 12345
+    password: password
   jpa:
     hibernate:
       ddl-auto: create
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+management:
+  tracing:
+    sampling:
+      probability: 1.0
 application:
   security:
     jwt:

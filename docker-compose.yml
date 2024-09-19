@@ -1,68 +1,46 @@
 services:
-  mysql:
-    container_name: MySQL_SERVER
-    image: mysql
+  postgresql:
+    container_name: postgres-sql
+    image: postgres
     environment:
-#      MYSQL_ROOT_PASSWORD: 12345
-#      MYSQL_DATABASE: customer
-      MYSQL_USER: root
-      MYSQL_PASSWORD: 12345
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      PGDATA: /data/postgres
     volumes:
-      - mysql:/var/lib/mysql
+      - postgres:/data/postgres
     ports:
-      - "3306:3306"
+      - "5432:5432"
     networks:
       - microservices-net
     restart: unless-stopped
 
+  pgadmin:
+    container_name: ms_pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    networks:
+      - microservices-net
+    restart: unless-stopped
 
-#  zipkin:
-#    container_name: zipkin
-#    image: openzipkin/zipkin
-#    ports:
-#      - "9411:9411"
-#    networks:
-#      - microservices-net
-
-
-#  zookeeper:
-#    image: confluentinc/cp-zookeeper:latest
-#    container_name: zookeeper
-#    environment:
-#      ZOOKEEPER_SERVER_ID: 1
-#      ZOOKEEPER_CLIENT_PORT: 2181
-#      ZOOKEEPER_TICK_TIME: 2000
-#    ports:
-#      - "22181:2181"
-#    networks:
-#      - microservices-net
-#  kafka:
-#    image: confluentinc/cp-kafka:latest
-#    container_name: ms_kafka
-#    ports:
-#      - "9092:9092"
-#    depends_on:
-#      - zookeeper
-#    environment:
-#      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-#      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-#      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-#      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-#    networks:
-#      - microservices-net
-
-#  mail-dev:
-#    container_name: ms-mail-dev
-#    image: maildev/maildev
-#    ports:
-#      - 1080:1080
-#      - 1025:1025
+  zipkin:
+    container_name: zipkin
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - microservices-net
 
 networks:
   microservices-net:
     driver: bridge
 
 volumes:
-  mysql:
+  postgres:
+  pgadmin:
