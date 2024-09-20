@@ -1,9 +1,6 @@
 package com.example.manageeducation.syllabusservice.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 import java.util.List;
@@ -13,6 +10,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class ViewSyllabusResponse {
     private UUID id;
     private String name;

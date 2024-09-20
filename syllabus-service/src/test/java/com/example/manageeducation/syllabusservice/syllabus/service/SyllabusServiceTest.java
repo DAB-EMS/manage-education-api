@@ -1,11 +1,14 @@
 package com.example.manageeducation.syllabusservice.syllabus.service;
 
+import com.example.manageeducation.syllabusservice.dto.request.AssessmentSchemeRequest;
+import com.example.manageeducation.syllabusservice.dto.request.SyllabusDayRequest;
+import com.example.manageeducation.syllabusservice.dto.request.SyllabusRequest;
+import com.example.manageeducation.syllabusservice.dto.request.SyllabusUpdateRequest;
+import com.example.manageeducation.syllabusservice.enums.MaterialStatus;
+import com.example.manageeducation.syllabusservice.enums.SyllabusDayStatus;
 import com.example.manageeducation.syllabusservice.enums.SyllabusStatus;
 import com.example.manageeducation.syllabusservice.jdbc.SyllabusJdbc;
-import com.example.manageeducation.syllabusservice.model.DeliveryType;
-import com.example.manageeducation.syllabusservice.model.OutputStandard;
-import com.example.manageeducation.syllabusservice.model.Syllabus;
-import com.example.manageeducation.syllabusservice.model.SyllabusLevel;
+import com.example.manageeducation.syllabusservice.model.*;
 import com.example.manageeducation.syllabusservice.repository.DeliveryTypeRepository;
 import com.example.manageeducation.syllabusservice.repository.OutputStandardRepository;
 import com.example.manageeducation.syllabusservice.repository.SyllabusLevelRepository;
@@ -13,18 +16,28 @@ import com.example.manageeducation.syllabusservice.repository.SyllabusRepository
 import com.example.manageeducation.syllabusservice.service.SyllabusService;
 import com.example.manageeducation.syllabusservice.utils.SyllabusServiceUtils;
 import lombok.extern.log4j.Log4j2;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.security.Principal;
 import java.util.*;
+
+import static org.aspectj.bridge.MessageUtil.fail;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @Log4j2
 public class SyllabusServiceTest {
+
+    @Mock
+    private Principal principal;
 
     @MockBean
     private SyllabusRepository syllabusRepository;
@@ -117,9 +130,9 @@ public class SyllabusServiceTest {
         Optional<SyllabusLevel> oSyllabusLevel3 = Optional.ofNullable(syllabusLevels.get(2));
 
         // Mockito to syllabus level
-        Mockito.when(syllabusLevelRepository.findById(syllabusLevelId1)).thenReturn(oSyllabusLevel1);
-        Mockito.when(syllabusLevelRepository.findById(syllabusLevelId2)).thenReturn(oSyllabusLevel2);
-        Mockito.when(syllabusLevelRepository.findById(syllabusLevelId3)).thenReturn(oSyllabusLevel3);
+        when(syllabusLevelRepository.findById(syllabusLevelId1)).thenReturn(oSyllabusLevel1);
+        when(syllabusLevelRepository.findById(syllabusLevelId2)).thenReturn(oSyllabusLevel2);
+        when(syllabusLevelRepository.findById(syllabusLevelId3)).thenReturn(oSyllabusLevel3);
 
 
         // Setup Optional for output standard
@@ -128,9 +141,9 @@ public class SyllabusServiceTest {
         Optional<OutputStandard> oOutputStandard3 = Optional.ofNullable(outputStandards.get(2));
 
         // Mockito to output standard
-        Mockito.when(outputStandardRepository.findById(outputStandardId1)).thenReturn(oOutputStandard1);
-        Mockito.when(outputStandardRepository.findById(outputStandardId2)).thenReturn(oOutputStandard2);
-        Mockito.when(outputStandardRepository.findById(outputStandardId3)).thenReturn(oOutputStandard3);
+        when(outputStandardRepository.findById(outputStandardId1)).thenReturn(oOutputStandard1);
+        when(outputStandardRepository.findById(outputStandardId2)).thenReturn(oOutputStandard2);
+        when(outputStandardRepository.findById(outputStandardId3)).thenReturn(oOutputStandard3);
 
 
         // Setup Optional for delivery type
@@ -142,33 +155,215 @@ public class SyllabusServiceTest {
         Optional<DeliveryType> oDeliveryType6 = Optional.ofNullable(deliveryTypes.get(5));
 
         // Mockito to delivery type
-        Mockito.when(deliveryTypeRepository.findById(deliveryTypeId1)).thenReturn(oDeliveryType1);
-        Mockito.when(deliveryTypeRepository.findById(deliveryTypeId2)).thenReturn(oDeliveryType2);
-        Mockito.when(deliveryTypeRepository.findById(deliveryTypeId3)).thenReturn(oDeliveryType3);
-        Mockito.when(deliveryTypeRepository.findById(deliveryTypeId4)).thenReturn(oDeliveryType4);
-        Mockito.when(deliveryTypeRepository.findById(deliveryTypeId5)).thenReturn(oDeliveryType5);
-        Mockito.when(deliveryTypeRepository.findById(deliveryTypeId6)).thenReturn(oDeliveryType6);
+        when(deliveryTypeRepository.findById(deliveryTypeId1)).thenReturn(oDeliveryType1);
+        when(deliveryTypeRepository.findById(deliveryTypeId2)).thenReturn(oDeliveryType2);
+        when(deliveryTypeRepository.findById(deliveryTypeId3)).thenReturn(oDeliveryType3);
+        when(deliveryTypeRepository.findById(deliveryTypeId4)).thenReturn(oDeliveryType4);
+        when(deliveryTypeRepository.findById(deliveryTypeId5)).thenReturn(oDeliveryType5);
+        when(deliveryTypeRepository.findById(deliveryTypeId6)).thenReturn(oDeliveryType6);
 
-//        List<User> users = new ArrayList<>(List.of(
-//                User.builder().id(userA).fullname("Lam Anh").build(),
-//
-//                User.builder().id(userB).fullname("The Huy").build(),
-//
-//                User.builder().id(userC).fullname("Tan Phuc").build()
-//        ));
+        when(syllabusRepository.findSyllabusById(syllabus1)).thenReturn(syllabuses.get(0));
+        when(syllabusRepository.findSyllabusById(syllabus2)).thenReturn(syllabuses.get(1));
+        when(syllabusRepository.findSyllabusById(syllabus3)).thenReturn(syllabuses.get(2));
+        when(syllabusRepository.findSyllabusById(syllabus4)).thenReturn(syllabuses.get(3));
+        when(syllabusRepository.findSyllabusById(syllabus5)).thenReturn(syllabuses.get(4));
+    }
 
-        Mockito.when(syllabusRepository.findSyllabusById(syllabus1)).thenReturn(syllabuses.get(0));
-        Mockito.when(syllabusRepository.findSyllabusById(syllabus2)).thenReturn(syllabuses.get(1));
-        Mockito.when(syllabusRepository.findSyllabusById(syllabus3)).thenReturn(syllabuses.get(2));
-        Mockito.when(syllabusRepository.findSyllabusById(syllabus4)).thenReturn(syllabuses.get(3));
-        Mockito.when(syllabusRepository.findSyllabusById(syllabus5)).thenReturn(syllabuses.get(4));
+    @Test
+    @DisplayName("Create new syllabus")
+    public void createSyllabus() {
+        when(principal.getName()).thenReturn("testUser");
+        Material material = Material.builder().name("Material").materialStatus(MaterialStatus.ACTIVE).createdDate(new Date())
+                .updatedDate(new Date()).createdBy(UUID.randomUUID()).updatedBy(UUID.randomUUID()).build();
+        List<Material> materialList = new ArrayList<>();
+        materialList.add(material);
 
-//        Optional<User> userOptionalA = Optional.ofNullable(users.get(0));
-//        Optional<User> userOptionalB = Optional.ofNullable(users.get(1));
-//        Optional<User> userOptionalC = Optional.ofNullable(users.get(2));
-//        Mockito.when(userRepository.findById(userA)).thenReturn(userOptionalA);
-//        Mockito.when(userRepository.findById(userB)).thenReturn(userOptionalB);
-//        Mockito.when(userRepository.findById(userC)).thenReturn(userOptionalC);
+        SyllabusUnitChapter syllabusUnitChapter1 = SyllabusUnitChapter.builder().isOnline(true).materials(materialList)
+                .outputStandard(outputStandardRepository.findById(outputStandardId1).get())
+                .deliveryType(deliveryTypeRepository.findById(deliveryTypeId1).get()).build();
+        List<SyllabusUnitChapter> syllabusUnitChapterList = new ArrayList<>();
+        syllabusUnitChapterList.add(syllabusUnitChapter1);
+
+        SyllabusUnit syllabusUnit1 = SyllabusUnit.builder().unitNo(1).duration(10).syllabusUnitChapters(syllabusUnitChapterList).build();
+        List<SyllabusUnit> syllabusUnitList = new ArrayList<>();
+        syllabusUnitList.add(syllabusUnit1);
+
+        SyllabusDay syllabusDay1 = SyllabusDay.builder().dayNo(1).status(SyllabusDayStatus.AVAILABLE).syllabusUnits(syllabusUnitList).build();
+        List<SyllabusDayRequest> syllabusDayList = new ArrayList<>();
+        syllabusDayList.add(modelMapper.map(syllabusDay1, SyllabusDayRequest.class));
+
+        AssessmentSchemeRequest assessmentScheme1 = AssessmentSchemeRequest.builder().assignment(15.0).quiz(15.0).gpa(70.0)
+                .finalPoint(70.0).finalTheory(40.0).finalPractice(60.0).build();
+
+        SyllabusRequest requestSyllabus = SyllabusRequest.builder().name(".NET Programming Language").code("NPL")
+                .syllabusDays(syllabusDayList).version("1.0").assessmentScheme(assessmentScheme1).attendeeNumber(20)
+                .syllabusLevel(syllabusLevelId1).build();
+
+        try{
+            String createSuccessfully = syllabusService.createSyllabus(principal,requestSyllabus);
+            Assertions.assertThat(createSuccessfully).isEqualTo("Create successfully.");
+        }catch (Exception e){
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("Create new syllabus not found assessment scheme")
+    public void createSyllabusNotFoundAssessmentScheme() {
+        when(principal.getName()).thenReturn("testUser");
+        Material material = Material.builder().name("Material").materialStatus(MaterialStatus.ACTIVE).createdDate(new Date())
+                .updatedDate(new Date()).createdBy(UUID.randomUUID()).updatedBy(UUID.randomUUID()).build();
+        List<Material> materialList = new ArrayList<>();
+        materialList.add(material);
+
+        SyllabusUnitChapter syllabusUnitChapter1 = SyllabusUnitChapter.builder().isOnline(true).materials(materialList)
+                .outputStandard(outputStandardRepository.findById(outputStandardId1).get())
+                .deliveryType(deliveryTypeRepository.findById(deliveryTypeId1).get()).build();
+        List<SyllabusUnitChapter> syllabusUnitChapterList = new ArrayList<>();
+        syllabusUnitChapterList.add(syllabusUnitChapter1);
+
+        SyllabusUnit syllabusUnit1 = SyllabusUnit.builder().unitNo(1).duration(10).syllabusUnitChapters(syllabusUnitChapterList).build();
+        List<SyllabusUnit> syllabusUnitList = new ArrayList<>();
+        syllabusUnitList.add(syllabusUnit1);
+
+        SyllabusDay syllabusDay1 = SyllabusDay.builder().dayNo(1).status(SyllabusDayStatus.AVAILABLE).syllabusUnits(syllabusUnitList).build();
+        List<SyllabusDayRequest> syllabusDayList = new ArrayList<>();
+        syllabusDayList.add(modelMapper.map(syllabusDay1, SyllabusDayRequest.class));
+
+        SyllabusRequest requestSyllabus = SyllabusRequest.builder().name(".NET Programming Language").code("NPL")
+                .syllabusDays(syllabusDayList).version("1.0").attendeeNumber(20)
+                .syllabusLevel(syllabusLevelId1).build();
+
+        try{
+            String createSuccessfully = syllabusService.createSyllabus(principal,requestSyllabus);
+            Assertions.assertThat(createSuccessfully).isEqualTo("Assessment scheme is not found.");
+        }catch (Exception e){
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("Create syllabus not found syllabus day")
+    public void createSyllabusNotFoundSyllabusDay() {
+        when(principal.getName()).thenReturn("testUser");
+        Material material = Material.builder().name("Material").materialStatus(MaterialStatus.ACTIVE).createdDate(new Date())
+                .updatedDate(new Date()).createdBy(UUID.randomUUID()).updatedBy(UUID.randomUUID()).build();
+        List<Material> materialList = new ArrayList<>();
+        materialList.add(material);
+
+        SyllabusUnitChapter syllabusUnitChapter1 = SyllabusUnitChapter.builder().isOnline(true).materials(materialList)
+                .outputStandard(outputStandardRepository.findById(outputStandardId1).get())
+                .deliveryType(deliveryTypeRepository.findById(deliveryTypeId1).get()).build();
+        List<SyllabusUnitChapter> syllabusUnitChapterList = new ArrayList<>();
+        syllabusUnitChapterList.add(syllabusUnitChapter1);
+
+        AssessmentSchemeRequest assessmentScheme1 = AssessmentSchemeRequest.builder().assignment(15.0).quiz(15.0).gpa(70.0)
+                .finalPoint(70.0).finalTheory(40.0).finalPractice(60.0).build();
+
+        SyllabusRequest requestSyllabus = SyllabusRequest.builder().name(".NET Programming Language").code("NPL")
+                .version("1.0").assessmentScheme(assessmentScheme1).attendeeNumber(20)
+                .syllabusLevel(syllabusLevelId1).build();
+        try{
+            String createSyllabus = syllabusService.createSyllabus(principal,requestSyllabus);
+            Assertions.assertThat(createSyllabus).isEqualTo("Syllabus day is not found.");
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("Create syllabus not found syllabus unit")
+    public void createSyllabusNotFoundSyllabusUnit() {
+        when(principal.getName()).thenReturn("testUser");
+        Material material = Material.builder().name("Material").materialStatus(MaterialStatus.ACTIVE).createdDate(new Date())
+                .updatedDate(new Date()).createdBy(UUID.randomUUID()).updatedBy(UUID.randomUUID()).build();
+        List<Material> materialList = new ArrayList<>();
+        materialList.add(material);
+
+        SyllabusUnitChapter syllabusUnitChapter1 = SyllabusUnitChapter.builder().isOnline(true).materials(materialList)
+                .outputStandard(outputStandardRepository.findById(outputStandardId1).get())
+                .deliveryType(deliveryTypeRepository.findById(deliveryTypeId1).get()).build();
+        List<SyllabusUnitChapter> syllabusUnitChapterList = new ArrayList<>();
+        syllabusUnitChapterList.add(syllabusUnitChapter1);
+
+        SyllabusDay syllabusDay1 = SyllabusDay.builder().dayNo(1).status(SyllabusDayStatus.AVAILABLE).build();
+        List<SyllabusDayRequest> syllabusDayList = new ArrayList<>();
+        syllabusDayList.add(modelMapper.map(syllabusDay1, SyllabusDayRequest.class));
+
+        AssessmentSchemeRequest assessmentScheme1 = AssessmentSchemeRequest.builder().assignment(15.0).quiz(15.0).gpa(70.0)
+                .finalPoint(70.0).finalTheory(40.0).finalPractice(60.0).build();
+
+        SyllabusRequest requestSyllabus = SyllabusRequest.builder().name(".NET Programming Language").code("NPL")
+                .syllabusDays(syllabusDayList).version("1.0").assessmentScheme(assessmentScheme1).attendeeNumber(20)
+                .syllabusLevel(syllabusLevelId1).build();
+        try{
+            String createSyllabus = syllabusService.createSyllabus(principal,requestSyllabus);
+            Assertions.assertThat(createSyllabus).isEqualTo("Syllabus unit is not found.");
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("Delete syllabus successfully")
+    public void deleteSyllabus() {
+        try {
+            String deleteSuccessfully = syllabusService.deleteSyllabus(syllabusLevelId1);
+            Assertions.assertThat(deleteSuccessfully).isEqualTo("Delete successfully.");
+        }catch (Exception e){
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("Duplication syllabus successfully")
+    public void duplicationSyllabus() {
+        try {
+            String deleteSuccessfully = syllabusService.duplicatedSyllabus(syllabusLevelId2);
+            Assertions.assertThat(deleteSuccessfully).isEqualTo("Create duplication successfully.");
+        }catch (Exception e){
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("De-active syllabus successfully")
+    public void deActiveSyllabus() {
+        try {
+            String deleteSuccessfully = syllabusService.deActive(syllabusLevelId2);
+            Assertions.assertThat(deleteSuccessfully).isEqualTo("De-active successfully.");
+        }catch (Exception e){
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("Update syllabus successfully")
+    public void updateSyllabus() {
+        when(principal.getName()).thenReturn("testUser");
+        Material material = Material.builder().name("Material").materialStatus(MaterialStatus.ACTIVE).createdDate(new Date())
+                .updatedDate(new Date()).createdBy(UUID.randomUUID()).updatedBy(UUID.randomUUID()).build();
+        List<Material> materialList = new ArrayList<>();
+        materialList.add(material);
+
+        SyllabusUnitChapter syllabusUnitChapter1 = SyllabusUnitChapter.builder().isOnline(true).materials(materialList)
+                .outputStandard(outputStandardRepository.findById(outputStandardId1).get())
+                .deliveryType(deliveryTypeRepository.findById(deliveryTypeId1).get()).build();
+        List<SyllabusUnitChapter> syllabusUnitChapterList = new ArrayList<>();
+        syllabusUnitChapterList.add(syllabusUnitChapter1);
+
+        AssessmentSchemeRequest assessmentScheme1 = AssessmentSchemeRequest.builder().assignment(15.0).quiz(15.0).gpa(70.0)
+                .finalPoint(70.0).finalTheory(40.0).finalPractice(60.0).build();
+
+        SyllabusUpdateRequest syllabusUpdateRequest = SyllabusUpdateRequest.builder().name(".NET Programming Language").code("NPL")
+                .version("1.0").assessmentScheme(assessmentScheme1).attendeeNumber(20)
+                .syllabusLevel(syllabusLevelId1).build();
+        try{
+            Syllabus updateSyllabus = syllabusService.updateSyllabus(syllabusLevelId3,syllabusUpdateRequest);
+            Assertions.assertThat(updateSyllabus.getName()).isEqualTo(syllabusUpdateRequest.getName());
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
     }
 
 }

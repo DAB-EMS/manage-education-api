@@ -1,9 +1,7 @@
 package com.example.manageeducation.syllabusservice.model;
 
 import com.example.manageeducation.syllabusservice.enums.MaterialStatus;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
@@ -11,10 +9,12 @@ import javax.persistence.*;
 import java.util.Date;
 import java.util.UUID;
 
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Getter
 @Setter
+@Builder
 public class Material {
     @Id
     @GeneratedValue(generator = "UUID")
