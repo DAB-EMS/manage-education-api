@@ -837,7 +837,7 @@ public class SyllabusServiceImpl implements SyllabusService {
         int totalPage = 0;
         int totalRows = 0;
         String message = "";
-        if("".equalsIgnoreCase(request.getKeyword())){
+        if("".equalsIgnoreCase(request.getStartDate()) && "".equalsIgnoreCase(request.getEndDate()) && request.getKeyword().length==0){
             if (request.getSortBy() == null && request.getSortType() == null) {
                 LOGGER.info("Start View All Syllabus");
                 Pageable pageable = PageRequest.of(request.getPage() - 1, request.getSize());
@@ -852,18 +852,74 @@ public class SyllabusServiceImpl implements SyllabusService {
                 totalRows = syllabusRepository.getTotalRows();
             }
         }else{
-            if (request.getSortBy() != null && request.getSortType() != null) {
-                LOGGER.info("View All Syllabus With Keywords and Sort Options");
-                results = syllabusJdbc.getSyllabus(syllabusServiceUtils
-                        .getSQLForSearchingByKeywordsForSuggestions(request.getPage() - 1, request.getSize(),
-                                request.getKeyword()));
-                totalRows = syllabusRepository.getTotalRows();
-            }else {
-                LOGGER.info("View All Syllabus With Keywords");
-                results = syllabusJdbc.getSyllabus(syllabusServiceUtils
-                        .getSQLForSearchingByKeywordsForSuggestionsAndSorting(request.getPage() - 1, request.getSize(),
-                                request.getSortBy(), request.getSortType(), request.getKeyword()));
-                totalRows = syllabusRepository.getTotalRows();
+            if("".equalsIgnoreCase(request.getStartDate()) && "".equalsIgnoreCase(request.getEndDate())){
+                if (request.getSortBy() != null && request.getSortType() != null) {
+                    LOGGER.info("View All Syllabus With Keywords");
+                    Set<Syllabus> syllabusSet = new HashSet<>();
+                    for(String tag: request.getKeyword()){
+                        List<Syllabus> syllabus = syllabusJdbc.getSyllabus(syllabusServiceUtils
+                                .getSQLForSearchingByKeywordsForSuggestions(request.getPage() - 1, request.getSize(),
+                                        tag));
+                        if(syllabus!=null){
+                            syllabusSet.addAll(syllabus);
+                        }
+                    }
+                    results = new ArrayList<>(syllabusSet);
+                    totalRows = syllabusSet.size();
+                }else {
+                    LOGGER.info("View All Syllabus With Keywords and Sort Options");
+                    Set<Syllabus> syllabusSet = new HashSet<>();
+                    for(String tag: request.getKeyword()){
+                        List<Syllabus> syllabus = syllabusJdbc.getSyllabus(syllabusServiceUtils
+                                .getSQLForSearchingByKeywordsForSuggestionsAndSorting(request.getPage() - 1, request.getSize(),
+                                        request.getSortBy(), request.getSortType(), tag));
+                        if(syllabus!=null){
+                            results.addAll(syllabus);
+                        }
+                    }
+                    results = new ArrayList<>(syllabusSet);
+                    totalRows = syllabusSet.size();
+                }
+            }else if(request.getKeyword().length==0){
+                if(request.getSortBy() == null && request.getSortType() == null) {
+                    LOGGER.info("View All Syllabus With start date and end date");
+                    results = syllabusJdbc.getSyllabus(syllabusServiceUtils
+                            .getSQLForSearchingByCreatedDateAndNotSort(request.getStartDate(), request.getEndDate(), request.getPage() - 1, request.getSize()));
+                    totalRows = syllabusRepository.getTotalRows();
+                }else{
+                    LOGGER.info("View All Syllabus With start date and end date and Sort Options");
+                    results = syllabusJdbc.getSyllabus(syllabusServiceUtils
+                            .getSQLForSearchingByCreatedDateAndSort(request.getStartDate(), request.getEndDate(), request.getPage() - 1, request.getSize(),
+                                    request.getSortBy(),request.getSortType()));
+                    totalRows = syllabusRepository.getTotalRows();
+                }
+            }else{
+                if (request.getSortBy() != null && request.getSortType() != null) {
+                    LOGGER.info("View All Syllabus With Keywords and Start Date and End Date");
+                    Set<Syllabus> syllabusSet = new HashSet<>();
+                    for(String tag: request.getKeyword()){
+                        List<Syllabus> syllabus = syllabusJdbc.getSyllabus(syllabusServiceUtils
+                                .getSQLForSearchingByKeywordAndCreatedDateAndNotSort(tag, request.getStartDate(), request.getEndDate(), request.getPage() - 1, request.getSize()));
+                        if(syllabus!=null){
+                            syllabusSet.addAll(syllabus);
+                        }
+                    }
+                    results = new ArrayList<>(syllabusSet);
+                    totalRows = syllabusSet.size();
+                }else {
+                    LOGGER.info("View All Syllabus With Keywords and Start Date and End Date and Sort Options");
+                    Set<Syllabus> syllabusSet = new HashSet<>();
+                    for(String tag: request.getKeyword()){
+                        List<Syllabus> syllabus = syllabusJdbc.getSyllabus(syllabusServiceUtils
+                                .getSQLForSearchingByKeywordAndCreatedDateAndSort(tag, request.getStartDate(), request.getEndDate(), request.getPage() - 1, request.getSize(),
+                                        request.getSortBy(), request.getSortType()));
+                        if(syllabus!=null){
+                            results.addAll(syllabus);
+                        }
+                    }
+                    results = new ArrayList<>(syllabusSet);
+                    totalRows = syllabusSet.size();
+                }
             }
         }
 

@@ -20,6 +20,7 @@ public class SyllabusRowMapper implements RowMapper<ViewSyllabusResponse> {
     @Override
     public ViewSyllabusResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
         try {
+            List<OutputStandardResponse> outputStandardList = getOutputStandards(rs);
             return ViewSyllabusResponse.builder()
                     .id(UUID.fromString(rs.getString("id")))
                     .name(rs.getString("name"))
@@ -27,6 +28,7 @@ public class SyllabusRowMapper implements RowMapper<ViewSyllabusResponse> {
                     .createOn(dateFormat.parse(rs.getString("createOn")))
                     .createBy(rs.getString("createBy"))
                     .duration(rs.getInt("duration"))
+                    .outputStandard(outputStandardList)
                     .build();
         } catch (ParseException e) {
             throw new RuntimeException(e);

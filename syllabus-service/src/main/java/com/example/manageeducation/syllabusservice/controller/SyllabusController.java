@@ -125,14 +125,16 @@ public class SyllabusController {
     @GetMapping("/customer/syllabus/keywords")
     @Operation(summary = "get all customers ")
     public ResponseEntity<ResponseObject> searchCustomers(
-            @RequestParam(name = "keyword", defaultValue = "") String keywords,
+            @RequestParam(name = "keyword", defaultValue = "") String[] keywords,
+            @RequestParam(name = "start", defaultValue = "") String start,
+            @RequestParam(name = "end", defaultValue = "") String end,
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(value = "sortBy", required = false)
             @Parameter(name = "sortBy", description = "name or age or address") String sortBy,
             @RequestParam(value = "sortType", required = false)
             @Parameter(name = "sortType", description = "ASC or DESC") String sortType) {
-        RequestForListOfSyllabus request = new RequestForListOfSyllabus(keywords,page, size, sortBy, sortType);
+        RequestForListOfSyllabus request = new RequestForListOfSyllabus(keywords, start, end, page, size, sortBy, sortType);
         LOGGER.info("Start method List of Customers in SpringDataController");
         return syllabusService.getAllSyllabus(request);
     }

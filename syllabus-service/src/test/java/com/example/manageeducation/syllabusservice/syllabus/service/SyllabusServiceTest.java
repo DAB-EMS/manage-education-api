@@ -1,9 +1,11 @@
 package com.example.manageeducation.syllabusservice.syllabus.service;
 
+import com.example.manageeducation.syllabusservice.dto.RequestForListOfSyllabus;
 import com.example.manageeducation.syllabusservice.dto.request.AssessmentSchemeRequest;
 import com.example.manageeducation.syllabusservice.dto.request.SyllabusDayRequest;
 import com.example.manageeducation.syllabusservice.dto.request.SyllabusRequest;
 import com.example.manageeducation.syllabusservice.dto.request.SyllabusUpdateRequest;
+import com.example.manageeducation.syllabusservice.dto.response.ViewSyllabusResponse;
 import com.example.manageeducation.syllabusservice.enums.MaterialStatus;
 import com.example.manageeducation.syllabusservice.enums.SyllabusDayStatus;
 import com.example.manageeducation.syllabusservice.enums.SyllabusStatus;
@@ -21,15 +23,22 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 
 import java.security.Principal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.aspectj.bridge.MessageUtil.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -58,7 +67,7 @@ public class SyllabusServiceTest {
     private SyllabusJdbc syllabusJdbc;
 
     @MockBean
-    private SyllabusServiceUtils syllabusServiceUtil;
+    private SyllabusServiceUtils syllabusServiceUtils;
 
     @Autowired
     private SyllabusService syllabusService;
@@ -77,28 +86,22 @@ public class SyllabusServiceTest {
     private final UUID deliveryTypeId6 = UUID.randomUUID();
 
     private final UUID userB = UUID.randomUUID();
-    private final UUID userA = UUID.randomUUID();
-    private final UUID userC = UUID.randomUUID();
     private final UUID syllabus1 = UUID.randomUUID();
     private final UUID syllabus2 = UUID.randomUUID();
     private final UUID syllabus3 = UUID.randomUUID();
     private final UUID syllabus4 = UUID.randomUUID();
     private final UUID syllabus5 = UUID.randomUUID();
-    private final UUID syllabusDeleted = UUID.randomUUID();
-    private final UUID syllabusNotFound = UUID.randomUUID();
-    private final UUID syllabusDraft = UUID.randomUUID();
-    private final UUID syllabusDraft2 = UUID.randomUUID();
     private final List<Syllabus> syllabuses = new ArrayList<>(List.of(
             Syllabus.builder().id(syllabus1).name(".Net Basic Program").code("NBP").createdBy(userB).days(2)
-                    .createdDate(new Date(2020, 11, 11)).hours(10).status(SyllabusStatus.ACTIVE).updatedBy(userB).version("1.0").build(),
+                    .createdDate(new Date(2024, 11, 11)).hours(10).status(SyllabusStatus.ACTIVE).updatedBy(userB).version("1.0").build(),
             Syllabus.builder().id(syllabus2).name("Azure DevOps").code("ADO").createdBy(userB).days(2).hours(10)
-                    .createdDate(new Date(2020, 12, 20)).status(SyllabusStatus.ACTIVE).updatedBy(userB).version("1.0").build(),
+                    .createdDate(new Date(2023, 12, 20)).status(SyllabusStatus.ACTIVE).updatedBy(userB).version("1.0").build(),
             Syllabus.builder().id(syllabus3).name("JUnit Testing").code("FSJ").createdBy(userB).days(2).hours(10)
-                    .createdDate(new Date(2019, 10, 10)).status(SyllabusStatus.ACTIVE).updatedBy(userB).version("1.0").build(),
+                    .createdDate(new Date(2023, 10, 10)).status(SyllabusStatus.ACTIVE).updatedBy(userB).version("1.0").build(),
             Syllabus.builder().id(syllabus4).name("JUnit Testing").code("JUT").createdBy(userB).days(2).hours(10)
-                    .createdDate(new Date(2011, 20, 20)).status(SyllabusStatus.DEACTIVE).updatedBy(userB).version("1.1").build(),
+                    .createdDate(new Date(2022, 20, 20)).status(SyllabusStatus.DEACTIVE).updatedBy(userB).version("1.1").build(),
             Syllabus.builder().id(syllabus5).name("JUnit Testing").code("JUT").createdBy(userB).days(2).hours(10)
-                    .createdDate(new Date(2017, 9, 8)).status(SyllabusStatus.ACTIVE).updatedBy(userB).version("3.0").build()
+                    .createdDate(new Date(2021, 9, 8)).status(SyllabusStatus.ACTIVE).updatedBy(userB).version("3.0").build()
     ));
 
     @BeforeEach
@@ -364,6 +367,146 @@ public class SyllabusServiceTest {
         } catch (Exception e) {
             fail(e.getMessage());
         }
+    }
+
+    @Test
+    @DisplayName("Get syllabus by keyword empty and date empty not sort")
+    public void getSyllabusByKeywordEmptyAndDateEmptyNotSort() {
+        RequestForListOfSyllabus request = new RequestForListOfSyllabus(new String[0],"","", 1, 10, null, null);
+        Page<Syllabus> results = new PageImpl<>(syllabuses);
+        Mockito.when(syllabusRepository.findAllSyllabus(any(Pageable.class))).thenReturn(results);
+
+        ResponseEntity<ResponseObject> response = syllabusService.getAllSyllabus(request);
+        List<ViewSyllabusResponse> actualList = (List<ViewSyllabusResponse>) response.getBody().getData();
+        Assertions.assertThat(actualList.size()).isEqualTo(5);
+    }
+
+    @Test
+    @DisplayName("Get syllabus by keyword empty and date empty sort")
+    public void getSyllabusByKeywordEmptyAndDateEmptySort() {
+        RequestForListOfSyllabus request = new RequestForListOfSyllabus(new String[0],"","", 1, 10, "NAME", "DESC");
+        String sql = syllabusServiceUtils.getSQLForSortingAllSyllabus(request.getPage(), request.getSize(),
+                request.getSortBy(), request.getSortType());
+        Mockito.when(syllabusJdbc.getSyllabus(sql)).thenReturn(syllabuses);
+
+        List<ViewSyllabusResponse> expectedList = syllabuses.stream()
+                .map(syllabus -> modelMapper.map(syllabus, ViewSyllabusResponse.class))
+                .collect(Collectors.toList());
+        ResponseEntity<ResponseObject> response = syllabusService.getAllSyllabus(request);
+        List<ViewSyllabusResponse> actualList = (List<ViewSyllabusResponse>) response.getBody().getData();
+        Assertions.assertThat(actualList)
+                .usingRecursiveComparison()
+                .isEqualTo(expectedList);
+    }
+
+    @Test
+    @DisplayName("Get syllabus by keyword name not sort name")
+    public void getSyllabusByKeywordNameNotSort() {
+        String[] keywords = {"Unit"};
+        RequestForListOfSyllabus request = new RequestForListOfSyllabus(keywords,"","", 1, 10, null, null);
+        String sql = syllabusServiceUtils.getSQLForSearchingByKeywordsForSuggestions(request.getPage(), request.getSize(),
+                keywords[0]);
+        Mockito.when(syllabusJdbc.getSyllabus(sql)).thenReturn(syllabuses);
+
+        List<ViewSyllabusResponse> expectedList = syllabuses.stream()
+                .map(syllabus -> modelMapper.map(syllabus, ViewSyllabusResponse.class))
+                .collect(Collectors.toList());
+        ResponseEntity<ResponseObject> response = syllabusService.getAllSyllabus(request);
+        List<ViewSyllabusResponse> actualList = (List<ViewSyllabusResponse>) response.getBody().getData();
+        Assertions.assertThat(actualList)
+                .usingRecursiveComparison()
+                .isEqualTo(expectedList);
+    }
+
+    @Test
+    @DisplayName("Get syllabus by keyword name sort name")
+    public void getSyllabusByKeywordNameSort() {
+        String[] keywords = {"Unit"};
+        RequestForListOfSyllabus request = new RequestForListOfSyllabus(keywords,"","", 1, 10, "NAME", "DESC");
+        String sql = syllabusServiceUtils.getSQLForSearchingByKeywordsForSuggestionsAndSorting(request.getPage(), request.getSize(),
+                request.getSortBy(), request.getSortType(), keywords[0]);
+        Mockito.when(syllabusJdbc.getSyllabus(sql)).thenReturn(syllabuses);
+
+        List<ViewSyllabusResponse> expectedList = syllabuses.stream()
+                .map(syllabus -> modelMapper.map(syllabus, ViewSyllabusResponse.class))
+                .collect(Collectors.toList());
+        ResponseEntity<ResponseObject> response = syllabusService.getAllSyllabus(request);
+        List<ViewSyllabusResponse> actualList = (List<ViewSyllabusResponse>) response.getBody().getData();
+        Assertions.assertThat(actualList)
+                .usingRecursiveComparison()
+                .isEqualTo(expectedList);
+    }
+
+    @Test
+    @DisplayName("Get syllabus by date not sort code")
+    public void getSyllabusByDateAndNotSort() {
+        RequestForListOfSyllabus request = new RequestForListOfSyllabus(new String[0],"13/09/2021", "24/11/2024", 1, 10, null, null);
+        String sql = syllabusServiceUtils.getSQLForSearchingByCreatedDateAndNotSort(request.getStartDate(), request.getEndDate(),request.getPage(), request.getSize());
+        Mockito.when(syllabusJdbc.getSyllabus(sql)).thenReturn(syllabuses);
+
+        List<ViewSyllabusResponse> expectedList = syllabuses.stream()
+                .map(syllabus -> modelMapper.map(syllabus, ViewSyllabusResponse.class))
+                .collect(Collectors.toList());
+        ResponseEntity<ResponseObject> response = syllabusService.getAllSyllabus(request);
+        List<ViewSyllabusResponse> actualList = (List<ViewSyllabusResponse>) response.getBody().getData();
+        Assertions.assertThat(actualList)
+                .usingRecursiveComparison()
+                .isEqualTo(expectedList);
+    }
+
+    @Test
+    @DisplayName("Get syllabus by date and sort")
+    public void getSyllabusByDateAndSort() {
+        RequestForListOfSyllabus request = new RequestForListOfSyllabus(new String[0],"","", 1, 10, "NAME", "DESC");
+        String sql = syllabusServiceUtils.getSQLForSearchingByCreatedDateAndSort(request.getStartDate(), request.getEndDate(),request.getPage(), request.getSize(),
+                request.getSortBy(), request.getSortType());
+        Mockito.when(syllabusJdbc.getSyllabus(sql)).thenReturn(syllabuses);
+
+        List<ViewSyllabusResponse> expectedList = syllabuses.stream()
+                .map(syllabus -> modelMapper.map(syllabus, ViewSyllabusResponse.class))
+                .collect(Collectors.toList());
+        ResponseEntity<ResponseObject> response = syllabusService.getAllSyllabus(request);
+        List<ViewSyllabusResponse> actualList = (List<ViewSyllabusResponse>) response.getBody().getData();
+        Assertions.assertThat(actualList)
+                .usingRecursiveComparison()
+                .isEqualTo(expectedList);
+    }
+
+    @Test
+    @DisplayName("Get syllabus by keyword and date not sort")
+    public void getSyllabusByKeywordAndDateNotSort() {
+        String[] keywords = {"Unit"};
+        RequestForListOfSyllabus request = new RequestForListOfSyllabus(keywords,"13/09/2021", "24/11/2024", 1, 10, null, null);
+        String sql = syllabusServiceUtils.getSQLForSearchingByKeywordAndCreatedDateAndNotSort(keywords[0], request.getStartDate(), request.getEndDate(),request.getPage(), request.getSize());
+        Mockito.when(syllabusJdbc.getSyllabus(sql)).thenReturn(syllabuses);
+
+        List<ViewSyllabusResponse> expectedList = syllabuses.stream()
+                .map(syllabus -> modelMapper.map(syllabus, ViewSyllabusResponse.class))
+                .collect(Collectors.toList());
+        ResponseEntity<ResponseObject> response = syllabusService.getAllSyllabus(request);
+        List<ViewSyllabusResponse> actualList = (List<ViewSyllabusResponse>) response.getBody().getData();
+        Assertions.assertThat(actualList)
+                .usingRecursiveComparison()
+                .isEqualTo(expectedList);
+    }
+
+    @Test
+    @DisplayName("Get syllabus by keyword and date and sort")
+    public void getSyllabusByKeywordAndDateSort() {
+        String[] keywords = {"Unit"};
+        RequestForListOfSyllabus request = new RequestForListOfSyllabus(keywords,"","", 1, 10, "NAME", "DESC");
+        String sql = syllabusServiceUtils.getSQLForSearchingByKeywordAndCreatedDateAndSort(keywords[0], request.getStartDate(), request.getEndDate(),request.getPage(), request.getSize(),
+                request.getSortBy(), request.getSortType());
+        Mockito.when(syllabusJdbc.getSyllabus(sql)).thenReturn(syllabuses);
+
+        List<ViewSyllabusResponse> expectedList = syllabuses.stream()
+                .map(syllabus -> modelMapper.map(syllabus, ViewSyllabusResponse.class))
+                .collect(Collectors.toList());
+        ResponseEntity<ResponseObject> response = syllabusService.getAllSyllabus(request);
+        List<ViewSyllabusResponse> actualList = (List<ViewSyllabusResponse>) response.getBody().getData();
+        Assertions.assertThat(actualList)
+                .usingRecursiveComparison()
+                .isEqualTo(expectedList);
     }
 
 }
