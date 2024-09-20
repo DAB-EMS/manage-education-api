@@ -1,8 +1,6 @@
 package com.example.manageeducation.syllabusservice.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
@@ -10,10 +8,12 @@ import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
 
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Getter
 @Setter
+@Builder
 public class SyllabusUnitChapter {
     @Id
     @GeneratedValue(generator = "UUID")

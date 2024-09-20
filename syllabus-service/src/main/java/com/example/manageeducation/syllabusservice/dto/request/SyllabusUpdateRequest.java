@@ -1,10 +1,7 @@
 package com.example.manageeducation.syllabusservice.dto.request;
 
 import com.example.manageeducation.syllabusservice.enums.SyllabusStatus;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -14,6 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class SyllabusUpdateRequest {
     private String name;
     private String code;

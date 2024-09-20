@@ -3,7 +3,6 @@ package com.example.manageeducation.userservice.mapper;
 import com.example.manageeducation.userservice.enums.CustomerStatus;
 import com.example.manageeducation.userservice.enums.Gender;
 import com.example.manageeducation.userservice.model.Customer;
-import com.example.manageeducation.userservice.model.Role;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;

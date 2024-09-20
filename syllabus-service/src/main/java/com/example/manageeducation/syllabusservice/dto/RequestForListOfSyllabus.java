@@ -10,7 +10,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestForListOfSyllabus {
-    private String keyword;
+    private String[] keyword;
+    private String startDate;
+    private String endDate;
     private int page;
     private int size;
     private String sortBy;

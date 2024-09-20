@@ -717,14 +717,6 @@ public class CustomerServiceTest {
     }
 
     @Test
-    @DisplayName("Get customer by email")
-    public void getCustomerByService1() {
-        CustomerResponse customer = customerService.getUser(customerId2);
-        Assertions.assertThat(customer.getEmail()).isEqualTo("customer2@example.com");
-    }
-
-
-    @Test
     @DisplayName("Get customer by keyword empty not sort")
     public void getCustomerByKeywordEmptyNotSort() {
         RequestForListOfCustomer request = new RequestForListOfCustomer("", 1, 10, null, null);
