@@ -1,10 +1,9 @@
 package com.example.manageeducation.trainingprogramservice.service;
 
-import com.example.manageeducation.trainingprogramservice.dto.TrainingProgramAddClassRequest;
-import com.example.manageeducation.trainingprogramservice.dto.TrainingProgramRequest;
-import com.example.manageeducation.trainingprogramservice.dto.TrainingProgramResponse;
-import com.example.manageeducation.trainingprogramservice.dto.TrainingProgramsResponse;
+import com.example.manageeducation.trainingprogramservice.dto.*;
+import com.example.manageeducation.trainingprogramservice.model.ResponseObject;
 import com.example.manageeducation.trainingprogramservice.model.TrainingProgram;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,4 +23,5 @@ public interface TrainingProgramService {
     List<TrainingProgramAddClassRequest> trainingProgramAddClass();
     TrainingProgram trainingProgramName(String name,String version);
     TrainingProgram trainingProgramId(UUID id);
+    ResponseEntity<ResponseObject> getAllTrainingPrograms(RequestForListOfTrainingProgram request);
 }

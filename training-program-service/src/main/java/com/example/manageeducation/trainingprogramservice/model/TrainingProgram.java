@@ -3,10 +3,7 @@ package com.example.manageeducation.trainingprogramservice.model;
 import com.example.manageeducation.trainingprogramservice.enums.TrainingProgramStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
@@ -17,11 +14,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Getter
 @Setter
 @ToString
+@Builder
 public class TrainingProgram {
     @Id
     @GeneratedValue(generator = "UUID")

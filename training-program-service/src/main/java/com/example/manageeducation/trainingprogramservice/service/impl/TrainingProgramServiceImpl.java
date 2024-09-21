@@ -7,19 +7,26 @@ import com.example.manageeducation.trainingprogramservice.dto.*;
 import com.example.manageeducation.trainingprogramservice.enums.SyllabusStatus;
 import com.example.manageeducation.trainingprogramservice.enums.TrainingProgramStatus;
 import com.example.manageeducation.trainingprogramservice.exception.BadRequestException;
-import com.example.manageeducation.trainingprogramservice.model.ProgramSyllabus;
-import com.example.manageeducation.trainingprogramservice.model.ProgramSyllabusId;
-import com.example.manageeducation.trainingprogramservice.model.TrainingProgram;
+import com.example.manageeducation.trainingprogramservice.jdbc.TrainingProgramJdbc;
+import com.example.manageeducation.trainingprogramservice.model.*;
 import com.example.manageeducation.trainingprogramservice.repository.ProgramSyllabusRepository;
 import com.example.manageeducation.trainingprogramservice.repository.TrainingProgramRepository;
 import com.example.manageeducation.trainingprogramservice.service.TrainingProgramService;
 import com.example.manageeducation.trainingprogramservice.utils.SecurityUtil;
+import com.example.manageeducation.trainingprogramservice.utils.TrainingProgramServiceUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,6 +38,8 @@ import java.util.*;
 
 @Service
 public class TrainingProgramServiceImpl implements TrainingProgramService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrainingProgramServiceImpl.class);
 
     @Autowired
     CustomerClient customerRepository;
@@ -45,10 +54,16 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
     ProgramSyllabusRepository programSyllabusRepository;
 
     @Autowired
+    TrainingProgramJdbc trainingProgramJdbc;
+
+    @Autowired
     ModelMapper modelMapper;
 
     @Autowired
     SecurityUtil securityUtil;
+
+    @Autowired
+    TrainingProgramServiceUtils trainingProgramServiceUtils;
 
     @Override
     public String createTrainingProgram(Principal principal, TrainingProgramRequest dto) {
@@ -371,6 +386,124 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
         }else {
             throw new BadRequestException("training program id not found.");
         }
+    }
+
+    @Override
+    public ResponseEntity<ResponseObject> getAllTrainingPrograms(RequestForListOfTrainingProgram request) {
+        LOGGER.info("Start method getAllTrainingPrograms in TrainingProgramServiceImpl");
+        List<TrainingProgramsResponse> responseData = new ArrayList<>();
+        List<TrainingProgram> results = new ArrayList<>();
+        int totalPage = 0;
+        int totalRows = 0;
+        String message = "";
+        if("".equalsIgnoreCase(request.getStartDate()) && "".equalsIgnoreCase(request.getEndDate()) && request.getKeyword().length==0){
+            if (request.getSortBy() == null && request.getSortType() == null) {
+                if(request.getStatus()==null){
+                    LOGGER.info("Start View All TrainingProgram");
+                    Pageable pageable = PageRequest.of(request.getPage() - 1, request.getSize());
+                    Page<TrainingProgram> trainingProgramPage = trainingProgramRepository.findAllTrainingProgram(pageable);
+                    totalPage = trainingProgramPage.getTotalPages();
+                    results = trainingProgramPage.getContent();
+                }else{
+                    LOGGER.info("Start View All TrainingProgram with status");
+                    Pageable pageable = PageRequest.of(request.getPage() - 1, request.getSize());
+                    Page<TrainingProgram> trainingProgramPage = trainingProgramRepository.findAllTrainingProgramWithStatus(pageable,request.getStatus());
+                    totalPage = trainingProgramPage.getTotalPages();
+                    results = trainingProgramPage.getContent();
+                }
+            }else {
+                LOGGER.info("View All TrainingProgram With Sort Options");
+                results = trainingProgramJdbc.getTrainingPrograms(trainingProgramServiceUtils
+                        .getSQLForSortingAllTrainingPrograms(request.getPage() - 1, request.getSize(),
+                                request.getSortBy(), request.getSortType()));
+                totalRows = trainingProgramRepository.getTotalRows();
+            }
+        }else{
+            if("".equalsIgnoreCase(request.getStartDate()) && "".equalsIgnoreCase(request.getEndDate())){
+                if (request.getSortBy() != null && request.getSortType() != null) {
+                    LOGGER.info("View All TrainingProgram With Keywords");
+                    Set<TrainingProgram> trainingProgramSet = new HashSet<>();
+                    for(String tag: request.getKeyword()){
+                        List<TrainingProgram> syllabus = trainingProgramJdbc.getTrainingPrograms(trainingProgramServiceUtils
+                                .getSQLForSearchingByKeywordsForSuggestions(tag, request.getStatus(), request.getPage() - 1, request.getSize()));
+                        if(syllabus!=null){
+                            trainingProgramSet.addAll(syllabus);
+                        }
+                    }
+                    results = new ArrayList<>(trainingProgramSet);
+                    totalRows = trainingProgramSet.size();
+                }else {
+                    LOGGER.info("View All TrainingProgram With Keywords and Sort Options");
+                    Set<TrainingProgram> trainingProgramSet = new HashSet<>();
+                    for(String tag: request.getKeyword()){
+                        List<TrainingProgram> syllabus = trainingProgramJdbc.getTrainingPrograms(trainingProgramServiceUtils
+                                .getSQLForSearchingByKeywordsForSuggestionsAndSorting(tag, request.getStatus(), request.getPage() - 1, request.getSize(),
+                                        request.getSortBy(), request.getSortType()));
+                        if(syllabus!=null){
+                            results.addAll(syllabus);
+                        }
+                    }
+                    results = new ArrayList<>(trainingProgramSet);
+                    totalRows = trainingProgramSet.size();
+                }
+            }else if(request.getKeyword().length==0){
+                if(request.getSortBy() == null && request.getSortType() == null) {
+                    LOGGER.info("View All TrainingProgram With start date and end date");
+                    results = trainingProgramJdbc.getTrainingPrograms(trainingProgramServiceUtils
+                            .getSQLForSearchingByCreatedDateAndNotSort(request.getStartDate(), request.getEndDate(), request.getStatus(), request.getPage() - 1, request.getSize()));
+                    totalRows = trainingProgramRepository.getTotalRows();
+                }else{
+                    LOGGER.info("View All TrainingProgram With start date and end date and Sort Options");
+                    results = trainingProgramJdbc.getTrainingPrograms(trainingProgramServiceUtils
+                            .getSQLForSearchingByCreatedDateAndSort(request.getStartDate(), request.getEndDate(), request.getStatus(), request.getPage() - 1, request.getSize(),
+                                    request.getSortBy(),request.getSortType()));
+                    totalRows = trainingProgramRepository.getTotalRows();
+                }
+            }else{
+                if (request.getSortBy() != null && request.getSortType() != null) {
+                    LOGGER.info("View All TrainingProgram With Keywords and Start Date and End Date");
+                    Set<TrainingProgram> trainingProgramSet = new HashSet<>();
+                    for(String tag: request.getKeyword()){
+                        List<TrainingProgram> syllabus = trainingProgramJdbc.getTrainingPrograms(trainingProgramServiceUtils
+                                .getSQLForSearchingByKeywordAndCreatedDateAndNotSort(tag, request.getStartDate(), request.getEndDate(), request.getStatus(), request.getPage() - 1, request.getSize()));
+                        if(syllabus!=null){
+                            trainingProgramSet.addAll(syllabus);
+                        }
+                    }
+                    results = new ArrayList<>(trainingProgramSet);
+                    totalRows = trainingProgramSet.size();
+                }else {
+                    LOGGER.info("View All TrainingProgram With Keywords and Start Date and End Date and Sort Options");
+                    Set<TrainingProgram> trainingProgramSet = new HashSet<>();
+                    for(String tag: request.getKeyword()){
+                        List<TrainingProgram> syllabus = trainingProgramJdbc.getTrainingPrograms(trainingProgramServiceUtils
+                                .getSQLForSearchingByKeywordAndCreatedDateAndSort(tag, request.getStartDate(), request.getEndDate(), request.getStatus(), request.getPage() - 1, request.getSize(),
+                                        request.getSortBy(), request.getSortType()));
+                        if(syllabus!=null){
+                            results.addAll(syllabus);
+                        }
+                    }
+                    results = new ArrayList<>(trainingProgramSet);
+                    totalRows = trainingProgramSet.size();
+                }
+            }
+        }
+
+        if (results.size() > 0) {
+            if(totalPage == 0) {
+                totalPage = (int)(totalRows % request.getSize() == 0 ? (totalRows / request.getSize()) : (totalRows / request.getSize()) + 1);
+            }
+            message += "Total " + results.size() + " element(s) in page " + request.getPage();
+            responseData = results.stream()
+                    .map(customer -> modelMapper.map(customer, TrainingProgramsResponse.class))
+                    .toList();
+        } else {
+            LOGGER.info("Null result");
+            message += "Empty list";
+        }
+        LOGGER.info("End method getAllTrainingProgram in TrainingProgramServiceImpl");
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(HttpStatus.OK.toString(), message,
+                new Pagination(request.getPage(), request.getSize(), totalPage), responseData));
     }
 
     private String checkValidationDataTrainingProgram(Principal principal, TrainingProgramImportRequest dto){
