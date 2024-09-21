@@ -123,8 +123,8 @@ public class SyllabusController {
     }
 
     @GetMapping("/customer/syllabus/keywords")
-    @Operation(summary = "get all customers ")
-    public ResponseEntity<ResponseObject> searchCustomers(
+    @Operation(summary = "get all syllabus ")
+    public ResponseEntity<ResponseObject> searchSyllabus(
             @RequestParam(name = "keyword", defaultValue = "") String[] keywords,
             @RequestParam(name = "start", defaultValue = "") String start,
             @RequestParam(name = "end", defaultValue = "") String end,

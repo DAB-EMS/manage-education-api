@@ -120,7 +120,7 @@ public class SyllabusServiceUtils {
                 + "JOIN output_standard os ON suc.output_standard_id = os.id "
                 + "WHERE (s.status = 0 OR s.status = 1) "
                 + "(s.name LIKE '%" + keyword + "%' OR s.code LIKE '%" + keyword + "%') "
-                + "AND (s.created_date BETWEEN '" + strStartDate + "' AND '" + strEndDate + "') "
+                + "AND (s.created_date BETWEEN '" + strStartDate + "' AND '" + strEndDate + "')"
                 + getLimitAndOffsetValues(page, size);
     }
 

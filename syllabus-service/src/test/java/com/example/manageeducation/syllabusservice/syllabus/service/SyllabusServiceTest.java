@@ -403,7 +403,7 @@ public class SyllabusServiceTest {
     @DisplayName("Get syllabus by keyword name not sort name")
     public void getSyllabusByKeywordNameNotSort() {
         String[] keywords = {"Unit"};
-        RequestForListOfSyllabus request = new RequestForListOfSyllabus(keywords,"","", 1, 10, null, null);
+        RequestForListOfSyllabus request = new RequestForListOfSyllabus(keywords,"","", 1, 10, "NAME", "DESC");
         String sql = syllabusServiceUtils.getSQLForSearchingByKeywordsForSuggestions(request.getPage(), request.getSize(),
                 keywords[0]);
         Mockito.when(syllabusJdbc.getSyllabus(sql)).thenReturn(syllabuses);
@@ -476,7 +476,7 @@ public class SyllabusServiceTest {
     @DisplayName("Get syllabus by keyword and date not sort")
     public void getSyllabusByKeywordAndDateNotSort() {
         String[] keywords = {"Unit"};
-        RequestForListOfSyllabus request = new RequestForListOfSyllabus(keywords,"13/09/2021", "24/11/2024", 1, 10, null, null);
+        RequestForListOfSyllabus request = new RequestForListOfSyllabus(keywords,"13/09/2021", "24/11/2024", 1, 10, "NAME", "DESC");
         String sql = syllabusServiceUtils.getSQLForSearchingByKeywordAndCreatedDateAndNotSort(keywords[0], request.getStartDate(), request.getEndDate(),request.getPage(), request.getSize());
         Mockito.when(syllabusJdbc.getSyllabus(sql)).thenReturn(syllabuses);
 
@@ -494,7 +494,7 @@ public class SyllabusServiceTest {
     @DisplayName("Get syllabus by keyword and date and sort")
     public void getSyllabusByKeywordAndDateSort() {
         String[] keywords = {"Unit"};
-        RequestForListOfSyllabus request = new RequestForListOfSyllabus(keywords,"","", 1, 10, "NAME", "DESC");
+        RequestForListOfSyllabus request = new RequestForListOfSyllabus(keywords,"13/09/2021", "24/11/2024", 1, 10, "NAME", "DESC");
         String sql = syllabusServiceUtils.getSQLForSearchingByKeywordAndCreatedDateAndSort(keywords[0], request.getStartDate(), request.getEndDate(),request.getPage(), request.getSize(),
                 request.getSortBy(), request.getSortType());
         Mockito.when(syllabusJdbc.getSyllabus(sql)).thenReturn(syllabuses);
