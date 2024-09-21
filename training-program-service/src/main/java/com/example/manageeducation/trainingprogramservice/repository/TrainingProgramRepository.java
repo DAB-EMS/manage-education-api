@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,6 +22,9 @@ public interface TrainingProgramRepository extends JpaRepository<TrainingProgram
 
     @Query("SELECT s FROM TrainingProgram s WHERE NOT s.status =2")
     Page<TrainingProgram> findAllTrainingProgram(Pageable pageable);
+
+    @Query("SELECT s FROM TrainingProgram s WHERE s.status !=2 AND s.status =:status")
+    Page<TrainingProgram> findAllTrainingProgramWithStatus(Pageable pageable, @Param("status") TrainingProgramStatus status);
 
     @Query("SELECT COUNT(s) FROM TrainingProgram s WHERE NOT s.status = 2")
     int getTotalRows();

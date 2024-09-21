@@ -398,11 +398,19 @@ public class TrainingProgramServiceImpl implements TrainingProgramService {
         String message = "";
         if("".equalsIgnoreCase(request.getStartDate()) && "".equalsIgnoreCase(request.getEndDate()) && request.getKeyword().length==0){
             if (request.getSortBy() == null && request.getSortType() == null) {
-                LOGGER.info("Start View All TrainingProgram");
-                Pageable pageable = PageRequest.of(request.getPage() - 1, request.getSize());
-                Page<TrainingProgram> trainingProgramPage = trainingProgramRepository.findAllTrainingProgram(pageable);
-                totalPage = trainingProgramPage.getTotalPages();
-                results = trainingProgramPage.getContent();
+                if(request.getStatus()==null){
+                    LOGGER.info("Start View All TrainingProgram");
+                    Pageable pageable = PageRequest.of(request.getPage() - 1, request.getSize());
+                    Page<TrainingProgram> trainingProgramPage = trainingProgramRepository.findAllTrainingProgram(pageable);
+                    totalPage = trainingProgramPage.getTotalPages();
+                    results = trainingProgramPage.getContent();
+                }else{
+                    LOGGER.info("Start View All TrainingProgram with status");
+                    Pageable pageable = PageRequest.of(request.getPage() - 1, request.getSize());
+                    Page<TrainingProgram> trainingProgramPage = trainingProgramRepository.findAllTrainingProgramWithStatus(pageable,request.getStatus());
+                    totalPage = trainingProgramPage.getTotalPages();
+                    results = trainingProgramPage.getContent();
+                }
             }else {
                 LOGGER.info("View All TrainingProgram With Sort Options");
                 results = trainingProgramJdbc.getTrainingPrograms(trainingProgramServiceUtils
