@@ -6,21 +6,31 @@ import com.example.manageeducation.trainingclassservice.dto.Customer;
 import com.example.manageeducation.trainingclassservice.dto.TrainingProgram;
 import com.example.manageeducation.trainingclassservice.dto.request.ClassCalendarRequest;
 import com.example.manageeducation.trainingclassservice.dto.request.CustomerRequest;
+import com.example.manageeducation.trainingclassservice.dto.request.RequestForListOfTrainingClass;
 import com.example.manageeducation.trainingclassservice.dto.request.TrainingClassRequest;
 import com.example.manageeducation.trainingclassservice.dto.response.*;
 import com.example.manageeducation.trainingclassservice.enums.TrainingClassStatus;
 import com.example.manageeducation.trainingclassservice.exception.BadRequestException;
+import com.example.manageeducation.trainingclassservice.jdbc.TrainingClassJdbc;
 import com.example.manageeducation.trainingclassservice.model.*;
 import com.example.manageeducation.trainingclassservice.repository.*;
 import com.example.manageeducation.trainingclassservice.service.TrainingClassService;
 import com.example.manageeducation.trainingclassservice.utils.DataUtil;
 import com.example.manageeducation.trainingclassservice.utils.DateTimeUtils;
 import com.example.manageeducation.trainingclassservice.utils.SecurityUtil;
+import com.example.manageeducation.trainingclassservice.utils.TrainingClassServiceUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,6 +47,8 @@ import java.util.*;
 
 @Service
 public class TrainingClassServiceImpl implements TrainingClassService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrainingClassServiceImpl.class);
 
     @Autowired
     TrainingClassRepository trainingClassRepository;
@@ -72,13 +84,16 @@ public class TrainingClassServiceImpl implements TrainingClassService {
     FsuRepository fsuRepository;
 
     @Autowired
-    ContactPointRepository contactPointRepository;
+    TrainingClassJdbc trainingClassJdbc;
 
     @Autowired
     ModelMapper modelMapper;
 
     @Autowired
     SecurityUtil securityUtil;
+
+    @Autowired
+    TrainingClassServiceUtils trainingClassServiceUtils;
 
     @Override
     public String createTrainingClass(Principal principal, UUID trainingProgramId, TrainingClassRequest dto) {
@@ -558,6 +573,59 @@ public class TrainingClassServiceImpl implements TrainingClassService {
         }
     }
 
+    @Override
+    public ResponseEntity<ResponseObject> getAllTrainingClasses(RequestForListOfTrainingClass request) {
+        LOGGER.info("Start method getAllTrainingClasses in TrainingClassServiceImpl");
+        List<TrainingClassesResponse> responseData = new ArrayList<>();
+        List<TrainingClass> results = new ArrayList<>();
+        int totalPage = 0;
+        int totalRows = 0;
+        String message = "";
+        if("".equalsIgnoreCase(request.getStartDate()) && "".equalsIgnoreCase(request.getEndDate()) && request.getKeyword().length==0){
+            if (request.getSortBy() == null && request.getSortType() == null) {
+                LOGGER.info("Start View All TrainingClass");
+                Pageable pageable = PageRequest.of(request.getPage() - 1, request.getSize());
+                Page<TrainingClass> trainingClassPage = trainingClassRepository.findAllTrainingClasses(pageable);
+                totalPage = trainingClassPage.getTotalPages();
+                results = trainingClassPage.getContent();
+            }else {
+                LOGGER.info("View All TrainingClass With Sort Options");
+                results = trainingClassJdbc.getTrainingClasses(trainingClassServiceUtils
+                        .getSQLForAllTrainingClasses(request.getKeyword(), request.getLocation(), request.getAttend(),
+                                request.getFsu(), request.getStartDate(), request.getEndDate(), request.getStatus(), request.getPage() - 1, request.getSize(),
+                                request.getSortBy(), request.getSortType()));
+                totalRows = trainingClassRepository.getTotalRows();
+            }
+        }else{
+            LOGGER.info("View All TrainingClass With Condition and Sort Options");
+            results = trainingClassJdbc.getTrainingClasses(trainingClassServiceUtils
+                    .getSQLForAllTrainingClasses(request.getKeyword(), request.getLocation(), request.getAttend(),
+                            request.getFsu(), request.getStartDate(), request.getEndDate(), request.getStatus(), request.getPage() - 1, request.getSize(),
+                            request.getSortBy(), request.getSortType()));
+            totalRows = trainingClassRepository.getTotalRows();
+        }
+        LOGGER.info("SQL Query: {}", trainingClassServiceUtils
+                .getSQLForAllTrainingClasses(request.getKeyword(), request.getLocation(), request.getAttend(),
+                        request.getFsu(), request.getStartDate(), request.getEndDate(), request.getStatus(), request.getPage() - 1, request.getSize(),
+                        request.getSortBy(), request.getSortType()));
+
+        if (results.size() > 0) {
+            if(totalPage == 0) {
+                totalPage = (int)(totalRows % request.getSize() == 0 ? (totalRows / request.getSize()) : (totalRows / request.getSize()) + 1);
+            }
+            message += "Total " + results.size() + " element(s) in page " + request.getPage();
+            responseData = results.stream()
+                    .map(customer -> modelMapper.map(customer, TrainingClassesResponse.class))
+                    .toList();
+        } else {
+            LOGGER.info("Null result");
+            message += "Empty list";
+        }
+        LOGGER.info("End method getAllTrainingClass in TrainingClassServiceImpl");
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(HttpStatus.OK.toString(), message,
+                new Pagination(request.getPage(), request.getSize(), totalPage), responseData));
+    }
+
     public void saveTrainingClass(Principal principal, DataExcelForTrainingClass dataExcelForTrainingClass) {
 
         TrainingProgram trainingProgram = findTrainingProgramByNameAndVersion(dataExcelForTrainingClass.getTrainingProgram(),dataExcelForTrainingClass.getTrainingProgramVersion());
@@ -672,7 +740,4 @@ public class TrainingClassServiceImpl implements TrainingClassService {
         return trainingProgramRepository.getTrainingProgram(name,version);
     }
 
-//    private TrainingClass findClassByTrainingProgramId(TrainingProgram trainingProgramId) {
-//        return trainingClassRepository.findClassByTrainingProgramId(trainingProgramId);
-//    }
 }

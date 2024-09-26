@@ -1,15 +1,11 @@
 package com.example.manageeducation.trainingprogramservice.utils;
 
 import com.example.manageeducation.trainingprogramservice.enums.TrainingProgramStatus;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TrainingProgramServiceUtils {
 
-    @Autowired
-    JdbcTemplate jdbcTemplate;
 
     public String getSQLForSortingAllTrainingPrograms(int page, int size, String sortBy, String sortType) {
         return "SELECT s.id, s.name, s.created_date, s.created_by, s.status "
@@ -20,44 +16,37 @@ public class TrainingProgramServiceUtils {
     }
 
     public String getSQLForSearchingByKeywordsForSuggestions(String keyword, TrainingProgramStatus status, int page, int size) {
-        String sqlWithStatus = "SELECT s.id, s.name, s.created_date, s.created_by, s.status "
-                + "FROM training_program s "
-                + "WHERE NOT s.status = 2 AND "
-                + "s.name LIKE '%" + keyword + "%' "
-                + getLimitAndOffsetValues(page, size);
-
-        String sqlWithNotStatus = "SELECT s.id, s.name, s.created_date, s.created_by, s.status "
-                + "FROM training_program s "
-                + "WHERE NOT s.status = 2 AND "
-                + "s.status = " + status + " AND s.name LIKE '%" + keyword + "%' "
-                + getLimitAndOffsetValues(page, size);
         if(status==null){
-            return sqlWithNotStatus;
+            return "SELECT s.id, s.name, s.created_date, s.created_by, s.status "
+                    + "FROM training_program s "
+                    + "WHERE s.status != 2 AND "
+                    + "s.name LIKE '%" + keyword + "%' "
+                    + getLimitAndOffsetValues(page, size);
         }else{
-            return sqlWithStatus;
+            return "SELECT s.id, s.name, s.created_date, s.created_by, s.status "
+                    + "FROM training_program s "
+                    + "WHERE s.status != 2 AND "
+                    + "s.status = " + status + " AND s.name LIKE '%" + keyword + "%' "
+                    + getLimitAndOffsetValues(page, size);
         }
 
     }
 
     public String getSQLForSearchingByKeywordsForSuggestionsAndSorting(String keyword, TrainingProgramStatus status, int page, int size, String sortBy, String sortType) {
-        String sqlWithStatus = "SELECT s.id, s.name, s.created_date, s.created_by, s.status "
-                + "FROM training_program s "
-                + "WHERE NOT s.status = 2 AND "
-                + "s.status = " + status + " AND s.name LIKE '%" + keyword + "%' "
-                + "ORDER BY s." + sortBy.toLowerCase() + " " + sortType
-                + getLimitAndOffsetValues(page, size);
-
-        String sqlWithNotStatus = "SELECT s.id, s.name, s.created_date, s.created_by, s.status "
-                + "FROM training_program s "
-                + "WHERE NOT s.status = 2 AND "
-                + "s.name LIKE '%" + keyword + "%' "
-                + "ORDER BY s." + sortBy.toLowerCase() + " " + sortType
-                + getLimitAndOffsetValues(page, size);
-
         if(status==null){
-            return sqlWithNotStatus;
+            return "SELECT s.id, s.name, s.created_date, s.created_by, s.status "
+                    + "FROM training_program s "
+                    + "WHERE s.status != 2 AND "
+                    + "s.name LIKE '%" + keyword + "%' "
+                    + "ORDER BY s." + sortBy.toLowerCase() + " " + sortType
+                    + getLimitAndOffsetValues(page, size);
         }else{
-            return sqlWithStatus;
+            return "SELECT s.id, s.name, s.created_date, s.created_by, s.status "
+                    + "FROM training_program s "
+                    + "WHERE s.status =! 2 AND "
+                    + "s.status = " + status + " AND s.name LIKE '%" + keyword + "%' "
+                    + "ORDER BY s." + sortBy.toLowerCase() + " " + sortType
+                    + getLimitAndOffsetValues(page, size);
         }
     }
 
@@ -79,7 +68,7 @@ public class TrainingProgramServiceUtils {
                 + "FROM training_program s "
                 + "WHERE NOT s.status = 2 "
                 + "AND (s.created_date BETWEEN '" + strStartDate + "' AND '" + strEndDate + "')"
-                + " ORDER BY s." + sortBy.toLowerCase() + " " + sortType
+                + " ORDER BY s." + sortBy + " " + sortType
                 + getLimitAndOffsetValues(page, size);
 
         if(status==null){
@@ -174,7 +163,7 @@ public class TrainingProgramServiceUtils {
     }
 
     public String getLimitAndOffsetValues(int page, int size) {
-        return " LIMIT " + size + " OFFSET " + (page * size);
+        return " LIMIT " + size + " OFFSET " + page;
     }
 
 }
