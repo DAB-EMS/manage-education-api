@@ -1,9 +1,7 @@
 package com.example.manageeducation.trainingclassservice.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
@@ -11,10 +9,12 @@ import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
 
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Getter
 @Setter
+@Builder
 public class Fsu {
     @Id
     @GeneratedValue(generator = "UUID")

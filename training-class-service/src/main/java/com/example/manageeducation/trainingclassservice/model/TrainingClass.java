@@ -4,9 +4,7 @@ import com.example.manageeducation.trainingclassservice.enums.TrainingClassStatu
 import com.example.manageeducation.trainingclassservice.utils.DateTimeUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedDate;
@@ -22,10 +20,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Getter
 @Setter
+@Builder
 public class TrainingClass implements Serializable {
     @Id
     @GeneratedValue(generator = "UUID")

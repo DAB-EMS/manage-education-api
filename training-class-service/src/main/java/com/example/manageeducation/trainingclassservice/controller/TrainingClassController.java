@@ -1,9 +1,16 @@
 package com.example.manageeducation.trainingclassservice.controller;
 
+import com.example.manageeducation.trainingclassservice.dto.request.RequestForListOfTrainingClass;
 import com.example.manageeducation.trainingclassservice.dto.request.TrainingClassRequest;
 import com.example.manageeducation.trainingclassservice.dto.response.DataExcelForTrainingClass;
+import com.example.manageeducation.trainingclassservice.enums.TrainingClassStatus;
+import com.example.manageeducation.trainingclassservice.model.ResponseObject;
 import com.example.manageeducation.trainingclassservice.service.TrainingClassService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.apache.poi.util.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +29,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/auth/")
 public class TrainingClassController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrainingClassController.class);
 
     @Autowired
     TrainingClassService trainingClassService;
@@ -75,5 +84,27 @@ public class TrainingClassController {
             throw new FileNotFoundException("File template not exist.");
         }
         return IOUtils.toByteArray(file);
+    }
+
+    @PreAuthorize("hasAuthority('VIEW_CLASS')")
+    @GetMapping("/customer/training-program/training-class/keywords")
+    @Operation(summary = "get all training class ")
+    public ResponseEntity<ResponseObject> searchSyllabus(
+            @RequestParam(name = "keyword", defaultValue = "") String[] keywords,
+            @RequestParam(name = "keyword", defaultValue = "") String[] location,
+            @RequestParam(name = "keyword", defaultValue = "") String[] attend,
+            @RequestParam(name = "keyword", defaultValue = "") String fsu,
+            @RequestParam(name = "start", defaultValue = "") String start,
+            @RequestParam(name = "end", defaultValue = "") String end,
+            @RequestParam(name = "keyword", defaultValue = "") TrainingClassStatus[] status,
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(value = "sortBy", required = false)
+            @Parameter(name = "sortBy", description = "name or age or address") String sortBy,
+            @RequestParam(value = "sortType", required = false)
+            @Parameter(name = "sortType", description = "ASC or DESC") String sortType) {
+        RequestForListOfTrainingClass request = new RequestForListOfTrainingClass(keywords, location, attend, fsu, start, end, status, page, size, sortBy, sortType);
+        LOGGER.info("Start method List of Training class");
+        return trainingClassService.getAllTrainingClasses(request);
     }
 }

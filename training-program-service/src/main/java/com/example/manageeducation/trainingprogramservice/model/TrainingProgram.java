@@ -28,7 +28,6 @@ public class TrainingProgram {
     @Column(name = "id", updatable = false, nullable = false)
     @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID id;
-    @Column(columnDefinition = "varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL, FULLTEXT KEY name(name)")
     private String name;
 
     private boolean isTemplate;
