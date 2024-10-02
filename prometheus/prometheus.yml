@@ -1,0 +1,32 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'user-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['user-service:8094']
+        labels:
+          application: 'User Service Application'
+
+  - job_name: 'syllabus-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['syllabus-service:8090']
+        labels:
+          application: 'Syllabus Service Application'
+
+  - job_name: 'training-program-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['training-program-service:8095']
+        labels:
+          application: 'Training Program Service Application'
+
+  - job_name: 'training-class-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['training-class-service:8092']
+        labels:
+          application: 'Training Class Service Application'
